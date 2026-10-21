@@ -14,6 +14,8 @@ def bibliography_index():
 def classify_citation(paper, contribution, index):
     if not contribution.related_dois:
         return 'THEMATIC_ONLY'
+    if paper is None:
+        return 'UNKNOWN'
     ids = [index.get(doi) for doi in contribution.related_dois]
     if any(identifier in paper.referenced_work_ids for identifier in ids if identifier):
         return 'CITED'
