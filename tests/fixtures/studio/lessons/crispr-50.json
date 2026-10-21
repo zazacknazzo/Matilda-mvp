@@ -1,0 +1,264 @@
+{
+  "lesson_bundle_id": "lesson-crispr-50",
+  "project_id": "project-example",
+  "preview_id": "preview-example",
+  "schema_version": 1,
+  "review_revision": 1,
+  "metadata": {
+    "title": "CRISPR-Cas9: conceitos e evidências",
+    "subject": "Biologia",
+    "education_level": "Ensino Médio",
+    "duration_minutes": 50,
+    "learning_objectives": [
+      "Explicar os conceitos científicos apresentados.",
+      "Analisar autoria, evidência e limites de uma afirmação."
+    ],
+    "prior_knowledge": [
+      "Noções de DNA e RNA"
+    ],
+    "materials": [
+      "Quadro",
+      "Fonte científica identificada"
+    ]
+  },
+  "sections": [
+    {
+      "id": "section-1",
+      "title": "Introdução",
+      "duration_minutes": 15,
+      "objective_indexes": [
+        0
+      ],
+      "explanation_blocks": [
+        {
+          "type": "text",
+          "text": "Apresentar a questão e levantar conhecimentos prévios."
+        }
+      ],
+      "slide_ids": [
+        "slide-1",
+        "slide-2"
+      ],
+      "activity_ids": []
+    },
+    {
+      "id": "section-2",
+      "title": "Processo e fontes",
+      "duration_minutes": 20,
+      "objective_indexes": [
+        0,
+        1
+      ],
+      "explanation_blocks": [
+        {
+          "type": "evidence_claim",
+          "evidence_id": "evidence-crispr-2012"
+        }
+      ],
+      "slide_ids": [
+        "slide-3",
+        "slide-4"
+      ],
+      "activity_ids": []
+    },
+    {
+      "id": "section-3",
+      "title": "Discussão e avaliação",
+      "duration_minutes": 15,
+      "objective_indexes": [
+        1
+      ],
+      "explanation_blocks": [
+        {
+          "type": "text",
+          "text": "Discutir limites e avaliar a leitura das fontes."
+        }
+      ],
+      "slide_ids": [
+        "slide-5",
+        "slide-6"
+      ],
+      "activity_ids": [
+        "activity-1"
+      ]
+    }
+  ],
+  "slides": [
+    {
+      "id": "slide-1",
+      "section_id": "section-1",
+      "layout": "TITLE",
+      "title": "CRISPR-Cas9: conceitos e evidências",
+      "subtitle": null,
+      "content_blocks": [
+        {
+          "type": "text",
+          "text": "Exemplo didático para revisão humana."
+        }
+      ],
+      "speaker_notes": "Objetivo: leitura crítica. Pergunte quais conclusões dependem de evidência. Exemplo: comparar uma afirmação com a fonte. Orientação pedagógica de teste.",
+      "duration_minutes": 5,
+      "contribution_ids": [],
+      "evidence_ids": []
+    },
+    {
+      "id": "slide-2",
+      "section_id": "section-1",
+      "layout": "CONCEPT",
+      "title": "Conceitos",
+      "subtitle": null,
+      "content_blocks": [
+        {
+          "type": "bullets",
+          "items": [
+            "Conceitos principais",
+            "Alcance e limites do modelo"
+          ]
+        }
+      ],
+      "speaker_notes": "Objetivo: leitura crítica. Pergunte quais conclusões dependem de evidência. Exemplo: comparar uma afirmação com a fonte. Orientação pedagógica de teste.",
+      "duration_minutes": 10,
+      "contribution_ids": [],
+      "evidence_ids": []
+    },
+    {
+      "id": "slide-3",
+      "section_id": "section-2",
+      "layout": "PROCESS",
+      "title": "Como investigar",
+      "subtitle": null,
+      "content_blocks": [
+        {
+          "type": "steps",
+          "items": [
+            "Identificar a questão científica",
+            "Examinar a evidência",
+            "Discutir as limitações"
+          ]
+        }
+      ],
+      "speaker_notes": "Objetivo: leitura crítica. Pergunte quais conclusões dependem de evidência. Exemplo: comparar uma afirmação com a fonte. Orientação pedagógica de teste.",
+      "duration_minutes": 10,
+      "contribution_ids": [],
+      "evidence_ids": []
+    },
+    {
+      "id": "slide-4",
+      "section_id": "section-2",
+      "layout": "SCIENTIST_SPOTLIGHT",
+      "title": "Contribuição documentada",
+      "subtitle": null,
+      "content_blocks": [
+        {
+          "type": "evidence_claim",
+          "evidence_id": "evidence-crispr-2012"
+        }
+      ],
+      "speaker_notes": "Objetivo: leitura crítica. Pergunte quais conclusões dependem de evidência. Exemplo: comparar uma afirmação com a fonte. Orientação pedagógica de teste.",
+      "duration_minutes": 10,
+      "contribution_ids": [
+        "crispr-2012"
+      ],
+      "evidence_ids": [
+        "evidence-crispr-2012"
+      ]
+    },
+    {
+      "id": "slide-5",
+      "section_id": "section-3",
+      "layout": "QUESTION",
+      "title": "Analisar a fonte",
+      "subtitle": null,
+      "content_blocks": [
+        {
+          "type": "question",
+          "text": "O que esta fonte permite afirmar e quais são seus limites?"
+        }
+      ],
+      "speaker_notes": "Objetivo: leitura crítica. Pergunte quais conclusões dependem de evidência. Exemplo: comparar uma afirmação com a fonte. Orientação pedagógica de teste.",
+      "duration_minutes": 10,
+      "contribution_ids": [],
+      "evidence_ids": []
+    },
+    {
+      "id": "slide-6",
+      "section_id": "section-3",
+      "layout": "SUMMARY",
+      "title": "Síntese",
+      "subtitle": null,
+      "content_blocks": [
+        {
+          "type": "bullets",
+          "items": [
+            "Rever o conceito",
+            "Distinguir autoria coletiva de atribuição exclusiva"
+          ]
+        }
+      ],
+      "speaker_notes": "Objetivo: leitura crítica. Pergunte quais conclusões dependem de evidência. Exemplo: comparar uma afirmação com a fonte. Orientação pedagógica de teste.",
+      "duration_minutes": 5,
+      "contribution_ids": [],
+      "evidence_ids": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity-1",
+      "section_id": "section-3",
+      "type": "discussion",
+      "prompt": "Em duplas, compare a afirmação documentada e seus limites.",
+      "teacher_guidance": "Reserve os dez minutos do slide de pergunta para a atividade; não somar tempo adicional.",
+      "objective_indexes": [
+        1
+      ],
+      "assessment_criteria": [
+        "Relaciona afirmação à fonte.",
+        "Reconhece a autoria coletiva e uma limitação."
+      ]
+    }
+  ],
+  "references": [
+    {
+      "id": "evidence-crispr-2012",
+      "contribution_id": "crispr-2012",
+      "claim_supported": "Jínek e colaboradores, incluindo Doudna e Charpentier, demonstraram a clivagem de DNA por Cas9 guiada por crRNA e tracrRNA e por um RNA quimérico, indicando potencial para edição genômica programável.",
+      "source_title": "A Programmable Dual-RNA–Guided DNA Endonuclease in Adaptive Bacterial Immunity",
+      "source_url": "https://doi.org/10.1126/science.1225829",
+      "source_type": "documental",
+      "excerpt_or_location": "Resumo: mecanismo de dois RNAs e RNA quimérico; Science 337(6096), 816–821.",
+      "verification_status": "verified",
+      "researcher_ids": [
+        "doudna",
+        "charpentier"
+      ],
+      "participants": [
+        "Martin Jínek",
+        "Krzysztof Chylinski",
+        "Ines Fonfara",
+        "M. Hauer",
+        "Jennifer A. Doudna",
+        "Emmanuelle Charpentier"
+      ],
+      "limitations": [
+        "Correspondência temática não comprova influência histórica direta.",
+        "Autoria coletiva: preservar todos os participantes documentados da publicação."
+      ],
+      "retrieved_at": "2026-10-21T09:44:17.890410+00:00",
+      "from_cache": true
+    }
+  ],
+  "limitations": [
+    "Correspondência temática não comprova influência histórica direta.",
+    "Autoria coletiva: preservar todos os participantes documentados da publicação."
+  ],
+  "generation_metadata": {
+    "provider": "fixture",
+    "model": "not-generated",
+    "prompt_version": "fixture-v1",
+    "schema_version": 1,
+    "generated_at": "2026-10-21T00:00:00Z",
+    "duration_ms": 0,
+    "input_tokens": null,
+    "output_tokens": null
+  }
+}
