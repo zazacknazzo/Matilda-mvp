@@ -1,5 +1,5 @@
 """Standalone API description for review. Does not create/register product routes."""
-from pydantic.json_schema import models_json_schema
+from pydantic.json_schema import GenerateJsonSchema, models_json_schema
 
 from app.schemas.lesson import LessonBundle
 from app.schemas.studio import (
@@ -17,6 +17,15 @@ ERROR_HTTP_STATUS = {
 }
 
 
+class StudioJsonSchema(GenerateJsonSchema):
+    """Responses use full model_dump output, including defaults and explicit nulls."""
+
+    def field_is_required(self, field, total):
+        if self.mode == 'serialization':
+            return field.get('serialization_exclude_if') is None
+        return super().field_is_required(field, total)
+
+
 def studio_openapi() -> dict:
     models = [
         (PreviewRequest, 'validation'), (ReviewRequest, 'validation'),
@@ -24,7 +33,10 @@ def studio_openapi() -> dict:
         (ExportQuery, 'validation'), (EnrichmentPreview, 'serialization'),
         (LessonBundle, 'serialization'), (StudioError, 'serialization'),
     ]
-    references, definitions = models_json_schema(models, ref_template='#/components/schemas/{model}')
+    references, definitions = models_json_schema(
+        models, ref_template='#/components/schemas/{model}', schema_generator=StudioJsonSchema,
+    )
+    header_properties = GenerationHeaders.model_json_schema()['properties']
     spec = {
         'openapi': '3.1.0', 'info': {'title': 'Matilda Studio — contrato T03, sem endpoints implementados', 'version': '1'},
         'paths': {}, 'components': {
@@ -45,9 +57,9 @@ def studio_openapi() -> dict:
         if '{id}' in path:
             parameters.append({'in': 'path', 'name': 'id', 'required': True, 'schema': {'type': 'string', 'minLength': 1}})
         if method == 'post':
-            parameters.append({'in': 'header', 'name': 'Origin', 'required': True, 'schema': {'type': 'string'}, 'description': 'Validar contra a origem configurada antes de qualquer escrita.'})
+            parameters.append({'in': 'header', 'name': 'Origin', 'required': True, 'schema': header_properties['Origin'], 'description': 'Validar contra a origem configurada antes de qualquer escrita.'})
         if request == GenerateRequest:
-            parameters.append({'in': 'header', 'name': 'Idempotency-Key', 'required': True, 'schema': {'type': 'string', 'minLength': 1, 'maxLength': 128, 'pattern': r'\S'}})
+            parameters.append({'in': 'header', 'name': 'Idempotency-Key', 'required': True, 'schema': header_properties['Idempotency-Key']})
         if identifier == 'studio_export_lesson':
             parameters.append({'in': 'query', 'name': 'format', 'required': False, 'schema': {'type': 'string', 'const': 'markdown', 'default': 'markdown'}})
         responses = {}

@@ -118,6 +118,54 @@ def test_standalone_openapi_describes_six_operations_without_installing_routes()
     assert app.openapi()['paths'] == before
 
 
+def test_openapi_responses_require_every_materialized_field_including_imported_models():
+    from app.studio.contracts import studio_openapi
+
+    contract = studio_openapi()
+    visited = set()
+
+    def check(schema):
+        if isinstance(schema, list):
+            for item in schema:
+                check(item)
+        elif isinstance(schema, dict):
+            if '$ref' in schema and schema['$ref'] not in visited:
+                visited.add(schema['$ref'])
+                check(contract['components']['schemas'][schema['$ref'].rsplit('/', 1)[-1]])
+            if 'properties' in schema:
+                assert set(schema.get('required', [])) == set(schema['properties'])
+            for value in schema.values():
+                check(value)
+
+    for path in contract['paths'].values():
+        for operation in path.values():
+            for response in operation['responses'].values():
+                check(response['content'])
+    assert any(ref.endswith('/SourceDocument') for ref in visited)
+    assert any(ref.endswith('/Provenance') for ref in visited)
+
+
+def test_openapi_requests_keep_defaults_optional():
+    from app.studio.contracts import studio_openapi
+
+    contract = studio_openapi()
+    schema = contract['components']['schemas']['PreviewRequest']
+    assert 'title' in schema['required']
+    assert not {'subject', 'education_level', 'duration_minutes', 'objectives', 'material_text'} & set(schema['required'])
+
+
+def test_openapi_write_headers_match_the_validation_model():
+    from app.schemas.studio import GenerationHeaders
+    from app.studio.contracts import studio_openapi
+
+    properties = GenerationHeaders.model_json_schema()['properties']
+    for path in studio_openapi()['paths'].values():
+        if 'post' in path:
+            for parameter in path['post']['parameters']:
+                if parameter['in'] == 'header':
+                    assert parameter['schema'] == properties[parameter['name']]
+
+
 @pytest.mark.parametrize('case', read('provider-cases'), ids=lambda c: c['name'])
 def test_provider_port_with_declared_external_transport_cases(case):
     from studio_provider_double import RecordedStudioProvider

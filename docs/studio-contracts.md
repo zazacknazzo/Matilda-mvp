@@ -17,7 +17,9 @@ A confere ciência e D o vínculo à entrega. O aceite humano continua pendente.
   vínculos determinísticos. Tipos estritos, extras proibidos, snake_case.
 - `frontend/src/types/studio.ts`: os mesmos nomes/enums/nulos e tipos importados
   dos contratos científico e de aula. Requests com defaults podem omitir campos;
-  respostas de prévia materializam defaults e nulos explicitamente.
+  respostas materializam defaults e nulos explicitamente. O gerador OpenAPI local
+  marca esses campos como obrigatórios, inclusive nos modelos T01/T02 importados,
+  sem mudar os modelos originais ou a opcionalidade dos requests.
 - `backend/app/studio/contracts.py`: `studio_openapi()` produz OpenAPI 3.1
   independente com schemas derivados do Pydantic, seis operações, segurança,
   cabeçalhos, códigos e formatos. Não registrar esse documento no app Forensics.
@@ -274,8 +276,8 @@ aprovações a pessoas não consultadas. Revisão técnica automatizada/por agen
 PR preparado não representam esses aceites, integração ou M0 fechado. Manter a
 Issue #4 aberta até o registro e a integração; #1 não é editada/fechada por T03.
 
-Verificação desta revisão em 21/10/2026: **363 testes backend aprovados** (241
-existentes + 122 T03), **40 payloads HTTP Studio**, **7 fixtures científicas** e
+Verificação desta revisão em 21/10/2026: **366 testes backend aprovados** (241
+existentes + 125 T03), **40 payloads HTTP Studio**, **7 fixtures científicas** e
 **4 fixtures de aula** validados/compilados contra TypeScript, build TypeScript/Vite
 aprovado e **6 testes Playwright Forensics aprovados**. Ambiente: Python 3.14.7,
 Pydantic 2.13.4, Node 26.10.0, Vite 6.4.5 e Chromium 156.0.8078.4. Sem alterar
