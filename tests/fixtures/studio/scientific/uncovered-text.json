@@ -1,0 +1,47 @@
+{
+  "source_documents": [
+    {
+      "id": "doc-uncovered-text",
+      "project_id": "project-uncovered-text",
+      "type": "text",
+      "title": "Material do professor",
+      "content": "Dinâmica de fluidos em uma tubulação.",
+      "doi": null,
+      "extraction_status": "ready"
+    }
+  ],
+  "scientific_context": {
+    "id": "context-uncovered-text",
+    "origin_type": "material",
+    "paper_ids": [],
+    "concept_ids": [],
+    "concept_labels": [],
+    "source_document_ids": [
+      "doc-uncovered-text"
+    ],
+    "provenance": [
+      {
+        "source_document_id": "doc-uncovered-text",
+        "concept_id": null,
+        "method": "teacher_input",
+        "quote": "Dinâmica de fluidos em uma tubulação.",
+        "retrieved_at": null,
+        "from_cache": null,
+        "source_url": null
+      }
+    ],
+    "limitations": [
+      "Sem cobertura neste catálogo; isto não indica inexistência de contribuições femininas."
+    ],
+    "analysis_id": null
+  },
+  "anchors": [
+    {
+      "source_document_id": "doc-uncovered-text",
+      "quote": "Dinâmica de fluidos",
+      "occurrence": 0
+    }
+  ],
+  "expected_matches": [],
+  "papers": []
+}

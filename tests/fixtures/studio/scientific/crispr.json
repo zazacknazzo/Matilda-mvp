@@ -1,0 +1,659 @@
+{
+  "source_documents": [
+    {
+      "id": "doc-crispr",
+      "project_id": "project-crispr",
+      "type": "paper_metadata",
+      "title": "Multiplex Genome Engineering Using CRISPR/Cas Systems",
+      "content": "Multiplex Genome Engineering Using CRISPR/Cas Systems\n\nFunctional elucidation of causal genetic variants and elements requires precise genome editing technologies. The type II prokaryotic CRISPR (clustered regularly interspaced short palindromic repeats)/Cas adaptive immune system has been shown to facilitate RNA-guided site-specific DNA cleavage. We engineered two different type II CRISPR/Cas systems and demonstrate that Cas9 nucleases can be directed by short RNAs to induce precise cleavage at endogenous genomic loci in human and mouse cells. Cas9 can also be converted into a nicking enzyme to facilitate homology-directed repair with minimal mutagenic activity. Lastly, multiple guide sequences can be encoded into a single CRISPR array to enable simultaneous editing of several sites within the mammalian genome, demonstrating easy programmability and wide applicability of the RNA-guided nuclease technology.",
+      "doi": "10.1126/science.1231143",
+      "extraction_status": "ready"
+    }
+  ],
+  "scientific_context": {
+    "id": "context-crispr",
+    "origin_type": "doi",
+    "paper_ids": [
+      "https://openalex.org/W2064815984"
+    ],
+    "concept_ids": [
+      "crispr",
+      "cas9",
+      "genome-editing",
+      "https://openalex.org/T10878"
+    ],
+    "concept_labels": [
+      "CRISPR",
+      "Cas9",
+      "Edição genômica",
+      "CRISPR and Genetic Engineering"
+    ],
+    "source_document_ids": [
+      "doc-crispr"
+    ],
+    "provenance": [
+      {
+        "source_document_id": "doc-crispr",
+        "concept_id": "crispr",
+        "method": "openalex_metadata",
+        "quote": null,
+        "retrieved_at": "2026-10-21T09:44:20.766031+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W2064815984"
+      },
+      {
+        "source_document_id": "doc-crispr",
+        "concept_id": "cas9",
+        "method": "openalex_metadata",
+        "quote": null,
+        "retrieved_at": "2026-10-21T09:44:20.766031+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W2064815984"
+      },
+      {
+        "source_document_id": "doc-crispr",
+        "concept_id": "genome-editing",
+        "method": "openalex_metadata",
+        "quote": null,
+        "retrieved_at": "2026-10-21T09:44:20.766031+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W2064815984"
+      },
+      {
+        "source_document_id": "doc-crispr",
+        "concept_id": "https://openalex.org/T10878",
+        "method": "openalex_metadata",
+        "quote": null,
+        "retrieved_at": "2026-10-21T09:44:20.766031+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W2064815984"
+      }
+    ],
+    "limitations": [
+      "O OpenAlex não garante a completude das referências. Ausência no conjunto recuperado não prova omissão.",
+      "Conceitos extraídos por correspondência determinística de termos; nenhuma influência histórica é inferida.",
+      "Metadados de cache identificado, recuperados em 2026-10-21T09:44:20.766031+00:00."
+    ],
+    "analysis_id": null
+  },
+  "papers": [
+    {
+      "id": "https://openalex.org/W2064815984",
+      "doi": "10.1126/science.1231143",
+      "openalex_id": "https://openalex.org/W2064815984",
+      "title": "Multiplex Genome Engineering Using CRISPR/Cas Systems",
+      "abstract": "Functional elucidation of causal genetic variants and elements requires precise genome editing technologies. The type II prokaryotic CRISPR (clustered regularly interspaced short palindromic repeats)/Cas adaptive immune system has been shown to facilitate RNA-guided site-specific DNA cleavage. We engineered two different type II CRISPR/Cas systems and demonstrate that Cas9 nucleases can be directed by short RNAs to induce precise cleavage at endogenous genomic loci in human and mouse cells. Cas9 can also be converted into a nicking enzyme to facilitate homology-directed repair with minimal mutagenic activity. Lastly, multiple guide sequences can be encoded into a single CRISPR array to enable simultaneous editing of several sites within the mammalian genome, demonstrating easy programmability and wide applicability of the RNA-guided nuclease technology.",
+      "year": 2013,
+      "authors": [
+        {
+          "id": "https://openalex.org/A5080765172",
+          "name": "Le Cong"
+        },
+        {
+          "id": "https://openalex.org/A5109381048",
+          "name": "F. Ann Ran"
+        },
+        {
+          "id": "https://openalex.org/A5149500925",
+          "name": "David B.T. Cox"
+        },
+        {
+          "id": "https://openalex.org/A5110288404",
+          "name": "Shuailiang Lin"
+        },
+        {
+          "id": "https://openalex.org/A5033377296",
+          "name": "Robert P. J. Barretto"
+        },
+        {
+          "id": "https://openalex.org/A5072175751",
+          "name": "Naomi Habib"
+        },
+        {
+          "id": "https://openalex.org/A5060049408",
+          "name": "Patrick D. Hsu"
+        },
+        {
+          "id": "https://openalex.org/A5037201682",
+          "name": "Xuebing Wu"
+        },
+        {
+          "id": "https://openalex.org/A5101516462",
+          "name": "Wenyan Jiang"
+        },
+        {
+          "id": "https://openalex.org/A5087893982",
+          "name": "Luciano A. Marraffini"
+        },
+        {
+          "id": "https://openalex.org/A5100401298",
+          "name": "Feng Zhang"
+        }
+      ],
+      "concepts": [
+        {
+          "id": "crispr",
+          "name": "CRISPR",
+          "aliases": [
+            "crispr",
+            "crisprs",
+            "clustered regularly interspaced short palindromic repeats"
+          ],
+          "provenance": [
+            "título",
+            "resumo",
+            "tópicos OpenAlex",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "cas9",
+          "name": "Cas9",
+          "aliases": [
+            "cas9",
+            "crispr-cas9",
+            "crispr/cas"
+          ],
+          "provenance": [
+            "título",
+            "resumo",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "genome-editing",
+          "name": "Edição genômica",
+          "aliases": [
+            "genome editing",
+            "genome engineering",
+            "gene editing",
+            "edição genômica",
+            "genomic manipulation"
+          ],
+          "provenance": [
+            "título",
+            "resumo",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "https://openalex.org/T10878",
+          "name": "CRISPR and Genetic Engineering",
+          "aliases": [],
+          "provenance": [
+            "tópico atribuído pelo OpenAlex; relevância não auditada"
+          ]
+        }
+      ],
+      "referenced_work_ids": [
+        "https://openalex.org/W137643597",
+        "https://openalex.org/W1978094899",
+        "https://openalex.org/W1978129709",
+        "https://openalex.org/W1989454102",
+        "https://openalex.org/W2003171404",
+        "https://openalex.org/W2010986636",
+        "https://openalex.org/W2019670881",
+        "https://openalex.org/W2020091112",
+        "https://openalex.org/W2023186109",
+        "https://openalex.org/W2025074364",
+        "https://openalex.org/W2045435533",
+        "https://openalex.org/W2047032063",
+        "https://openalex.org/W2051395442",
+        "https://openalex.org/W2068847708",
+        "https://openalex.org/W2073873559",
+        "https://openalex.org/W2082131511",
+        "https://openalex.org/W2112006537",
+        "https://openalex.org/W2112295554",
+        "https://openalex.org/W2116565356",
+        "https://openalex.org/W2120503144",
+        "https://openalex.org/W2130069008",
+        "https://openalex.org/W2131527797",
+        "https://openalex.org/W2135598273",
+        "https://openalex.org/W2137209165",
+        "https://openalex.org/W2140494588",
+        "https://openalex.org/W2143554177",
+        "https://openalex.org/W2149751339",
+        "https://openalex.org/W2163241233",
+        "https://openalex.org/W2164852115",
+        "https://openalex.org/W2166113462",
+        "https://openalex.org/W2170255645",
+        "https://openalex.org/W4211152707"
+      ],
+      "references_status": "retrieved_unverified_completeness",
+      "source_url": "https://openalex.org/W2064815984",
+      "retrieved_at": "2026-10-21T09:44:20.766031+00:00",
+      "from_cache": true,
+      "cache_stale": false,
+      "limitations": [
+        "O OpenAlex não garante a completude das referências. Ausência no conjunto recuperado não prova omissão.",
+        "Conceitos extraídos por correspondência determinística de termos; nenhuma influência histórica é inferida.",
+        "Metadados de cache identificado, recuperados em 2026-10-21T09:44:20.766031+00:00."
+      ]
+    }
+  ],
+  "anchors": [
+    {
+      "source_document_id": "doc-crispr",
+      "quote": "Multiplex Genome Engineering Using CRISPR/Cas Systems",
+      "occurrence": 0
+    }
+  ],
+  "expected_matches": [
+    {
+      "contribution": {
+        "id": "crispr-2012",
+        "title": "Cas9 programável guiada por dois RNAs",
+        "description": "Jínek e colaboradores, incluindo Doudna e Charpentier, demonstraram a clivagem de DNA por Cas9 guiada por crRNA e tracrRNA e por um RNA quimérico, indicando potencial para edição genômica programável.",
+        "researcher_ids": [
+          "doudna",
+          "charpentier"
+        ],
+        "participants": [
+          "Martin Jínek",
+          "Krzysztof Chylinski",
+          "Ines Fonfara",
+          "M. Hauer",
+          "Jennifer A. Doudna",
+          "Emmanuelle Charpentier"
+        ],
+        "concept_ids": [
+          "crispr",
+          "cas9",
+          "genome-editing"
+        ],
+        "related_dois": [
+          "10.1126/science.1225829"
+        ],
+        "scientific_field": "Genética e edição genômica",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "doudna",
+          "name": "Jennifer A. Doudna",
+          "research_areas": [
+            "CRISPR",
+            "Bioquímica"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/doudna/facts/",
+            "https://api.nobelprize.org/2.1/laureate/992"
+          ],
+          "openalex_id": "https://openalex.org/A5067184382",
+          "orcid": null
+        },
+        {
+          "id": "charpentier",
+          "name": "Emmanuelle Charpentier",
+          "research_areas": [
+            "CRISPR",
+            "Microbiologia"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/charpentier/facts/",
+            "https://api.nobelprize.org/2.1/laureate/991"
+          ],
+          "openalex_id": "https://openalex.org/A5074743574",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-crispr-2012",
+          "contribution_id": "crispr-2012",
+          "claim_supported": "Jínek e colaboradores, incluindo Doudna e Charpentier, demonstraram a clivagem de DNA por Cas9 guiada por crRNA e tracrRNA e por um RNA quimérico, indicando potencial para edição genômica programável.",
+          "source_title": "A Programmable Dual-RNA–Guided DNA Endonuclease in Adaptive Bacterial Immunity",
+          "source_url": "https://doi.org/10.1126/science.1225829",
+          "source_type": "documental",
+          "excerpt_or_location": "Resumo: mecanismo de dois RNAs e RNA quimérico; Science 337(6096), 816–821.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "crispr",
+          "name": "CRISPR",
+          "aliases": [
+            "crispr",
+            "crisprs",
+            "clustered regularly interspaced short palindromic repeats"
+          ],
+          "provenance": [
+            "título",
+            "resumo",
+            "tópicos OpenAlex",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "cas9",
+          "name": "Cas9",
+          "aliases": [
+            "cas9",
+            "crispr-cas9",
+            "crispr/cas"
+          ],
+          "provenance": [
+            "título",
+            "resumo",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "genome-editing",
+          "name": "Edição genômica",
+          "aliases": [
+            "genome editing",
+            "genome engineering",
+            "gene editing",
+            "edição genômica",
+            "genomic manipulation"
+          ],
+          "provenance": [
+            "título",
+            "resumo",
+            "palavras-chave OpenAlex"
+          ]
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "CITED",
+      "explanation": "O artigo e esta contribuição compartilham os conceitos: CRISPR, Cas9, Edição genômica. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+      "limitations": [
+        "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+        "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada."
+      ],
+      "relevance": 3
+    },
+    {
+      "contribution": {
+        "id": "crispr-2014",
+        "title": "Síntese dos mecanismos e aplicações de CRISPR-Cas9",
+        "description": "Doudna e Charpentier revisaram a história, o mecanismo e as aplicações da tecnologia CRISPR-Cas9. Esta contribuição é uma síntese científica, não uma nova descoberta experimental.",
+        "researcher_ids": [
+          "doudna",
+          "charpentier"
+        ],
+        "participants": [
+          "Jennifer A. Doudna",
+          "Emmanuelle Charpentier"
+        ],
+        "concept_ids": [
+          "crispr",
+          "cas9",
+          "genome-editing"
+        ],
+        "related_dois": [
+          "10.1126/science.1258096"
+        ],
+        "scientific_field": "Genética e edição genômica",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "doudna",
+          "name": "Jennifer A. Doudna",
+          "research_areas": [
+            "CRISPR",
+            "Bioquímica"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/doudna/facts/",
+            "https://api.nobelprize.org/2.1/laureate/992"
+          ],
+          "openalex_id": "https://openalex.org/A5067184382",
+          "orcid": null
+        },
+        {
+          "id": "charpentier",
+          "name": "Emmanuelle Charpentier",
+          "research_areas": [
+            "CRISPR",
+            "Microbiologia"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/charpentier/facts/",
+            "https://api.nobelprize.org/2.1/laureate/991"
+          ],
+          "openalex_id": "https://openalex.org/A5074743574",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-crispr-2014",
+          "contribution_id": "crispr-2014",
+          "claim_supported": "Doudna e Charpentier revisaram a história, o mecanismo e as aplicações da tecnologia CRISPR-Cas9. Esta contribuição é uma síntese científica, não uma nova descoberta experimental.",
+          "source_title": "The new frontier of genome engineering with CRISPR-Cas9",
+          "source_url": "https://doi.org/10.1126/science.1258096",
+          "source_type": "documental",
+          "excerpt_or_location": "Resumo e revisão; Science 346(6213), 1258096.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "crispr",
+          "name": "CRISPR",
+          "aliases": [
+            "crispr",
+            "crisprs",
+            "clustered regularly interspaced short palindromic repeats"
+          ],
+          "provenance": [
+            "título",
+            "resumo",
+            "tópicos OpenAlex",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "cas9",
+          "name": "Cas9",
+          "aliases": [
+            "cas9",
+            "crispr-cas9",
+            "crispr/cas"
+          ],
+          "provenance": [
+            "título",
+            "resumo",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "genome-editing",
+          "name": "Edição genômica",
+          "aliases": [
+            "genome editing",
+            "genome engineering",
+            "gene editing",
+            "edição genômica",
+            "genomic manipulation"
+          ],
+          "provenance": [
+            "título",
+            "resumo",
+            "palavras-chave OpenAlex"
+          ]
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "NOT_FOUND_IN_RETRIEVED_REFERENCES",
+      "explanation": "O artigo e esta contribuição compartilham os conceitos: CRISPR, Cas9, Edição genômica. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+      "limitations": [
+        "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+        "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+        "Publicação não localizada apenas nas referências recuperadas; a bibliografia completa não foi auditada."
+      ],
+      "relevance": 3
+    },
+    {
+      "contribution": {
+        "id": "crispr-2010",
+        "title": "Processamento específico de pre-crRNA por Csy4",
+        "description": "Haurwitz e colaboradores, incluindo Jennifer Doudna, identificaram Csy4 como endorribonuclease responsável pelo processamento de transcritos CRISPR em Pseudomonas aeruginosa e descreveram seu reconhecimento de RNA.",
+        "researcher_ids": [
+          "doudna"
+        ],
+        "participants": [
+          "R.E. Haurwitz",
+          "Martin Jínek",
+          "Blake Wiedenheft",
+          "Kaihong Zhou",
+          "Jennifer A. Doudna"
+        ],
+        "concept_ids": [
+          "crispr"
+        ],
+        "related_dois": [
+          "10.1126/science.1192272"
+        ],
+        "scientific_field": "Genética e edição genômica",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "doudna",
+          "name": "Jennifer A. Doudna",
+          "research_areas": [
+            "CRISPR",
+            "Bioquímica"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/doudna/facts/",
+            "https://api.nobelprize.org/2.1/laureate/992"
+          ],
+          "openalex_id": "https://openalex.org/A5067184382",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-crispr-2010",
+          "contribution_id": "crispr-2010",
+          "claim_supported": "Haurwitz e colaboradores, incluindo Jennifer Doudna, identificaram Csy4 como endorribonuclease responsável pelo processamento de transcritos CRISPR em Pseudomonas aeruginosa e descreveram seu reconhecimento de RNA.",
+          "source_title": "Sequence- and Structure-Specific RNA Processing by a CRISPR Endonuclease",
+          "source_url": "https://doi.org/10.1126/science.1192272",
+          "source_type": "documental",
+          "excerpt_or_location": "Resumo: identificação de Csy4 e estrutura cristalográfica de 1,8 Å; Science 329(5997), 1355–1358.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "crispr",
+          "name": "CRISPR",
+          "aliases": [
+            "crispr",
+            "crisprs",
+            "clustered regularly interspaced short palindromic repeats"
+          ],
+          "provenance": [
+            "título",
+            "resumo",
+            "tópicos OpenAlex",
+            "palavras-chave OpenAlex"
+          ]
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "NOT_FOUND_IN_RETRIEVED_REFERENCES",
+      "explanation": "O artigo e esta contribuição compartilham os conceitos: CRISPR. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+      "limitations": [
+        "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+        "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+        "Publicação não localizada apenas nas referências recuperadas; a bibliografia completa não foi auditada."
+      ],
+      "relevance": 1
+    },
+    {
+      "contribution": {
+        "id": "crispr-2011",
+        "title": "Maturação de RNA CRISPR com tracrRNA e RNase III",
+        "description": "Deltcheva e colaboradores, incluindo Emmanuelle Charpentier, documentaram a participação de um pequeno RNA transcrito em trans e da RNase III na maturação de RNAs CRISPR.",
+        "researcher_ids": [
+          "charpentier"
+        ],
+        "participants": [
+          "Elitza M. Deltcheva",
+          "Krzysztof Chylinski",
+          "Cynthia Mira Sharma",
+          "Karine Gonzales",
+          "Yanjie Chao",
+          "Zaid Ahmed Pirzada",
+          "Maria R. Eckert",
+          "Jörg Vogel",
+          "Emmanuelle Charpentier"
+        ],
+        "concept_ids": [
+          "crispr"
+        ],
+        "related_dois": [
+          "10.1038/nature09886"
+        ],
+        "scientific_field": "Genética e edição genômica",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "charpentier",
+          "name": "Emmanuelle Charpentier",
+          "research_areas": [
+            "CRISPR",
+            "Microbiologia"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/charpentier/facts/",
+            "https://api.nobelprize.org/2.1/laureate/991"
+          ],
+          "openalex_id": "https://openalex.org/A5074743574",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-crispr-2011",
+          "contribution_id": "crispr-2011",
+          "claim_supported": "Deltcheva e colaboradores, incluindo Emmanuelle Charpentier, documentaram a participação de um pequeno RNA transcrito em trans e da RNase III na maturação de RNAs CRISPR.",
+          "source_title": "CRISPR RNA maturation by trans-encoded small RNA and host factor RNase III",
+          "source_url": "https://doi.org/10.1038/nature09886",
+          "source_type": "documental",
+          "excerpt_or_location": "Título e resumo; Nature 471, 602–607. A contribuição é coletiva.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "crispr",
+          "name": "CRISPR",
+          "aliases": [
+            "crispr",
+            "crisprs",
+            "clustered regularly interspaced short palindromic repeats"
+          ],
+          "provenance": [
+            "título",
+            "resumo",
+            "tópicos OpenAlex",
+            "palavras-chave OpenAlex"
+          ]
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "CITED",
+      "explanation": "O artigo e esta contribuição compartilham os conceitos: CRISPR. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+      "limitations": [
+        "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+        "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada."
+      ],
+      "relevance": 1
+    }
+  ]
+}

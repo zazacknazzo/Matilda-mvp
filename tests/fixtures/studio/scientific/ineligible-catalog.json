@@ -1,0 +1,7 @@
+[
+  {"name": "pending-identity", "changes": [{"catalog": "researchers.json", "id": "kariko", "field": "identity_status", "value": "pending"}], "expected_ids": []},
+  {"name": "pending-evidence", "changes": [{"catalog": "evidence.json", "id": "evidence-rna-2005", "field": "verification_status", "value": "pending"}], "expected_ids": ["rna-2008"]},
+  {"name": "evidence-of-another-contribution", "changes": [{"catalog": "evidence.json", "id": "evidence-rna-2005", "field": "contribution_id", "value": "crispr-2012"}], "expected_ids": ["rna-2008"]},
+  {"name": "pending-contribution", "changes": [{"catalog": "contributions.json", "id": "rna-2005", "field": "verification_status", "value": "pending"}], "expected_ids": ["rna-2008"]},
+  {"name": "thematic-evidence-is-not-documentary", "changes": [{"catalog": "evidence.json", "id": "evidence-rna-2005", "field": "source_type", "value": "thematic"}], "expected_ids": ["rna-2008"]}
+]
