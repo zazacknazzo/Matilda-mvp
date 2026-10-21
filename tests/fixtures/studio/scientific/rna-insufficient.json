@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "source_documents": [
+    {
+      "id": "doc-material",
+      "project_id": "project-example",
+      "type": "text",
+      "title": "Material docente",
+      "content": "immunogenicity e resposta imune.",
+      "doi": null,
+      "extraction_status": "ready"
+    }
+  ],
+  "scientific_context": {
+    "id": "context-rna-insufficient",
+    "origin_type": "material",
+    "paper_ids": [],
+    "concept_ids": [
+      "rna-immunity"
+    ],
+    "concept_labels": [
+      "Reconhecimento imune de RNA"
+    ],
+    "source_document_ids": [
+      "doc-material"
+    ],
+    "provenance": [
+      {
+        "source_document_id": "doc-material",
+        "method": "teacher_input",
+        "quote": "immunogenicity e resposta imune."
+      },
+      {
+        "source_document_id": "doc-material",
+        "concept_id": "rna-immunity",
+        "method": "editorial_alias",
+        "quote": "immunogenicity e resposta imune."
+      }
+    ],
+    "limitations": [
+      "A cobertura é limitada ao catálogo editorial; ausência de resultados não indica inexistência de contribuições femininas."
+    ],
+    "analysis_id": null
+  },
+  "anchors": [
+    {
+      "source_document_id": "doc-material",
+      "quote": "immunogenicity e resposta imune.",
+      "occurrence": 0
+    }
+  ],
+  "paper_dois": [],
+  "expected_matches": []
+}

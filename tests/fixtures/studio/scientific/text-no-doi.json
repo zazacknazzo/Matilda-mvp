@@ -1,0 +1,421 @@
+{
+  "schema_version": 1,
+  "source_documents": [
+    {
+      "id": "doc-material",
+      "project_id": "project-example",
+      "type": "text",
+      "title": "Material docente",
+      "content": "CRISPR permite discutir edição genômica. CRISPR e autoria coletiva.",
+      "doi": null,
+      "extraction_status": "ready"
+    }
+  ],
+  "scientific_context": {
+    "id": "context-text-no-doi",
+    "origin_type": "material",
+    "paper_ids": [],
+    "concept_ids": [
+      "crispr",
+      "genome-editing"
+    ],
+    "concept_labels": [
+      "CRISPR",
+      "Edição genômica"
+    ],
+    "source_document_ids": [
+      "doc-material"
+    ],
+    "provenance": [
+      {
+        "source_document_id": "doc-material",
+        "method": "teacher_input",
+        "quote": "CRISPR permite discutir edição genômica. CRISPR e autoria coletiva."
+      },
+      {
+        "source_document_id": "doc-material",
+        "concept_id": "crispr",
+        "method": "editorial_alias",
+        "quote": "CRISPR permite discutir edição genômica. CRISPR e autoria coletiva."
+      },
+      {
+        "source_document_id": "doc-material",
+        "concept_id": "genome-editing",
+        "method": "editorial_alias",
+        "quote": "CRISPR permite discutir edição genômica. CRISPR e autoria coletiva."
+      }
+    ],
+    "limitations": [
+      "A cobertura é limitada ao catálogo editorial; ausência de resultados não indica inexistência de contribuições femininas."
+    ],
+    "analysis_id": null
+  },
+  "anchors": [
+    {
+      "source_document_id": "doc-material",
+      "quote": "CRISPR",
+      "occurrence": 1
+    }
+  ],
+  "paper_dois": [],
+  "expected_matches": [
+    {
+      "contribution": {
+        "id": "crispr-2012",
+        "title": "Cas9 programável guiada por dois RNAs",
+        "description": "Jínek e colaboradores, incluindo Doudna e Charpentier, demonstraram a clivagem de DNA por Cas9 guiada por crRNA e tracrRNA e por um RNA quimérico, indicando potencial para edição genômica programável.",
+        "researcher_ids": [
+          "doudna",
+          "charpentier"
+        ],
+        "participants": [
+          "Martin Jínek",
+          "Krzysztof Chylinski",
+          "Ines Fonfara",
+          "M. Hauer",
+          "Jennifer A. Doudna",
+          "Emmanuelle Charpentier"
+        ],
+        "concept_ids": [
+          "crispr",
+          "cas9",
+          "genome-editing"
+        ],
+        "related_dois": [
+          "10.1126/science.1225829"
+        ],
+        "scientific_field": "Genética e edição genômica",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "doudna",
+          "name": "Jennifer A. Doudna",
+          "research_areas": [
+            "CRISPR",
+            "Bioquímica"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/doudna/facts/",
+            "https://api.nobelprize.org/2.1/laureate/992"
+          ],
+          "openalex_id": "https://openalex.org/A5067184382",
+          "orcid": null
+        },
+        {
+          "id": "charpentier",
+          "name": "Emmanuelle Charpentier",
+          "research_areas": [
+            "CRISPR",
+            "Microbiologia"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/charpentier/facts/",
+            "https://api.nobelprize.org/2.1/laureate/991"
+          ],
+          "openalex_id": "https://openalex.org/A5074743574",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-crispr-2012",
+          "contribution_id": "crispr-2012",
+          "claim_supported": "Jínek e colaboradores, incluindo Doudna e Charpentier, demonstraram a clivagem de DNA por Cas9 guiada por crRNA e tracrRNA e por um RNA quimérico, indicando potencial para edição genômica programável.",
+          "source_title": "A Programmable Dual-RNA–Guided DNA Endonuclease in Adaptive Bacterial Immunity",
+          "source_url": "https://doi.org/10.1126/science.1225829",
+          "source_type": "documental",
+          "excerpt_or_location": "Resumo: mecanismo de dois RNAs e RNA quimérico; Science 337(6096), 816–821.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "crispr",
+          "name": "CRISPR",
+          "aliases": [
+            "crispr",
+            "crisprs",
+            "clustered regularly interspaced short palindromic repeats"
+          ],
+          "provenance": []
+        },
+        {
+          "id": "genome-editing",
+          "name": "Edição genômica",
+          "aliases": [
+            "genome editing",
+            "genome engineering",
+            "gene editing",
+            "edição genômica",
+            "genomic manipulation"
+          ],
+          "provenance": []
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "UNKNOWN",
+      "explanation": "Material e contribuição compartilham conceitos editoriais. Correspondência temática não comprova influência histórica.",
+      "limitations": [
+        "Sem artigo comparável: não é possível determinar citação.",
+        "Autoria coletiva: preservar todos os participantes documentados."
+      ],
+      "relevance": 2
+    },
+    {
+      "contribution": {
+        "id": "crispr-2014",
+        "title": "Síntese dos mecanismos e aplicações de CRISPR-Cas9",
+        "description": "Doudna e Charpentier revisaram a história, o mecanismo e as aplicações da tecnologia CRISPR-Cas9. Esta contribuição é uma síntese científica, não uma nova descoberta experimental.",
+        "researcher_ids": [
+          "doudna",
+          "charpentier"
+        ],
+        "participants": [
+          "Jennifer A. Doudna",
+          "Emmanuelle Charpentier"
+        ],
+        "concept_ids": [
+          "crispr",
+          "cas9",
+          "genome-editing"
+        ],
+        "related_dois": [
+          "10.1126/science.1258096"
+        ],
+        "scientific_field": "Genética e edição genômica",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "doudna",
+          "name": "Jennifer A. Doudna",
+          "research_areas": [
+            "CRISPR",
+            "Bioquímica"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/doudna/facts/",
+            "https://api.nobelprize.org/2.1/laureate/992"
+          ],
+          "openalex_id": "https://openalex.org/A5067184382",
+          "orcid": null
+        },
+        {
+          "id": "charpentier",
+          "name": "Emmanuelle Charpentier",
+          "research_areas": [
+            "CRISPR",
+            "Microbiologia"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/charpentier/facts/",
+            "https://api.nobelprize.org/2.1/laureate/991"
+          ],
+          "openalex_id": "https://openalex.org/A5074743574",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-crispr-2014",
+          "contribution_id": "crispr-2014",
+          "claim_supported": "Doudna e Charpentier revisaram a história, o mecanismo e as aplicações da tecnologia CRISPR-Cas9. Esta contribuição é uma síntese científica, não uma nova descoberta experimental.",
+          "source_title": "The new frontier of genome engineering with CRISPR-Cas9",
+          "source_url": "https://doi.org/10.1126/science.1258096",
+          "source_type": "documental",
+          "excerpt_or_location": "Resumo e revisão; Science 346(6213), 1258096.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "crispr",
+          "name": "CRISPR",
+          "aliases": [
+            "crispr",
+            "crisprs",
+            "clustered regularly interspaced short palindromic repeats"
+          ],
+          "provenance": []
+        },
+        {
+          "id": "genome-editing",
+          "name": "Edição genômica",
+          "aliases": [
+            "genome editing",
+            "genome engineering",
+            "gene editing",
+            "edição genômica",
+            "genomic manipulation"
+          ],
+          "provenance": []
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "UNKNOWN",
+      "explanation": "Material e contribuição compartilham conceitos editoriais. Correspondência temática não comprova influência histórica.",
+      "limitations": [
+        "Sem artigo comparável: não é possível determinar citação.",
+        "Autoria coletiva: preservar todos os participantes documentados."
+      ],
+      "relevance": 2
+    },
+    {
+      "contribution": {
+        "id": "crispr-2010",
+        "title": "Processamento específico de pre-crRNA por Csy4",
+        "description": "Haurwitz e colaboradores, incluindo Jennifer Doudna, identificaram Csy4 como endorribonuclease responsável pelo processamento de transcritos CRISPR em Pseudomonas aeruginosa e descreveram seu reconhecimento de RNA.",
+        "researcher_ids": [
+          "doudna"
+        ],
+        "participants": [
+          "R.E. Haurwitz",
+          "Martin Jínek",
+          "Blake Wiedenheft",
+          "Kaihong Zhou",
+          "Jennifer A. Doudna"
+        ],
+        "concept_ids": [
+          "crispr"
+        ],
+        "related_dois": [
+          "10.1126/science.1192272"
+        ],
+        "scientific_field": "Genética e edição genômica",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "doudna",
+          "name": "Jennifer A. Doudna",
+          "research_areas": [
+            "CRISPR",
+            "Bioquímica"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/doudna/facts/",
+            "https://api.nobelprize.org/2.1/laureate/992"
+          ],
+          "openalex_id": "https://openalex.org/A5067184382",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-crispr-2010",
+          "contribution_id": "crispr-2010",
+          "claim_supported": "Haurwitz e colaboradores, incluindo Jennifer Doudna, identificaram Csy4 como endorribonuclease responsável pelo processamento de transcritos CRISPR em Pseudomonas aeruginosa e descreveram seu reconhecimento de RNA.",
+          "source_title": "Sequence- and Structure-Specific RNA Processing by a CRISPR Endonuclease",
+          "source_url": "https://doi.org/10.1126/science.1192272",
+          "source_type": "documental",
+          "excerpt_or_location": "Resumo: identificação de Csy4 e estrutura cristalográfica de 1,8 Å; Science 329(5997), 1355–1358.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "crispr",
+          "name": "CRISPR",
+          "aliases": [
+            "crispr",
+            "crisprs",
+            "clustered regularly interspaced short palindromic repeats"
+          ],
+          "provenance": []
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "UNKNOWN",
+      "explanation": "Material e contribuição compartilham conceitos editoriais. Correspondência temática não comprova influência histórica.",
+      "limitations": [
+        "Sem artigo comparável: não é possível determinar citação.",
+        "Autoria coletiva: preservar todos os participantes documentados."
+      ],
+      "relevance": 1
+    },
+    {
+      "contribution": {
+        "id": "crispr-2011",
+        "title": "Maturação de RNA CRISPR com tracrRNA e RNase III",
+        "description": "Deltcheva e colaboradores, incluindo Emmanuelle Charpentier, documentaram a participação de um pequeno RNA transcrito em trans e da RNase III na maturação de RNAs CRISPR.",
+        "researcher_ids": [
+          "charpentier"
+        ],
+        "participants": [
+          "Elitza M. Deltcheva",
+          "Krzysztof Chylinski",
+          "Cynthia Mira Sharma",
+          "Karine Gonzales",
+          "Yanjie Chao",
+          "Zaid Ahmed Pirzada",
+          "Maria R. Eckert",
+          "Jörg Vogel",
+          "Emmanuelle Charpentier"
+        ],
+        "concept_ids": [
+          "crispr"
+        ],
+        "related_dois": [
+          "10.1038/nature09886"
+        ],
+        "scientific_field": "Genética e edição genômica",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "charpentier",
+          "name": "Emmanuelle Charpentier",
+          "research_areas": [
+            "CRISPR",
+            "Microbiologia"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/chemistry/2020/charpentier/facts/",
+            "https://api.nobelprize.org/2.1/laureate/991"
+          ],
+          "openalex_id": "https://openalex.org/A5074743574",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-crispr-2011",
+          "contribution_id": "crispr-2011",
+          "claim_supported": "Deltcheva e colaboradores, incluindo Emmanuelle Charpentier, documentaram a participação de um pequeno RNA transcrito em trans e da RNase III na maturação de RNAs CRISPR.",
+          "source_title": "CRISPR RNA maturation by trans-encoded small RNA and host factor RNase III",
+          "source_url": "https://doi.org/10.1038/nature09886",
+          "source_type": "documental",
+          "excerpt_or_location": "Título e resumo; Nature 471, 602–607. A contribuição é coletiva.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "crispr",
+          "name": "CRISPR",
+          "aliases": [
+            "crispr",
+            "crisprs",
+            "clustered regularly interspaced short palindromic repeats"
+          ],
+          "provenance": []
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "UNKNOWN",
+      "explanation": "Material e contribuição compartilham conceitos editoriais. Correspondência temática não comprova influência histórica.",
+      "limitations": [
+        "Sem artigo comparável: não é possível determinar citação.",
+        "Autoria coletiva: preservar todos os participantes documentados."
+      ],
+      "relevance": 1
+    }
+  ]
+}

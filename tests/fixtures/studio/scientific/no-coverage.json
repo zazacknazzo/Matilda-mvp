@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "source_documents": [
+    {
+      "id": "doc-material",
+      "project_id": "project-example",
+      "type": "text",
+      "title": "Material docente",
+      "content": "Estudo de rochas e minerais.",
+      "doi": null,
+      "extraction_status": "ready"
+    }
+  ],
+  "scientific_context": {
+    "id": "context-no-coverage",
+    "origin_type": "material",
+    "paper_ids": [],
+    "concept_ids": [],
+    "concept_labels": [],
+    "source_document_ids": [
+      "doc-material"
+    ],
+    "provenance": [
+      {
+        "source_document_id": "doc-material",
+        "method": "teacher_input",
+        "quote": "Estudo de rochas e minerais."
+      }
+    ],
+    "limitations": [
+      "A cobertura é limitada ao catálogo editorial; ausência de resultados não indica inexistência de contribuições femininas."
+    ],
+    "analysis_id": null
+  },
+  "anchors": [
+    {
+      "source_document_id": "doc-material",
+      "quote": "Estudo de rochas e minerais.",
+      "occurrence": 0
+    }
+  ],
+  "paper_dois": [],
+  "expected_matches": []
+}

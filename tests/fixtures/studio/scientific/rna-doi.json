@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "source_documents": [
+    {
+      "id": "doc-paper",
+      "project_id": "project-example",
+      "type": "paper_metadata",
+      "title": "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
+      "content": "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
+      "doi": "10.1056/nejmoa2034577",
+      "extraction_status": "ready"
+    }
+  ],
+  "scientific_context": {
+    "id": "context-rna-doi",
+    "origin_type": "doi",
+    "paper_ids": [
+      "https://openalex.org/W3111255098"
+    ],
+    "concept_ids": [
+      "mrna",
+      "nucleoside",
+      "rna-immunity",
+      "https://openalex.org/T10118"
+    ],
+    "concept_labels": [
+      "RNA mensageiro",
+      "Modificação de nucleosídeos",
+      "Reconhecimento imune de RNA",
+      "SARS-CoV-2 and COVID-19 Research"
+    ],
+    "source_document_ids": [
+      "doc-paper"
+    ],
+    "provenance": [
+      {
+        "source_document_id": "doc-paper",
+        "concept_id": "mrna",
+        "method": "openalex_metadata",
+        "retrieved_at": "2026-10-21T09:44:20.132809+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W3111255098"
+      },
+      {
+        "source_document_id": "doc-paper",
+        "concept_id": "nucleoside",
+        "method": "openalex_metadata",
+        "retrieved_at": "2026-10-21T09:44:20.132809+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W3111255098"
+      },
+      {
+        "source_document_id": "doc-paper",
+        "concept_id": "rna-immunity",
+        "method": "openalex_metadata",
+        "retrieved_at": "2026-10-21T09:44:20.132809+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W3111255098"
+      },
+      {
+        "source_document_id": "doc-paper",
+        "concept_id": "https://openalex.org/T10118",
+        "method": "openalex_metadata",
+        "retrieved_at": "2026-10-21T09:44:20.132809+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W3111255098"
+      }
+    ],
+    "limitations": [
+      "A cobertura é limitada ao catálogo editorial; ausência de resultados não indica inexistência de contribuições femininas."
+    ],
+    "analysis_id": null
+  },
+  "anchors": [
+    {
+      "source_document_id": "doc-paper",
+      "quote": "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
+      "occurrence": 0
+    }
+  ],
+  "paper_dois": [
+    "10.1056/nejmoa2034577"
+  ],
+  "expected_matches": [
+    {
+      "contribution": {
+        "id": "rna-2005",
+        "title": "Modificações de nucleosídeos e reconhecimento imune de RNA",
+        "description": "O trabalho de Karikó, Buckstein, Ni e Weissman investiga a supressão do reconhecimento de RNA por receptores Toll-like a partir de modificações de nucleosídeos.",
+        "researcher_ids": [
+          "kariko"
+        ],
+        "participants": [
+          "Katalin Karikó",
+          "Michael H. Buckstein",
+          "Houping Ni",
+          "Drew Weissman"
+        ],
+        "concept_ids": [
+          "mrna",
+          "nucleoside",
+          "rna-immunity"
+        ],
+        "related_dois": [
+          "10.1016/j.immuni.2005.06.008"
+        ],
+        "scientific_field": "Biologia molecular e RNA",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "kariko",
+          "name": "Katalin Karikó",
+          "research_areas": [
+            "RNA mensageiro",
+            "Imunologia"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/medicine/2023/kariko/facts/",
+            "https://api.nobelprize.org/2.1/laureate/1024"
+          ],
+          "openalex_id": "https://openalex.org/A5030598859",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-rna-2005",
+          "contribution_id": "rna-2005",
+          "claim_supported": "O trabalho de Karikó, Buckstein, Ni e Weissman investiga a supressão do reconhecimento de RNA por receptores Toll-like a partir de modificações de nucleosídeos.",
+          "source_title": "Suppression of RNA Recognition by Toll-like Receptors: The Impact of Nucleoside Modification and the Evolutionary Origin of RNA",
+          "source_url": "https://doi.org/10.1016/j.immuni.2005.06.008",
+          "source_type": "documental",
+          "excerpt_or_location": "Título e resumo da publicação, Immunity 23(2), 165–175.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "mrna",
+          "name": "RNA mensageiro",
+          "aliases": [
+            "mrna",
+            "messenger rna",
+            "rna mensageiro"
+          ],
+          "provenance": [
+            "título",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "nucleoside",
+          "name": "Modificação de nucleosídeos",
+          "aliases": [
+            "pseudouridine",
+            "nucleoside modification",
+            "modified nucleosides",
+            "modified nucleotides",
+            "nucleoside-modified"
+          ],
+          "provenance": [
+            "resumo"
+          ]
+        },
+        {
+          "id": "rna-immunity",
+          "name": "Reconhecimento imune de RNA",
+          "aliases": [
+            "toll-like",
+            "immunogenicity",
+            "immunogenic",
+            "rna recognition",
+            "interferon-alpha"
+          ],
+          "provenance": [
+            "palavras-chave OpenAlex"
+          ]
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "NOT_FOUND_IN_RETRIEVED_REFERENCES",
+      "explanation": "O artigo e esta contribuição compartilham os conceitos: RNA mensageiro, Modificação de nucleosídeos, Reconhecimento imune de RNA. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+      "limitations": [
+        "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+        "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+        "Publicação não localizada apenas nas referências recuperadas; a bibliografia completa não foi auditada."
+      ],
+      "relevance": 3
+    },
+    {
+      "contribution": {
+        "id": "rna-2008",
+        "title": "Pseudouridina: tradução e estabilidade de mRNA",
+        "description": "Em experimentos com células, lisados e camundongos, a equipe observou maior capacidade de tradução e menor imunogenicidade de mRNAs contendo pseudouridina, nas condições estudadas.",
+        "researcher_ids": [
+          "kariko"
+        ],
+        "participants": [
+          "Katalin Karikó",
+          "Hiromi Muramatsu",
+          "Frank A. Welsh",
+          "János Ludwig",
+          "Hiroki Kato",
+          "Shizuo Akira",
+          "Drew Weissman"
+        ],
+        "concept_ids": [
+          "mrna",
+          "nucleoside",
+          "rna-immunity"
+        ],
+        "related_dois": [
+          "10.1038/mt.2008.200"
+        ],
+        "scientific_field": "Biologia molecular e RNA",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "kariko",
+          "name": "Katalin Karikó",
+          "research_areas": [
+            "RNA mensageiro",
+            "Imunologia"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/medicine/2023/kariko/facts/",
+            "https://api.nobelprize.org/2.1/laureate/1024"
+          ],
+          "openalex_id": "https://openalex.org/A5030598859",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-rna-2008",
+          "contribution_id": "rna-2008",
+          "claim_supported": "Em experimentos com células, lisados e camundongos, a equipe observou maior capacidade de tradução e menor imunogenicidade de mRNAs contendo pseudouridina, nas condições estudadas.",
+          "source_title": "Incorporation of Pseudouridine Into mRNA Yields Superior Nonimmunogenic Vector With Increased Translational Capacity and Biological Stability",
+          "source_url": "https://doi.org/10.1038/mt.2008.200",
+          "source_type": "documental",
+          "excerpt_or_location": "Resumo: comparação de mRNA com pseudouridina e mRNA não modificado; Molecular Therapy 16, 1833–1840.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "mrna",
+          "name": "RNA mensageiro",
+          "aliases": [
+            "mrna",
+            "messenger rna",
+            "rna mensageiro"
+          ],
+          "provenance": [
+            "título",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "nucleoside",
+          "name": "Modificação de nucleosídeos",
+          "aliases": [
+            "pseudouridine",
+            "nucleoside modification",
+            "modified nucleosides",
+            "modified nucleotides",
+            "nucleoside-modified"
+          ],
+          "provenance": [
+            "resumo"
+          ]
+        },
+        {
+          "id": "rna-immunity",
+          "name": "Reconhecimento imune de RNA",
+          "aliases": [
+            "toll-like",
+            "immunogenicity",
+            "immunogenic",
+            "rna recognition",
+            "interferon-alpha"
+          ],
+          "provenance": [
+            "palavras-chave OpenAlex"
+          ]
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "CITED",
+      "explanation": "O artigo e esta contribuição compartilham os conceitos: RNA mensageiro, Modificação de nucleosídeos, Reconhecimento imune de RNA. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+      "limitations": [
+        "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+        "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada."
+      ],
+      "relevance": 3
+    }
+  ]
+}
