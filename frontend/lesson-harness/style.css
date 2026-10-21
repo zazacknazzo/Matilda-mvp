@@ -1,0 +1,42 @@
+:root {
+  font-family: Arial, sans-serif;
+  background: #f6f5ef;
+  color: #203f36;
+}
+body {
+  margin: 0;
+}
+.lesson-example-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  padding: 12px 4%;
+  background: #eae1c8;
+  color: #574425;
+  font:
+    12px/1.5 Arial,
+    sans-serif;
+}
+.lesson-example-banner strong {
+  letter-spacing: 1px;
+  font-size: 10px;
+}
+.lesson-example-banner label {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.lesson-example-banner select {
+  padding: 7px;
+  background: #fffdf7;
+  border: 1px solid #a99b78;
+  border-radius: 5px;
+  color: #203f36;
+}
+@media (max-width: 760px) {
+  .lesson-example-banner label {
+    margin-left: 0;
+  }
+}
