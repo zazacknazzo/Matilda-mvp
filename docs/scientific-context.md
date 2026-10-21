@@ -155,8 +155,8 @@ npm run test:e2e
 A validação não exige chave Gemini nem chamada científica externa. Resultados
 finais de execução e revisão são registrados no PR vinculado à Issue #2.
 
-Execução final desta revisão em 21/10/2026: **126 testes backend aprovados**
-(59 anteriores + 67 de contrato/compatibilidade), **7 fixtures compiladas contra
+Execução final desta revisão em 21/10/2026: **128 testes backend aprovados**
+(59 anteriores + 69 de contrato/compatibilidade), **7 fixtures compiladas contra
 TypeScript**, **build TypeScript/Vite aprovado** e **6 testes Playwright
 aprovados** com frontend/API reais e SQLite temporário. Ambiente frontend:
 Node 26.10.0, Vite 6.4.5, Chromium 156.0.8078.4. A descoberta externa nos testes

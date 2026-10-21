@@ -91,6 +91,21 @@ class SourceAnchor(ScientificModel):
         return start, start + len(self.quote)
 
 
+def _quoted_editorial_alias(content: str, quote: str, aliases: Sequence[str]) -> bool:
+    from app.services.concept_analysis import contains, normalized
+
+    start = content.find(quote)
+    while start != -1:
+        end = start + len(quote)
+        # Keep word boundaries from the original document, including combining marks.
+        before = normalized(content[:start])[-1:]
+        after = normalized(content[end:])[:1]
+        if any(contains(quote, alias) and contains(before + quote + after, alias) for alias in aliases):
+            return True
+        start = content.find(quote, start + 1)
+    return False
+
+
 class ScientificContext(ScientificModel):
     id: NonBlank
     origin_type: Literal['doi', 'material', 'mixed']
@@ -161,9 +176,8 @@ class ScientificContext(ScientificModel):
             if provenance.quote is not None and provenance.quote not in document.content:
                 raise ValueError('Trecho da procedência não é literal.')
             if provenance.method == 'editorial_alias':
-                from app.services.concept_analysis import contains
                 editorial = next((concept for concept in concepts if concept.id == provenance.concept_id), None)
-                if editorial is None or provenance.quote is None or not any(contains(provenance.quote, alias) for alias in editorial.aliases):
+                if editorial is None or provenance.quote is None or not _quoted_editorial_alias(document.content, provenance.quote, editorial.aliases):
                     raise ValueError('Procedência não corresponde a um alias editorial do conceito.')
             if provenance.retrieved_at is not None:
                 paper = by_doi.get(document.doi) if document.type == 'paper_metadata' else None

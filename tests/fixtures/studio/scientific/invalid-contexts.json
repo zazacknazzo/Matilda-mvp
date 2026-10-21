@@ -11,5 +11,7 @@
   {"name": "forged-paper-metadata", "fixture": "crispr", "path": ["source_documents", 0, "content"], "value": "Artigo inventado", "error": "Metadados"},
   {"name": "forged-retrieval-cache", "fixture": "crispr", "path": ["scientific_context", "provenance", 0, "from_cache"], "value": false, "error": "consulta"},
   {"name": "teacher-material-labelled-as-doi-only", "fixture": "mixed", "path": ["scientific_context", "origin_type"], "value": "doi", "error": "origem"},
-  {"name": "unresolved-concept-with-consistent-provenance", "fixture": "text", "path": ["scientific_context", "concept_labels", 1], "value": "Conceito desconhecido", "error": "Conceito"}
+  {"name": "unresolved-concept-with-consistent-provenance", "fixture": "text", "path": ["scientific_context", "concept_labels", 1], "value": "Conceito desconhecido", "error": "Conceito"},
+  {"name": "alias-inside-a-word", "fixture": "text", "path": ["source_documents", 0, "content"], "value": "antiCRISPR edição genômica. antiCRISPR", "error": "alias"},
+  {"name": "alias-after-combining-mark-inside-a-word", "fixture": "text", "path": ["source_documents", 0, "content"], "value": "antíCRISPR edição genômica. antíCRISPR", "error": "alias"}
 ]
