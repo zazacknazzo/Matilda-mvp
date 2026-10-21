@@ -58,14 +58,21 @@ normalização e os limites de palavra atuais. Labels pedagógicos livres da IA 
 viram IDs científicos.
 
 `SourceDocument.content` preserva o texto exato, inclusive espaços e acentos.
-Texto tem até 20.000 caracteres. `concept_list` usa um conceito por linha, até
+Todos os tipos de documento têm título e conteúdo de até 20.000 caracteres,
+sem truncamento. Quotes de procedência e âncoras usam esse mesmo teto.
+`concept_list` usa um conceito por linha, até
 20 linhas não vazias com até 100 caracteres cada. `paper_metadata` exige DOI
 normalizado pelo validador atual (limite efetivo 250) e preserva o título real;
 seu conteúdo é `paper.title`, seguido de `"\n\n" + paper.abstract` quando houver
 resumo. Esse formato é uma representação para ancoragem, não uma nova publicação.
-Títulos de publicações não herdam o limite de 160 do título pedagógico do projeto.
+Títulos de publicações não herdam o limite de 160 do título pedagógico do projeto;
+respeitam o teto documental de 20.000, inclusive quando excedem 160 caracteres.
 
 Procedência pode apontar para documento sem conceito (`concept_id = null`).
+Para `ai_suggested`, esse nulo é obrigatório: nem IDs editoriais reais nem IDs
+OpenAlex podem ser atribuídos por essa origem. Uma resolução científica
+independente deve ter procedência autorizada própria; a sugestão pedagógica
+não substitui essa resolução.
 Quando há consulta científica, data UTC ISO 8601, indicador de cache e URL
 HTTP/HTTPS sem credenciais são obrigatórios juntos. Em metadados de artigo,
 esses valores devem coincidir com o Paper recuperado; a data não é atualizada
@@ -123,8 +130,37 @@ Comparação bibliográfica independente da relação temática:
 
 Em origem mista, apenas o artigo vinculado é comparado. Sua bibliografia não é a
 bibliografia do material docente. Sem cobertura, contexto válido e lista vazia,
-com aviso explícito do limite do catálogo. Nenhum estado prova intenção, omissão,
+com aviso explícito do limite do catálogo. Sem conceitos resolvidos, o modelo
+rejeita `limitations = []`; cada elemento deve ser não vazio. Ausência de
+contribuições elegíveis mesmo com conceitos, como RNA inespecífico ou conceitos
+fora do catálogo editorial, também exige aviso nos resultados: as fixtures
+registram isso, e o motor futuro deverá aplicar a regra sem duplicar sua seleção
+nos schemas desta fatia. Nenhum estado prova intenção, omissão,
 discriminação ou influência histórica.
+
+## Convenção consolidada dos PRs #15 e #16
+
+Decisão do usuário: #15 como base; quatro melhorias selecionadas do #16
+(`5d9d7f77463b2f9a3340870784e2cc7d0ecbbb9f`). A proposta e os impactos foram
+[registrados na Issue #2](https://github.com/zazacknazzo/Matilda-mvp/issues/2#issuecomment-6326394436)
+antes da edição. A integração continua dependente do acordo B/C/D.
+
+| Divergência | Convenção única preservada/adotada |
+|---|---|
+| `validate_references` versus `validate_sources` | Manter a interface do #15 |
+| `locate` com sobreposição versus `validate_source` sem sobreposição | Manter `locate` e a contagem do #15 |
+| Metadados completos versus título isolado | Exigir título + resumo real quando disponível, como no #15 |
+| DOI normalizado versus entrada já canônica obrigatória | Manter normalização Forensics do #15 |
+| Respostas TypeScript completas versus opcionais de entrada | Manter tipos serializados, defaults e nulos explícitos do #15 |
+| Envelopes/nomes de fixtures diferentes | Manter os sete exemplos e envelope do #15 |
+| Conteúdo/quotes sem teto uniforme | Adotar teto documental comum de 20.000 e preservar limites da lista de conceitos |
+| IA com ID científico | Adotar rejeição de `ai_suggested` com `concept_id` não nulo |
+| Contexto vazio sem limitação | Adotar limitação obrigatória sem conceitos e auditar exemplos sem sugestões |
+| Baseline de três versus dez snapshots | Incorporar expectativas congeladas dos dez, reutilizando registros do #15 |
+
+Não foram incorporados o Protocol ScientificRetriever, o tipo ScientificMatch,
+o segundo verificador TypeScript ou cenários duplicados do #16. A interface de
+recuperação acima continua apenas documentada. Nenhuma branch foi mesclada.
 
 ## Exemplos e linha de base
 
@@ -132,6 +168,11 @@ Leia o [índice das fixtures](../tests/fixtures/studio/scientific/README.md).
 Os JSON de DOI preservam Paper e DiscoveryMatch serializados a partir dos
 snapshots reais versionados, incluindo cache, participantes, afirmações e limites.
 Os testes HTTP comparam as respostas completas com esses exemplos congelados.
+O índice `forensics-baseline.json` incorpora as expectativas dos dez snapshots do
+#16. Três entradas referenciam diretamente os exemplos DOI existentes; as outras
+sete referenciam os registros congelados de contribuição/pesquisadores/evidências
+e guardam somente as diferenças de cada retorno. O teste recompõe o JSON completo
+**a partir de fixtures**, sem gerar expectativas pelo motor ou catálogo atual.
 Os resultados esperados de texto/misto são exemplos de contrato para T03; não
 representam uma recuperação Studio executada ou uma API de produção.
 
@@ -155,10 +196,17 @@ npm run test:e2e
 A validação não exige chave Gemini nem chamada científica externa. Resultados
 finais de execução e revisão são registrados no PR vinculado à Issue #2.
 
-Execução final desta revisão em 21/10/2026: **128 testes backend aprovados**
+Execução inicial do PR #15 em 21/10/2026: **128 testes backend aprovados**
 (59 anteriores + 69 de contrato/compatibilidade), **7 fixtures compiladas contra
 TypeScript**, **build TypeScript/Vite aprovado** e **6 testes Playwright
 aprovados** com frontend/API reais e SQLite temporário. Ambiente frontend:
 Node 26.10.0, Vite 6.4.5, Chromium 156.0.8078.4. A descoberta externa nos testes
 de navegador conserva os mocks já declarados na suíte existente. Isso comprova
 regressão do Forensics, não integração ou geração real do Studio.
+
+Após a consolidação seletiva com #16, os mesmos comandos passaram com **158
+testes backend** (59 anteriores + 99 de contrato/compatibilidade), **7 fixtures
+TypeScript**, **build TypeScript/Vite** e **6 testes Playwright** aprovados.
+Foram adicionados 30 casos de regressão/validação; as expectativas completas dos
+dez snapshots são recompostas sem duplicar os registros científicos congelados.
+Mantidos ambiente, snapshots, mocks declarados e aviso preexistente do TestClient.

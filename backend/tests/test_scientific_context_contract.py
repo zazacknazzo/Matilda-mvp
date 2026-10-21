@@ -7,7 +7,7 @@ from pydantic import ValidationError
 
 from app.schemas import Concept, Paper
 from app.schemas.scientific_context import ScientificContext, SourceAnchor, SourceDocument
-from app.services.storage import load_json
+from app.services.storage import DATA, load_json
 
 
 FIXTURES = Path(__file__).resolve().parents[2] / 'tests/fixtures/studio/scientific'
@@ -210,3 +210,92 @@ def test_provenance_rejects_incomplete_or_non_utc_retrieval(change):
     provenance = json.loads((FIXTURES / 'text.json').read_text())['scientific_context']['provenance'][0]
     with pytest.raises(ValidationError):
         Provenance.model_validate_json(json.dumps(provenance | change))
+
+
+@pytest.mark.parametrize('kind', ['text', 'concept_list', 'paper_metadata'])
+@pytest.mark.parametrize('field', ['title', 'content'])
+def test_all_document_kinds_reject_text_above_the_document_limit(kind, field):
+    document = dict(id='doc', project_id='project', type=kind, title='Original', content='CRISPR')
+    if kind == 'paper_metadata':
+        document['doi'] = '10.1126/science.1231143'
+    with pytest.raises(ValidationError, match='string_too_long'):
+        SourceDocument.model_validate(document | {field: 'x' * 20001})
+
+
+@pytest.mark.parametrize('kind', ['text', 'paper_metadata'])
+def test_document_boundary_preserves_complete_literal_content_and_long_source_titles(kind):
+    content = ' ' + 'x' * 19998 + ' '
+    document = SourceDocument(
+        id='doc', project_id='project', type=kind, title='t' * 20000,
+        content=content, doi='10.1126/science.1231143' if kind == 'paper_metadata' else None,
+    )
+    assert document.content == content
+    assert len(document.title) == 20000
+
+
+@pytest.mark.parametrize('kind', ['anchor', 'provenance'])
+def test_literal_quotes_share_the_document_size_limit(kind):
+    from app.schemas.scientific_context import Provenance
+
+    model = SourceAnchor if kind == 'anchor' else Provenance
+    payload = {'source_document_id': 'doc'}
+    payload.update({'occurrence': 0} if kind == 'anchor' else {'method': 'teacher_input'})
+    assert model.model_validate(payload | {'quote': 'q' * 20000}).quote == 'q' * 20000
+    with pytest.raises(ValidationError, match='string_too_long'):
+        model.model_validate(payload | {'quote': 'q' * 20001})
+
+
+@pytest.mark.parametrize('identifier', ['crispr', 'https://openalex.org/T10878', 'invented-concept'])
+def test_ai_suggestions_cannot_resolve_scientific_ids(identifier):
+    from app.schemas.scientific_context import Provenance
+
+    with pytest.raises(ValidationError, match='IA'):
+        Provenance(source_document_id='doc', method='ai_suggested', concept_id=identifier)
+
+
+def test_ai_pedagogical_provenance_without_scientific_id_is_allowed():
+    example = json.loads((FIXTURES / 'text.json').read_text())
+    example['scientific_context']['provenance'].append({
+        'source_document_id': 'doc-text', 'method': 'ai_suggested', 'concept_id': None,
+        'quote': 'CRISPR',
+    })
+    context = validate_example(example)
+    assert context.concept_ids == ['crispr', 'genome-editing']
+    assert context.provenance[-1].concept_id is None
+
+
+@pytest.mark.parametrize('name', ['no-coverage', 'uncovered-text', 'rna-insufficient'])
+def test_examples_without_eligible_matches_explain_the_coverage_limit(name):
+    example = json.loads((FIXTURES / f'{name}.json').read_text())
+    assert example['expected_matches'] == []
+    assert any('cobertura' in limitation.lower() for limitation in validate_example(example).limitations)
+
+
+def frozen_forensics_matches(case):
+    if 'fixture' in case:
+        return json.loads((FIXTURES / (case['fixture'] + '.json')).read_text())['expected_matches']
+    expected = []
+    for reference in case['matches']:
+        matches = json.loads((FIXTURES / (reference['fixture'] + '.json')).read_text())['expected_matches']
+        match = next(match for match in matches if match['contribution']['id'] == reference['contribution_id'])
+        expected.append(match | reference['overrides'])
+    return expected
+
+
+@pytest.mark.parametrize('path', sorted((DATA / 'openalex_snapshots').glob('*.json')), ids=lambda path: path.stem)
+def test_all_ten_forensics_snapshots_preserve_complete_discovery_matches(path):
+    from app.integrations.openalex import parse_paper
+    from app.services.contribution_search import search_contributions
+
+    snapshot = json.loads(path.read_text(encoding='utf-8'))
+    doi = snapshot['data']['doi'].removeprefix('https://doi.org/').lower()
+    baseline = json.loads((FIXTURES / 'forensics-baseline.json').read_text(encoding='utf-8'))
+    paper = parse_paper(snapshot['data'], doi, snapshot['retrieved_at'], from_cache=True)
+    assert [match.model_dump(mode='json') for match in search_contributions(paper)] == frozen_forensics_matches(baseline[doi])
+
+
+def test_frozen_forensics_baseline_covers_exactly_the_existing_ten_snapshots():
+    baseline = json.loads((FIXTURES / 'forensics-baseline.json').read_text(encoding='utf-8'))
+    snapshots = [json.loads(path.read_text(encoding='utf-8')) for path in (DATA / 'openalex_snapshots').glob('*.json')]
+    assert len(baseline) == 10
+    assert set(baseline) == {snapshot['data']['doi'].removeprefix('https://doi.org/').lower() for snapshot in snapshots}

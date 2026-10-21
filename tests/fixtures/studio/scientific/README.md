@@ -31,11 +31,23 @@ implica inexistência de contribuições femininas.
 | `invalid-contexts.json` | Carregar `fixture`, substituir o valor no `path` por `value`, esperar erro estrutural ou de referências/âncora |
 | `ineligible-catalog.json` | Aplicar `changes` em cópia temporária dos arquivos de catálogo e conferir `expected_ids` pela recuperação Forensics atual |
 
+`forensics-baseline.json` é o índice congelado dos dez snapshots existentes,
+incorporado seletivamente do PR #16 (`5d9d7f7`). Uma entrada com `fixture` reutiliza
+todo o `expected_matches` daquele exemplo DOI. As demais têm `matches`, na ordem
+esperada; cada item seleciona `fixture` + `contribution_id` e aplica `overrides`
+somente aos campos diferentes. Assim, os registros canônicos já congelados não
+são duplicados. O JSON completo recomposto é idêntico à baseline do #16, incluindo
+fontes, participantes, conceitos, ordem, explicação, limitações e citação.
+Não atualizar esses valores para acompanhar uma regressão do motor.
+
 Contraexemplos de catálogo abrangem identidade, evidência e contribuição pendentes,
 evidência de outra contribuição e fonte meramente temática. Nunca modificar o
 catálogo real ao consumir esses exemplos. Conceito desconhecido, label errado,
 documento/projeto incorreto, trecho/ocorrência inexistente, metadados inventados e
 cache adulterado são rejeitados pelos validadores, sem consultar fontes externas.
+Os contraexemplos incluem agora IA atribuindo ID editorial real e contexto sem
+conceitos sem aviso de cobertura. Quotes e todos os documentos usam teto de
+20.000 caracteres; a contagem literal de âncoras continua incluindo sobreposições.
 
 Antes de integrar, A/B/C/D devem registrar revisão e acordo explícito em M0.
 Esta pasta, sozinha, não constitui esse aceite.

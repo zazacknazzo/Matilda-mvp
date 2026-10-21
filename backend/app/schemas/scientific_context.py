@@ -11,6 +11,7 @@ from .models import Concept, Paper
 
 
 NonBlank = Annotated[str, Field(min_length=1, pattern=r'\S')]
+DocumentText = Annotated[NonBlank, Field(max_length=20000)]
 
 
 class ScientificModel(BaseModel):
@@ -21,8 +22,8 @@ class SourceDocument(ScientificModel):
     id: NonBlank
     project_id: NonBlank
     type: Literal['text', 'concept_list', 'paper_metadata']
-    title: NonBlank
-    content: NonBlank
+    title: DocumentText
+    content: DocumentText
     doi: str | None = None
     extraction_status: Literal['ready'] = 'ready'
 
@@ -41,8 +42,6 @@ class SourceDocument(ScientificModel):
     def document_limits(self):
         if self.type == 'paper_metadata' and self.doi is None:
             raise ValueError('Metadados bibliográficos exigem DOI real.')
-        if self.type == 'text' and len(self.content) > 20000:
-            raise ValueError('Material textual excede 20.000 caracteres.')
         if self.type == 'concept_list':
             terms = self.content.splitlines()
             if len(terms) > 20 or any(not term.strip() or len(term) > 100 for term in terms):
@@ -54,13 +53,15 @@ class Provenance(ScientificModel):
     source_document_id: NonBlank
     concept_id: NonBlank | None = None
     method: Literal['teacher_input', 'editorial_alias', 'openalex_metadata', 'ai_suggested']
-    quote: NonBlank | None = None
+    quote: DocumentText | None = None
     retrieved_at: str | None = Field(default=None, json_schema_extra={'format': 'date-time'})
     from_cache: bool | None = None
     source_url: str | None = None
 
     @model_validator(mode='after')
     def scientific_retrieval(self):
+        if self.method == 'ai_suggested' and self.concept_id is not None:
+            raise ValueError('Sugestão de IA não pode atribuir ID científico.')
         metadata = (self.retrieved_at, self.from_cache, self.source_url)
         if self.method == 'openalex_metadata' or any(value is not None for value in metadata):
             if any(value is None for value in metadata):
@@ -76,7 +77,7 @@ class Provenance(ScientificModel):
 
 class SourceAnchor(ScientificModel):
     source_document_id: NonBlank
-    quote: NonBlank
+    quote: DocumentText
     occurrence: int = Field(ge=0)
 
     def locate(self, document: SourceDocument) -> tuple[int, int]:
@@ -128,6 +129,8 @@ class ScientificContext(ScientificModel):
             raise ValueError('Material sem DOI não pode inventar artigo ou investigação.')
         if self.origin_type != 'material' and not self.paper_ids:
             raise ValueError('Origem DOI ou mista exige artigo real.')
+        if not self.concept_ids and not self.limitations:
+            raise ValueError('Contexto sem cobertura exige limitação explícita.')
         for provenance in self.provenance:
             if provenance.source_document_id not in self.source_document_ids:
                 raise ValueError('Procedência aponta para documento fora do contexto.')
