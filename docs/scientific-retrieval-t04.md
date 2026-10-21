@@ -91,3 +91,26 @@ da explicação/limitações para não fixar essa frase em outros domínios.
 Esta entrega não implementa rotas Studio, planner, validação de geração,
 persistência, navegação ou UI dos tickets seguintes. A revisão por outro
 integrante e integração via PR continuam necessárias antes do merge.
+
+Execução final em 21/10/2026, macOS arm64, Python 3.14.7, Pydantic 2.13.4,
+Node 26.10.0 e Vite 6.4.5:
+
+- **386 testes backend aprovados**, incluindo 20 novos casos da fronteira de
+  contexto e as comparações HTTP completas dos dez snapshots existentes.
+- **6 testes Forensics no navegador aprovados**, sem alterar seus asserts;
+  API/frontend reais, SQLite isolado, cache dos snapshots com
+  `MATILDA_CACHE_TTL=999999999` e descoberta externa controlada pelos mocks já
+  declarados na suíte. API iniciada sem `GEMINI_API_KEY`.
+- **14 testes de entrega de aulas aprovados**, no harness de fixtures existente.
+- Tipagem do produto/harness, **7 fixtures científicas**, **40 payloads HTTP
+  Studio**, **4 fixtures LessonBundle**, build TypeScript/Vite e
+  `git diff --check` aprovados. Dependências do frontend instaladas pelo lockfile
+  em checkout isolado; nenhum manifesto ou lockfile alterado.
+- TDD registrou falhas antes da implementação para a nova recuperação,
+  resolução/procedência, vazio explícito, reutilização DOI e explicação mista.
+  Revisão por agentes contra a base `d16c374`: **Standards 0 achados** e
+  **Spec 0 achados**. Isso não substitui aceite da equipe antes do merge.
+
+Permanece apenas o aviso preexistente Starlette/TestClient sobre HTTPX. Esta
+validação comprova o T04 e regressões existentes, sem declarar integração Studio
+ou geração real dos tickets seguintes.
