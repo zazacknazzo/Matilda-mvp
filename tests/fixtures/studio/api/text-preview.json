@@ -1,0 +1,229 @@
+{
+  "preview_id": "preview-example",
+  "project_id": "project-example",
+  "schema_version": 1,
+  "scientific_context": {
+    "id": "context-text",
+    "origin_type": "material",
+    "paper_ids": [],
+    "concept_ids": [
+      "crispr",
+      "genome-editing"
+    ],
+    "concept_labels": [
+      "CRISPR",
+      "Edição genômica"
+    ],
+    "source_document_ids": [
+      "doc-text"
+    ],
+    "provenance": [
+      {
+        "source_document_id": "doc-text",
+        "concept_id": "crispr",
+        "method": "editorial_alias",
+        "quote": "CRISPR",
+        "retrieved_at": null,
+        "from_cache": null,
+        "source_url": null
+      },
+      {
+        "source_document_id": "doc-text",
+        "concept_id": "genome-editing",
+        "method": "editorial_alias",
+        "quote": "edição genômica",
+        "retrieved_at": null,
+        "from_cache": null,
+        "source_url": null
+      }
+    ],
+    "limitations": [
+      "Sem artigo comparável: citação UNKNOWN. Correspondência temática não comprova influência histórica."
+    ],
+    "analysis_id": null
+  },
+  "concepts": [
+    {
+      "id": "crispr",
+      "name": "CRISPR",
+      "aliases": [
+        "crispr",
+        "crisprs",
+        "clustered regularly interspaced short palindromic repeats"
+      ],
+      "provenance": []
+    },
+    {
+      "id": "genome-editing",
+      "name": "Edição genômica",
+      "aliases": [
+        "genome editing",
+        "genome engineering",
+        "gene editing",
+        "edição genômica",
+        "genomic manipulation"
+      ],
+      "provenance": []
+    }
+  ],
+  "suggested_objectives": [
+    "Explicar os conceitos científicos apresentados.",
+    "Analisar autoria, evidência e limites de uma afirmação."
+  ],
+  "suggestions": [
+    {
+      "id": "suggestion-1",
+      "project_id": "project-example",
+      "concept_ids": [
+        "crispr",
+        "genome-editing"
+      ],
+      "source_anchor": {
+        "source_document_id": "doc-text",
+        "quote": "CRISPR",
+        "occurrence": 1
+      },
+      "researcher_ids": [
+        "doudna",
+        "charpentier"
+      ],
+      "contribution_id": "crispr-2012",
+      "evidence_ids": [
+        "evidence-crispr-2012"
+      ],
+      "scientific_explanation": "Contribuição documentada relacionada aos conceitos do material. Não há artigo comparável; correspondência temática não comprova influência histórica.",
+      "historical_claim": "Jínek e colaboradores, incluindo Doudna e Charpentier, demonstraram a clivagem de DNA por Cas9 guiada por crRNA e tracrRNA e por um RNA quimérico, indicando potencial para edição genômica programável.",
+      "pedagogical_rationale": "Relacionar o conceito à fonte e discutir autoria coletiva.",
+      "suggested_content": "Ler a fonte documental e discutir seus limites em grupo.",
+      "status": "accepted"
+    },
+    {
+      "id": "suggestion-2",
+      "project_id": "project-example",
+      "concept_ids": [
+        "crispr",
+        "genome-editing"
+      ],
+      "source_anchor": {
+        "source_document_id": "doc-text",
+        "quote": "CRISPR",
+        "occurrence": 1
+      },
+      "researcher_ids": [
+        "doudna",
+        "charpentier"
+      ],
+      "contribution_id": "crispr-2014",
+      "evidence_ids": [
+        "evidence-crispr-2014"
+      ],
+      "scientific_explanation": "Contribuição documentada relacionada aos conceitos do material. Não há artigo comparável; correspondência temática não comprova influência histórica.",
+      "historical_claim": "Doudna e Charpentier revisaram a história, o mecanismo e as aplicações da tecnologia CRISPR-Cas9. Esta contribuição é uma síntese científica, não uma nova descoberta experimental.",
+      "pedagogical_rationale": "Relacionar o conceito à fonte e discutir autoria coletiva.",
+      "suggested_content": "Ler a fonte documental e discutir seus limites em grupo.",
+      "status": "rejected"
+    }
+  ],
+  "evidence_references": [
+    {
+      "id": "evidence-crispr-2012",
+      "contribution_id": "crispr-2012",
+      "claim_supported": "Jínek e colaboradores, incluindo Doudna e Charpentier, demonstraram a clivagem de DNA por Cas9 guiada por crRNA e tracrRNA e por um RNA quimérico, indicando potencial para edição genômica programável.",
+      "source_title": "A Programmable Dual-RNA–Guided DNA Endonuclease in Adaptive Bacterial Immunity",
+      "source_url": "https://doi.org/10.1126/science.1225829",
+      "source_type": "documental",
+      "excerpt_or_location": "Resumo: mecanismo de dois RNAs e RNA quimérico; Science 337(6096), 816–821.",
+      "verification_status": "verified",
+      "researcher_ids": [
+        "doudna",
+        "charpentier"
+      ],
+      "participants": [
+        "Martin Jínek",
+        "Krzysztof Chylinski",
+        "Ines Fonfara",
+        "M. Hauer",
+        "Jennifer A. Doudna",
+        "Emmanuelle Charpentier"
+      ],
+      "limitations": [
+        "Correspondência temática não comprova influência histórica direta.",
+        "Autoria coletiva: preservar todos os participantes documentados da publicação."
+      ],
+      "retrieved_at": "2026-10-21T09:44:17.890410+00:00",
+      "from_cache": true
+    },
+    {
+      "id": "evidence-crispr-2014",
+      "contribution_id": "crispr-2014",
+      "claim_supported": "Doudna e Charpentier revisaram a história, o mecanismo e as aplicações da tecnologia CRISPR-Cas9. Esta contribuição é uma síntese científica, não uma nova descoberta experimental.",
+      "source_title": "The new frontier of genome engineering with CRISPR-Cas9",
+      "source_url": "https://doi.org/10.1126/science.1258096",
+      "source_type": "documental",
+      "excerpt_or_location": "Resumo e revisão; Science 346(6213), 1258096.",
+      "verification_status": "verified",
+      "researcher_ids": [
+        "doudna",
+        "charpentier"
+      ],
+      "participants": [
+        "Jennifer A. Doudna",
+        "Emmanuelle Charpentier"
+      ],
+      "limitations": [
+        "Sem artigo comparável: dados insuficientes para determinar citação.",
+        "A autoria é coletiva; participantes canônicos preservados.",
+        "Correspondência temática não comprova influência histórica direta."
+      ],
+      "retrieved_at": "2026-10-21T09:44:19.239012+00:00",
+      "from_cache": true
+    }
+  ],
+  "limitations": [
+    "Sem artigo comparável: citação UNKNOWN. Correspondência temática não comprova influência histórica."
+  ],
+  "review_revision": 1,
+  "expires_at": "2026-10-28T12:10:00Z",
+  "generation_metadata": {
+    "provider": "fixture",
+    "model": "not-generated",
+    "prompt_version": "fixture-v1",
+    "schema_version": 1,
+    "generated_at": "2026-10-21T00:00:00Z",
+    "duration_ms": 0,
+    "input_tokens": null,
+    "output_tokens": null
+  },
+  "generation_status": "idle",
+  "last_lesson_bundle_id": null,
+  "project": {
+    "id": "project-example",
+    "title": "CRISPR-Cas9: conceitos e evidências",
+    "subject": "Biologia",
+    "education_level": "Ensino Médio",
+    "duration_minutes": 50,
+    "learning_objectives": [],
+    "scientific_context_id": "context-text",
+    "status": "reviewed",
+    "created_at": "2026-10-21T12:00:00Z",
+    "updated_at": "2026-10-21T12:10:00Z",
+    "last_teacher_activity_at": "2026-10-21T12:10:00Z",
+    "expires_at": "2026-10-28T12:10:00Z"
+  },
+  "source_documents": [
+    {
+      "id": "doc-text",
+      "project_id": "project-example",
+      "type": "text",
+      "title": "Material do professor",
+      "content": "CRISPR permite estudar edição genômica. CRISPR será discutido em grupo.",
+      "doi": null,
+      "extraction_status": "ready"
+    }
+  ],
+  "approved_objectives": [
+    "Explicar os conceitos científicos apresentados.",
+    "Analisar autoria, evidência e limites de uma afirmação."
+  ],
+  "last_error": null
+}

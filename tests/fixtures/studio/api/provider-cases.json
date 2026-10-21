@@ -1,0 +1,13 @@
+[
+  {"name": "valid-preview", "stage": "preview", "content": "{\"local_section_key\":\"section-a\"}", "reason": null},
+  {"name": "valid-lesson", "stage": "lesson", "content": "{\"local_slide_key\":\"slide-a\"}", "reason": null},
+  {"name": "invalid-json", "stage": "lesson", "content": "{invalid", "reason": null},
+  {"name": "invalid-schema", "stage": "preview", "content": "[]", "reason": null},
+  {"name": "blocked", "stage": "preview", "content": null, "reason": "blocked"},
+  {"name": "incomplete-output", "stage": "lesson", "content": null, "reason": "truncated"},
+  {"name": "429", "stage": "preview", "content": null, "reason": "rate_limited"},
+  {"name": "401", "stage": "preview", "content": null, "reason": "unauthorized"},
+  {"name": "403", "stage": "lesson", "content": null, "reason": "unauthorized"},
+  {"name": "timeout", "stage": "lesson", "content": null, "reason": "timeout"},
+  {"name": "upstream-unavailable", "stage": "preview", "content": null, "reason": "unavailable"}
+]

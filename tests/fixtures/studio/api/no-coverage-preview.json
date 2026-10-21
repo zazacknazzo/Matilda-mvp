@@ -1,0 +1,84 @@
+{
+  "preview_id": "preview-example",
+  "project_id": "project-example",
+  "schema_version": 1,
+  "scientific_context": {
+    "id": "context-uncovered-text",
+    "origin_type": "material",
+    "paper_ids": [],
+    "concept_ids": [],
+    "concept_labels": [],
+    "source_document_ids": [
+      "doc-uncovered-text"
+    ],
+    "provenance": [
+      {
+        "source_document_id": "doc-uncovered-text",
+        "concept_id": null,
+        "method": "teacher_input",
+        "quote": "Dinâmica de fluidos em uma tubulação.",
+        "retrieved_at": null,
+        "from_cache": null,
+        "source_url": null
+      }
+    ],
+    "limitations": [
+      "Sem cobertura neste catálogo; isto não indica inexistência de contribuições femininas."
+    ],
+    "analysis_id": null
+  },
+  "concepts": [],
+  "suggested_objectives": [
+    "Explicar os conceitos científicos apresentados.",
+    "Analisar autoria, evidência e limites de uma afirmação."
+  ],
+  "suggestions": [],
+  "evidence_references": [],
+  "limitations": [
+    "Sem cobertura neste catálogo; isto não indica inexistência de contribuições femininas."
+  ],
+  "review_revision": 1,
+  "expires_at": "2026-10-28T12:10:00Z",
+  "generation_metadata": {
+    "provider": "fixture",
+    "model": "not-generated",
+    "prompt_version": "fixture-v1",
+    "schema_version": 1,
+    "generated_at": "2026-10-21T00:00:00Z",
+    "duration_ms": 0,
+    "input_tokens": null,
+    "output_tokens": null
+  },
+  "generation_status": "idle",
+  "last_lesson_bundle_id": null,
+  "project": {
+    "id": "project-example",
+    "title": "CRISPR-Cas9: conceitos e evidências",
+    "subject": "Biologia",
+    "education_level": "Ensino Médio",
+    "duration_minutes": 50,
+    "learning_objectives": [],
+    "scientific_context_id": "context-uncovered-text",
+    "status": "reviewed",
+    "created_at": "2026-10-21T12:00:00Z",
+    "updated_at": "2026-10-21T12:10:00Z",
+    "last_teacher_activity_at": "2026-10-21T12:10:00Z",
+    "expires_at": "2026-10-28T12:10:00Z"
+  },
+  "source_documents": [
+    {
+      "id": "doc-uncovered-text",
+      "project_id": "project-example",
+      "type": "text",
+      "title": "Material do professor",
+      "content": "Dinâmica de fluidos em uma tubulação.",
+      "doi": null,
+      "extraction_status": "ready"
+    }
+  ],
+  "approved_objectives": [
+    "Explicar os conceitos científicos apresentados.",
+    "Analisar autoria, evidência e limites de uma afirmação."
+  ],
+  "last_error": null
+}
