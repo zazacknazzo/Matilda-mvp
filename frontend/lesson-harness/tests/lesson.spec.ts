@@ -165,6 +165,29 @@ test("tela cheia nativa entra e sai preservando o slide e devolvendo o foco", as
   await expect(page.getByRole("status")).toHaveText("Slide 2 de 6");
 });
 
+test("navegar a partir de uma fonte mantém foco e Escape utilizáveis", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Ciência e autoria/ }).click();
+  const launch = page.getByRole("button", { name: "Apresentar aula" });
+  await launch.click();
+  const presentation = page.getByRole("dialog", {
+    name: "Apresentação da aula",
+  });
+  await presentation.getByRole("link").first().focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(presentation.getByRole("status")).toHaveText("Slide 5 de 6");
+  await expect
+    .poll(() =>
+      presentation.evaluate((node) => node.contains(document.activeElement)),
+    )
+    .toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(presentation).toHaveCount(0);
+  await expect(launch).toBeFocused();
+});
+
 test("sem enriquecimentos, opcionais e mobile não inventam conteúdo documental", async ({
   page,
 }) => {
