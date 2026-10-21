@@ -6,6 +6,8 @@
     "./vite.config.ts",
     "../src/lesson",
     "./tests/lesson.spec.ts",
-    "../playwright.lesson.config.ts"
+    "./tests/export.spec.ts",
+    "../playwright.lesson.config.ts",
+    "../playwright.export.config.ts"
   ]
 }

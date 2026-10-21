@@ -7,11 +7,19 @@ import {
   navigateSlides,
 } from "./lesson-view";
 import { LessonPlan } from "./LessonPlan";
+import { LessonExportActions } from "./LessonExportActions";
+import { LessonPrintView } from "./LessonPrintView";
+import type { LessonExportApi } from "./export-api";
 import { PresentationMode } from "./PresentationMode";
 import { SlideControls, SlideRenderer } from "./SlideRenderer";
 import "./lesson.css";
 
-export function LessonWorkspace({ bundle }: { bundle: LessonBundle }) {
+interface Props {
+  bundle: LessonBundle;
+  exportApi?: LessonExportApi;
+}
+
+export function LessonWorkspace({ bundle, exportApi }: Props) {
   const error = lessonRenderError(bundle);
   return error ? (
     <div className="lesson-ui lesson-invalid" role="alert">
@@ -20,11 +28,15 @@ export function LessonWorkspace({ bundle }: { bundle: LessonBundle }) {
       <p>Confira o bundle validado antes de continuar.</p>
     </div>
   ) : (
-    <ValidatedWorkspace key={bundle.lesson_bundle_id} bundle={bundle} />
+    <ValidatedWorkspace
+      key={bundle.lesson_bundle_id}
+      bundle={bundle}
+      exportApi={exportApi}
+    />
   );
 }
 
-function ValidatedWorkspace({ bundle }: { bundle: LessonBundle }) {
+function ValidatedWorkspace({ bundle, exportApi }: Props) {
   const [view, setView] = useState<"slides" | "plan">("slides");
   const [selected, setSelected] = useState(0);
   const [presenting, setPresenting] = useState(false);
@@ -59,6 +71,10 @@ function ValidatedWorkspace({ bundle }: { bundle: LessonBundle }) {
             Apresentar aula ↗
           </button>
         </header>
+        <LessonExportActions
+          bundleId={bundle.lesson_bundle_id}
+          api={exportApi}
+        />
         <nav className="lesson-view-switch" aria-label="Visualização da aula">
           <button
             type="button"
@@ -156,6 +172,7 @@ function ValidatedWorkspace({ bundle }: { bundle: LessonBundle }) {
           </section>
         ) : null}
       </main>
+      <LessonPrintView bundle={bundle} />
       {presenting ? (
         <PresentationMode
           slides={index.orderedSlides}
