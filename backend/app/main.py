@@ -117,3 +117,7 @@ def export(identifier: str, format: str = 'markdown'):
         lines += ['Limite da ampliação: '+warning for warning in result.external_discovery.warnings]
     lines += ['## Cobertura e limitações'] + ['- '+w for w in result.coverage_warnings]
     return Response('\n'.join(lines), media_type='text/markdown; charset=utf-8', headers={'Content-Disposition':f'attachment; filename="matilda-{identifier}.md"'})
+
+# Studio is composed independently; no provider is initialized at import/startup.
+from app.api.studio_preview import router as studio_preview_router
+app.include_router(studio_preview_router)

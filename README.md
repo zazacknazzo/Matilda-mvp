@@ -1,4 +1,4 @@
-# Matilda Forensics
+# Matilda — Forensics e Studio
 
 **Toda descoberta tem uma história. Investigue a participação delas.**
 
@@ -96,6 +96,42 @@ Confirme a ficha bibliográfica e clique em **Investigar contribuições feminin
 Selecione uma contribuição, leia a classificação bibliográfica e abra a evidência.
 Use as camadas do grafo, a alternativa em lista ou exporte Markdown/JSON.
 
+## Studio: texto até prévia verificável (T05)
+
+Selecione **Studio — Criar aula**, informe título, texto e/ou conceitos (por
+exemplo CRISPR-Cas9), confira os defaults e clique em **Criar prévia**.
+O texto é enviado ao Gemini junto da configuração e do conjunto científico
+resolvido pelo mesmo motor do Forensics. A tela separa material original,
+propostas pedagógicas pendentes e evidências canônicas com participantes e fontes.
+A revisão docente e a geração final ainda não estão conectadas neste fluxo.
+
+Configure `GEMINI_API_KEY` no `.env` da raiz, exclusivamente no backend, e
+reinicie a API. O modelo configurável é `GEMINI_MODEL=gemini-3.8-flash`.
+Sem chave/quota ou com resposta inválida, a prévia falha explicitamente e conserva
+a entrada; o Forensics permanece disponível. Nenhum retorno simulado é selecionado
+pela aplicação de produção.
+
+Uma prévia válida é persistida no SQLite e pode ser retomada pelo endereço
+`#studio/previews/<id>` no mesmo navegador. O cookie é HttpOnly; outro navegador
+não acessa o material. A retenção é de sete dias por criação válida admitida;
+consultar não renova. Material e configuração ficam gravados antes da IA;
+erro devolve o projeto próprio para tentativa explícita. Antes da primeira
+prévia válida, o formulário mantém a entrada na tela; não há consulta pública
+de drafts nem recuperação de formulário após fechar essa tela.
+
+Testes com API, SQLite e provedor externo controlado, incluindo a regressão
+Forensics (os servidores são iniciados automaticamente):
+
+```sh
+cd frontend
+node node_modules/@playwright/test/cli.js test --config playwright.studio.config.ts
+```
+
+[Contrato e execução T05](docs/studio-preview-t05.md). Para publicar, mantenha
+frontend e `/api` na mesma origem HTTPS, proxy com timeout de pelo menos 100 s
+e SQLite persistente. No desenvolvimento, `MATILDA_API_PROXY` altera o destino
+do proxy Vite; o navegador continua usando `/api` e não recebe a chave.
+
 ## Ampliação automática
 
 Após investigar um DOI, clique em **Ampliar descoberta automaticamente**.
@@ -127,6 +163,8 @@ não localizada nas referências recuperadas **não comprova exclusão**.
 |---|---|
 | `OPENALEX_API_KEY` | Chave opcional do OpenAlex, apenas no backend; pode ser exigida pelo serviço |
 | `OPENALEX_MAILTO` | Contato opcional para consultas acadêmicas |
+| `GEMINI_API_KEY` | Chave Gemini, somente no backend; exigida apenas pelo Studio |
+| `GEMINI_MODEL` | Modelo Studio; padrão `gemini-3.8-flash` |
 | `MATILDA_DB` | Banco SQLite; padrão `.runtime/matilda.db` na raiz |
 | `MATILDA_CACHE_TTL` | Validade do cache em segundos; padrão 86400; use 0 para tentar atualizar |
 | `MATILDA_CORS_ORIGINS` | Origens frontend permitidas, separadas por vírgula |
@@ -159,8 +197,8 @@ celular e teclado. Evidências de execução em [docs/validation.md](docs/valida
 ## Arquitetura e fontes
 
 React 19, TypeScript, Vite, React Flow e Lucide; FastAPI, Pydantic, HTTPX,
-SQLite e catálogo JSON. Não há serviço de IA externo: o fallback determinístico
-previsto no PRD é o mecanismo implementado.
+SQLite e catálogo JSON. O Forensics mantém explicações determinísticas. O Studio
+usa Gemini real por meio do SDK oficial `google-genai`, com validação no servidor.
 
 - [Arquitetura e API](docs/architecture.md)
 - [Método científico e fontes](docs/research-methodology.md)
