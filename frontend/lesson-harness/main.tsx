@@ -32,7 +32,8 @@ function Harness() {
         <strong>EXEMPLO / DESENVOLVIMENTO</strong>
         <span>
           Dados de teste. Esta aula não foi gerada por IA nem pertence a um
-          professor.
+          professor. Download usa o host de exportação de desenvolvimento;
+          autorização e repositório são simulados.
         </span>
         <label>
           Exemplo{" "}
