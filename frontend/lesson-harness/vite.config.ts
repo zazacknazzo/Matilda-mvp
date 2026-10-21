@@ -4,6 +4,9 @@ import { fileURLToPath } from "node:url";
 
 export default defineConfig({
   root: fileURLToPath(new URL(".", import.meta.url)),
+  cacheDir: fileURLToPath(
+    new URL("../node_modules/.vite-lesson-harness", import.meta.url),
+  ),
   plugins: [react()],
   server: {
     host: "127.0.0.1",

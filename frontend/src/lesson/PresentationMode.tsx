@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { LessonReference, LessonSlide } from "../types/lesson";
 import { navigateSlides } from "./lesson-view";
@@ -20,6 +20,12 @@ export function PresentationMode({
   const dialog = useRef<HTMLDivElement>(null);
   const wasFullscreen = useRef(false);
   const [notice, setNotice] = useState("");
+  useLayoutEffect(() => {
+    // A source link can disappear when advancing to a slide without evidence.
+    // Keep keyboard navigation and Escape inside the presentation in that case.
+    if (!dialog.current?.contains(document.activeElement))
+      dialog.current?.focus();
+  }, [index]);
   useEffect(() => {
     const element = dialog.current;
     const previousOverflow = document.body.style.overflow;
