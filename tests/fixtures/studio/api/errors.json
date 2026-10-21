@@ -1,0 +1,104 @@
+[
+  {
+    "http_status": 422,
+    "body": {
+      "detail": "Entrada inválida.",
+      "code": "invalid_input",
+      "retryable": false,
+      "project_id": null
+    },
+    "headers": {}
+  },
+  {
+    "http_status": 404,
+    "body": {
+      "detail": "Recurso não encontrado.",
+      "code": "not_found",
+      "retryable": false,
+      "project_id": null
+    },
+    "headers": {}
+  },
+  {
+    "http_status": 409,
+    "body": {
+      "detail": "Atualize a revisão.",
+      "code": "review_conflict",
+      "retryable": true,
+      "project_id": "project-example"
+    },
+    "headers": {}
+  },
+  {
+    "http_status": 409,
+    "body": {
+      "detail": "Geração em andamento.",
+      "code": "generation_in_progress",
+      "retryable": true,
+      "project_id": "project-example"
+    },
+    "headers": {}
+  },
+  {
+    "http_status": 413,
+    "body": {
+      "detail": "Reduza o material.",
+      "code": "input_too_large",
+      "retryable": false,
+      "project_id": null
+    },
+    "headers": {}
+  },
+  {
+    "http_status": 429,
+    "body": {
+      "detail": "Limite temporal da sessão.",
+      "code": "session_limit",
+      "retryable": true,
+      "project_id": "project-example"
+    },
+    "headers": {
+      "Retry-After": "60"
+    }
+  },
+  {
+    "http_status": 502,
+    "body": {
+      "detail": "Saída fora do contrato.",
+      "code": "invalid_generation",
+      "retryable": true,
+      "project_id": "project-example"
+    },
+    "headers": {}
+  },
+  {
+    "http_status": 503,
+    "body": {
+      "detail": "Provedor indisponível.",
+      "code": "provider_unavailable",
+      "retryable": true,
+      "project_id": "project-example"
+    },
+    "headers": {}
+  },
+  {
+    "http_status": 503,
+    "body": {
+      "detail": "Studio não configurado.",
+      "code": "studio_not_configured",
+      "retryable": false,
+      "project_id": "project-example"
+    },
+    "headers": {}
+  },
+  {
+    "http_status": 504,
+    "body": {
+      "detail": "Tempo de geração excedido.",
+      "code": "generation_timeout",
+      "retryable": true,
+      "project_id": "project-example"
+    },
+    "headers": {}
+  }
+]

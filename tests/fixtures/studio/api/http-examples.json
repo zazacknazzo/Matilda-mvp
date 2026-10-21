@@ -1,0 +1,137 @@
+[
+  {
+    "operation_id": "studio_preview",
+    "method": "POST",
+    "path": "/api/studio/preview",
+    "status": 201,
+    "request": {
+      "fixture": "requests",
+      "path": [
+        "preview",
+        0
+      ]
+    },
+    "response": {
+      "fixture": "pending-preview",
+      "path": []
+    },
+    "headers": {
+      "Origin": "https://matilda.example"
+    }
+  },
+  {
+    "operation_id": "studio_get_preview",
+    "method": "GET",
+    "path": "/api/studio/previews/{id}",
+    "status": 200,
+    "request": null,
+    "response": {
+      "fixture": "text-preview",
+      "path": []
+    },
+    "cookies": {
+      "matilda_studio_session": "fixture-opaque-session"
+    }
+  },
+  {
+    "operation_id": "studio_review",
+    "method": "POST",
+    "path": "/api/studio/previews/{id}/review",
+    "status": 200,
+    "request": {
+      "fixture": "requests",
+      "path": [
+        "review",
+        0
+      ]
+    },
+    "response": {
+      "fixture": "text-preview",
+      "path": []
+    },
+    "headers": {
+      "Origin": "https://matilda.example"
+    },
+    "cookies": {
+      "matilda_studio_session": "fixture-opaque-session"
+    }
+  },
+  {
+    "operation_id": "studio_generate",
+    "method": "POST",
+    "path": "/api/studio/generate",
+    "status": 201,
+    "headers": {
+      "Idempotency-Key": "fixture-generation-1",
+      "Origin": "https://matilda.example"
+    },
+    "request": {
+      "fixture": "requests",
+      "path": [
+        "generate",
+        0
+      ]
+    },
+    "response": {
+      "fixture": "../lessons/crispr-50",
+      "path": []
+    },
+    "cookies": {
+      "matilda_studio_session": "fixture-opaque-session"
+    }
+  },
+  {
+    "operation_id": "studio_generate",
+    "method": "POST",
+    "path": "/api/studio/generate",
+    "status": 200,
+    "headers": {
+      "Idempotency-Key": "fixture-generation-1",
+      "Origin": "https://matilda.example"
+    },
+    "request": {
+      "fixture": "requests",
+      "path": [
+        "generate",
+        0
+      ]
+    },
+    "response": {
+      "fixture": "../lessons/crispr-50",
+      "path": []
+    },
+    "cookies": {
+      "matilda_studio_session": "fixture-opaque-session"
+    }
+  },
+  {
+    "operation_id": "studio_get_lesson",
+    "method": "GET",
+    "path": "/api/studio/lessons/{id}",
+    "status": 200,
+    "request": null,
+    "response": {
+      "fixture": "../lessons/crispr-50",
+      "path": []
+    },
+    "cookies": {
+      "matilda_studio_session": "fixture-opaque-session"
+    }
+  },
+  {
+    "operation_id": "studio_export_lesson",
+    "method": "GET",
+    "path": "/api/studio/lessons/{id}/export",
+    "status": 200,
+    "query": {
+      "format": "markdown"
+    },
+    "request": null,
+    "response_text": "# Aula de exemplo\n\nFixture de transporte, não uma exportação real.\n",
+    "content_type": "text/markdown; charset=utf-8",
+    "content_disposition": "attachment; filename=matilda-lesson-example.md",
+    "cookies": {
+      "matilda_studio_session": "fixture-opaque-session"
+    }
+  }
+]

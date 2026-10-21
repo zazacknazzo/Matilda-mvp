@@ -1,0 +1,199 @@
+{
+  "preview": [
+    {
+      "title": "CRISPR-Cas9: conceitos e evidências",
+      "subject": "Biologia",
+      "education_level": "Ensino Médio",
+      "duration_minutes": 50,
+      "objectives": [],
+      "concepts": [],
+      "material_text": "CRISPR permite estudar edição genômica. CRISPR será discutido em grupo.",
+      "doi": null,
+      "analysis_id": null,
+      "project_id": null
+    },
+    {
+      "title": "CRISPR-Cas9: conceitos e evidências",
+      "subject": "Biologia",
+      "education_level": "Ensino Médio",
+      "duration_minutes": 50,
+      "objectives": [],
+      "concepts": [],
+      "material_text": "",
+      "doi": "10.1126/science.1231143",
+      "analysis_id": null,
+      "project_id": null
+    },
+    {
+      "title": "RNA mensageiro: conceitos e evidências",
+      "subject": "Biologia",
+      "education_level": "Ensino Médio",
+      "duration_minutes": 50,
+      "objectives": [],
+      "concepts": [],
+      "material_text": "",
+      "doi": "10.1056/nejmoa2034577",
+      "analysis_id": null,
+      "project_id": null
+    },
+    {
+      "title": "CRISPR-Cas9: conceitos e evidências",
+      "subject": "Biologia",
+      "education_level": "Ensino Médio",
+      "duration_minutes": 50,
+      "objectives": [],
+      "concepts": [
+        "RNA mensageiro"
+      ],
+      "material_text": "",
+      "doi": "10.1126/science.1231143",
+      "analysis_id": null,
+      "project_id": null
+    },
+    {
+      "title": "CRISPR-Cas9: conceitos e evidências",
+      "subject": "Biologia",
+      "education_level": "Ensino Médio",
+      "duration_minutes": 50,
+      "objectives": [],
+      "concepts": [],
+      "material_text": "Dinâmica de fluidos em uma tubulação.",
+      "doi": null,
+      "analysis_id": null,
+      "project_id": null
+    },
+    {
+      "title": "Investigação existente",
+      "analysis_id": "analysis-fixture"
+    }
+  ],
+  "review": [
+    {
+      "review_revision": 0,
+      "decisions": [
+        {
+          "suggestion_id": "suggestion-1",
+          "status": "accepted",
+          "pedagogical_rationale": null,
+          "suggested_content": null
+        },
+        {
+          "suggestion_id": "suggestion-2",
+          "status": "rejected",
+          "pedagogical_rationale": null,
+          "suggested_content": null
+        }
+      ],
+      "approved_objectives": [
+        "Explicar os conceitos científicos apresentados.",
+        "Analisar autoria, evidência e limites de uma afirmação."
+      ]
+    },
+    {
+      "review_revision": 0,
+      "decisions": [
+        {
+          "suggestion_id": "suggestion-1",
+          "status": "accepted",
+          "pedagogical_rationale": null,
+          "suggested_content": null
+        },
+        {
+          "suggestion_id": "suggestion-2",
+          "status": "rejected",
+          "pedagogical_rationale": null,
+          "suggested_content": null
+        }
+      ],
+      "approved_objectives": [
+        "Explicar os conceitos científicos apresentados.",
+        "Analisar autoria, evidência e limites de uma afirmação."
+      ]
+    },
+    {
+      "review_revision": 0,
+      "decisions": [
+        {
+          "suggestion_id": "suggestion-1",
+          "status": "accepted",
+          "pedagogical_rationale": null,
+          "suggested_content": null
+        },
+        {
+          "suggestion_id": "suggestion-2",
+          "status": "rejected",
+          "pedagogical_rationale": null,
+          "suggested_content": null
+        }
+      ],
+      "approved_objectives": [
+        "Explicar os conceitos científicos apresentados.",
+        "Analisar autoria, evidência e limites de uma afirmação."
+      ]
+    },
+    {
+      "review_revision": 0,
+      "decisions": [
+        {
+          "suggestion_id": "suggestion-1",
+          "status": "accepted",
+          "pedagogical_rationale": null,
+          "suggested_content": null
+        },
+        {
+          "suggestion_id": "suggestion-2",
+          "status": "rejected",
+          "pedagogical_rationale": null,
+          "suggested_content": null
+        }
+      ],
+      "approved_objectives": [
+        "Explicar os conceitos científicos apresentados.",
+        "Analisar autoria, evidência e limites de uma afirmação."
+      ]
+    },
+    {
+      "review_revision": 0,
+      "decisions": [],
+      "approved_objectives": [
+        "Explicar os conceitos científicos apresentados.",
+        "Analisar autoria, evidência e limites de uma afirmação."
+      ]
+    }
+  ],
+  "generate": [
+    {
+      "preview_id": "preview-example",
+      "review_revision": 1,
+      "accepted_suggestion_ids": [
+        "suggestion-1"
+      ]
+    },
+    {
+      "preview_id": "preview-example",
+      "review_revision": 1,
+      "accepted_suggestion_ids": [
+        "suggestion-1"
+      ]
+    },
+    {
+      "preview_id": "preview-example",
+      "review_revision": 1,
+      "accepted_suggestion_ids": [
+        "suggestion-1"
+      ]
+    },
+    {
+      "preview_id": "preview-example",
+      "review_revision": 1,
+      "accepted_suggestion_ids": [
+        "suggestion-1"
+      ]
+    },
+    {
+      "preview_id": "preview-example",
+      "review_revision": 1,
+      "accepted_suggestion_ids": []
+    }
+  ]
+}
