@@ -98,3 +98,33 @@ Essa evidência cobre o renderer e a regressão existente, sem declarar jornada
 Studio integrada, sessão/GET protegido ou geração real. Projetor físico,
 impressão e ensaio com docentes permanecem nos tickets de entrega correspondentes.
 O PR continua sujeito à revisão por outro integrante antes da integração.
+
+## Revalidação e correção de foco — macOS, 21/10/2026
+
+Revisão adicional encontrou um caso não coberto pela suíte inicial: focar o link
+documental e avançar para um slide sem fonte removia o elemento focado. O foco
+caía no `body` e Escape não alcançava o diálogo. Um teste pelo harness reproduziu
+a falha antes da correção e passou após restaurar o foco no diálogo quando o
+elemento anterior deixa de pertencer à apresentação. Controles que mantêm foco
+continuam utilizáveis sem redirecionamento.
+
+O harness também usa um cache Vite próprio em
+`node_modules/.vite-lesson-harness`: os servidores do produto e dos exemplos
+podem rodar juntos sem invalidar as dependências um do outro (`504 Outdated
+Optimize Dep`). Nenhuma entrada de produção ou contrato compartilhado mudou.
+
+Resultados sobre a branch T08, macOS arm64, Python 3.14.7, Node 26.10.0 e
+Chromium 156.0.8078.4, executando os comandos acima e a suíte Forensics do README:
+
+- **14 testes T08 aprovados**, incluindo a regressão de foco e Escape.
+- **6 testes Forensics aprovados**, com API/frontend locais, SQLite isolado,
+  `MATILDA_CACHE_TTL=999999999` para os snapshots existentes e as respostas de
+  descoberta controladas pelos testes. Ambos os servidores Vite estavam ativos.
+- **366 testes backend aprovados**; somente o aviso Starlette/TestClient existente.
+- Tipagem do harness/componentes/testes, quatro fixtures TypeScript, build
+  TypeScript/Vite e `git diff --check` aprovados. Saída de produção sem fixtures
+  de aula, banner ou `setLessonExample`.
+
+Revisão por agentes nos eixos Standards e Spec: nenhum achado de padrões; o
+achado de foco da revisão de spec foi corrigido com a regressão acima. O aceite
+do PR por outro integrante da equipe continua necessário antes do merge.
