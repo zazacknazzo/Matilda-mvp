@@ -1,0 +1,492 @@
+[
+  {
+    "name": "wrong-total",
+    "fixture": "crispr-50",
+    "path": [
+      "metadata",
+      "duration_minutes"
+    ],
+    "value": 49
+  },
+  {
+    "name": "wrong-section-time",
+    "fixture": "crispr-50",
+    "path": [
+      "sections",
+      0,
+      "duration_minutes"
+    ],
+    "value": 16
+  },
+  {
+    "name": "wrong-slide-time",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      0,
+      "duration_minutes"
+    ],
+    "value": 6
+  },
+  {
+    "name": "activity-time-double-count",
+    "fixture": "crispr-50",
+    "path": [
+      "activities",
+      0,
+      "duration_minutes"
+    ],
+    "value": 10
+  },
+  {
+    "name": "unknown-layout",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      0,
+      "layout"
+    ],
+    "value": "HTML"
+  },
+  {
+    "name": "missing-slide",
+    "fixture": "crispr-50",
+    "path": [
+      "sections",
+      0,
+      "slide_ids",
+      0
+    ],
+    "value": "missing"
+  },
+  {
+    "name": "orphan-slide",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      0,
+      "section_id"
+    ],
+    "value": "missing"
+  },
+  {
+    "name": "missing-activity",
+    "fixture": "crispr-50",
+    "path": [
+      "sections",
+      2,
+      "activity_ids"
+    ],
+    "value": []
+  },
+  {
+    "name": "wrong-activity-section",
+    "fixture": "crispr-50",
+    "path": [
+      "activities",
+      0,
+      "section_id"
+    ],
+    "value": "section-1"
+  },
+  {
+    "name": "invalid-objective",
+    "fixture": "crispr-50",
+    "path": [
+      "activities",
+      0,
+      "objective_indexes"
+    ],
+    "value": [
+      2
+    ]
+  },
+  {
+    "name": "duplicate-objective",
+    "fixture": "crispr-50",
+    "path": [
+      "sections",
+      0,
+      "objective_indexes"
+    ],
+    "value": [
+      0,
+      0
+    ]
+  },
+  {
+    "name": "no-assessment",
+    "fixture": "crispr-50",
+    "path": [
+      "activities",
+      0,
+      "assessment_criteria"
+    ],
+    "value": []
+  },
+  {
+    "name": "no-activity",
+    "fixture": "crispr-50",
+    "path": [
+      "activities"
+    ],
+    "value": []
+  },
+  {
+    "name": "free-historical-claim",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      3,
+      "content_blocks",
+      0,
+      "text"
+    ],
+    "value": "Descoberta exclusiva inventada."
+  },
+  {
+    "name": "foreign-evidence",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      3,
+      "content_blocks",
+      0,
+      "evidence_id"
+    ],
+    "value": "evidence-rna-2005"
+  },
+  {
+    "name": "mismatched-contribution",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      3,
+      "contribution_ids"
+    ],
+    "value": [
+      "rna-2005"
+    ]
+  },
+  {
+    "name": "pending-evidence",
+    "fixture": "crispr-50",
+    "path": [
+      "references",
+      0,
+      "verification_status"
+    ],
+    "value": "pending"
+  },
+  {
+    "name": "unsafe-url",
+    "fixture": "crispr-50",
+    "path": [
+      "references",
+      0,
+      "source_url"
+    ],
+    "value": "javascript:alert(1)"
+  },
+  {
+    "name": "claim-too-long",
+    "fixture": "crispr-50",
+    "path": [
+      "references",
+      0,
+      "claim_supported"
+    ],
+    "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  {
+    "name": "slide-title-too-long",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      0,
+      "title"
+    ],
+    "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  {
+    "name": "notes-too-long",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      0,
+      "speaker_notes"
+    ],
+    "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  {
+    "name": "too-many-blocks",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      0,
+      "content_blocks"
+    ],
+    "value": [
+      {
+        "type": "text",
+        "text": "x"
+      },
+      {
+        "type": "text",
+        "text": "x"
+      },
+      {
+        "type": "text",
+        "text": "x"
+      },
+      {
+        "type": "text",
+        "text": "x"
+      },
+      {
+        "type": "text",
+        "text": "x"
+      },
+      {
+        "type": "text",
+        "text": "x"
+      },
+      {
+        "type": "text",
+        "text": "x"
+      }
+    ]
+  },
+  {
+    "name": "visible-text-too-long",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      0,
+      "content_blocks"
+    ],
+    "value": [
+      {
+        "type": "text",
+        "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    ]
+  },
+  {
+    "name": "process-one-step",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      2,
+      "content_blocks"
+    ],
+    "value": [
+      {
+        "type": "steps",
+        "items": [
+          "Só uma etapa"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "question-without-question",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      4,
+      "content_blocks"
+    ],
+    "value": [
+      {
+        "type": "text",
+        "text": "Pergunta ausente"
+      }
+    ]
+  },
+  {
+    "name": "spotlight-without-document",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      3,
+      "content_blocks"
+    ],
+    "value": [
+      {
+        "type": "text",
+        "text": "Sem fonte"
+      }
+    ]
+  },
+  {
+    "name": "duplicate-reference",
+    "fixture": "crispr-50",
+    "path": [
+      "references"
+    ],
+    "value": [
+      {
+        "id": "evidence-crispr-2012",
+        "contribution_id": "crispr-2012",
+        "claim_supported": "Jínek e colaboradores, incluindo Doudna e Charpentier, demonstraram a clivagem de DNA por Cas9 guiada por crRNA e tracrRNA e por um RNA quimérico, indicando potencial para edição genômica programável.",
+        "source_title": "A Programmable Dual-RNA–Guided DNA Endonuclease in Adaptive Bacterial Immunity",
+        "source_url": "https://doi.org/10.1126/science.1225829",
+        "source_type": "documental",
+        "excerpt_or_location": "Resumo: mecanismo de dois RNAs e RNA quimérico; Science 337(6096), 816–821.",
+        "verification_status": "verified",
+        "researcher_ids": [
+          "doudna",
+          "charpentier"
+        ],
+        "participants": [
+          "Martin Jínek",
+          "Krzysztof Chylinski",
+          "Ines Fonfara",
+          "M. Hauer",
+          "Jennifer A. Doudna",
+          "Emmanuelle Charpentier"
+        ],
+        "limitations": [
+          "Correspondência temática não comprova influência histórica direta.",
+          "Autoria coletiva: preservar todos os participantes documentados da publicação."
+        ],
+        "retrieved_at": "2026-10-21T09:44:17.890410+00:00",
+        "from_cache": true
+      },
+      {
+        "id": "evidence-crispr-2012",
+        "contribution_id": "crispr-2012",
+        "claim_supported": "Jínek e colaboradores, incluindo Doudna e Charpentier, demonstraram a clivagem de DNA por Cas9 guiada por crRNA e tracrRNA e por um RNA quimérico, indicando potencial para edição genômica programável.",
+        "source_title": "A Programmable Dual-RNA–Guided DNA Endonuclease in Adaptive Bacterial Immunity",
+        "source_url": "https://doi.org/10.1126/science.1225829",
+        "source_type": "documental",
+        "excerpt_or_location": "Resumo: mecanismo de dois RNAs e RNA quimérico; Science 337(6096), 816–821.",
+        "verification_status": "verified",
+        "researcher_ids": [
+          "doudna",
+          "charpentier"
+        ],
+        "participants": [
+          "Martin Jínek",
+          "Krzysztof Chylinski",
+          "Ines Fonfara",
+          "M. Hauer",
+          "Jennifer A. Doudna",
+          "Emmanuelle Charpentier"
+        ],
+        "limitations": [
+          "Correspondência temática não comprova influência histórica direta.",
+          "Autoria coletiva: preservar todos os participantes documentados da publicação."
+        ],
+        "retrieved_at": "2026-10-21T09:44:17.890410+00:00",
+        "from_cache": true
+      }
+    ]
+  },
+  {
+    "name": "unused-reference",
+    "fixture": "crispr-50",
+    "path": [
+      "references"
+    ],
+    "value": [
+      {
+        "id": "evidence-crispr-2012",
+        "contribution_id": "crispr-2012",
+        "claim_supported": "Jínek e colaboradores, incluindo Doudna e Charpentier, demonstraram a clivagem de DNA por Cas9 guiada por crRNA e tracrRNA e por um RNA quimérico, indicando potencial para edição genômica programável.",
+        "source_title": "A Programmable Dual-RNA–Guided DNA Endonuclease in Adaptive Bacterial Immunity",
+        "source_url": "https://doi.org/10.1126/science.1225829",
+        "source_type": "documental",
+        "excerpt_or_location": "Resumo: mecanismo de dois RNAs e RNA quimérico; Science 337(6096), 816–821.",
+        "verification_status": "verified",
+        "researcher_ids": [
+          "doudna",
+          "charpentier"
+        ],
+        "participants": [
+          "Martin Jínek",
+          "Krzysztof Chylinski",
+          "Ines Fonfara",
+          "M. Hauer",
+          "Jennifer A. Doudna",
+          "Emmanuelle Charpentier"
+        ],
+        "limitations": [
+          "Correspondência temática não comprova influência histórica direta.",
+          "Autoria coletiva: preservar todos os participantes documentados da publicação."
+        ],
+        "retrieved_at": "2026-10-21T09:44:17.890410+00:00",
+        "from_cache": true
+      },
+      {
+        "id": "evidence-rna-2005",
+        "contribution_id": "rna-2005",
+        "claim_supported": "O trabalho de Karikó, Buckstein, Ni e Weissman investiga a supressão do reconhecimento de RNA por receptores Toll-like a partir de modificações de nucleosídeos.",
+        "source_title": "Suppression of RNA Recognition by Toll-like Receptors: The Impact of Nucleoside Modification and the Evolutionary Origin of RNA",
+        "source_url": "https://doi.org/10.1016/j.immuni.2005.06.008",
+        "source_type": "documental",
+        "excerpt_or_location": "Título e resumo da publicação, Immunity 23(2), 165–175.",
+        "verification_status": "verified",
+        "researcher_ids": [
+          "kariko"
+        ],
+        "participants": [
+          "Katalin Karikó",
+          "Michael H. Buckstein",
+          "Houping Ni",
+          "Drew Weissman"
+        ],
+        "limitations": [
+          "Correspondência temática não comprova influência histórica direta.",
+          "Autoria coletiva: preservar todos os participantes documentados da publicação."
+        ],
+        "retrieved_at": "2026-10-21T09:44:19.624064+00:00",
+        "from_cache": true
+      }
+    ]
+  },
+  {
+    "name": "string-duration",
+    "fixture": "crispr-50",
+    "path": [
+      "slides",
+      0,
+      "duration_minutes"
+    ],
+    "value": "5"
+  },
+  {
+    "name": "boolean-version",
+    "fixture": "crispr-50",
+    "path": [
+      "schema_version"
+    ],
+    "value": true
+  },
+  {
+    "name": "wrong-version",
+    "fixture": "crispr-50",
+    "path": [
+      "schema_version"
+    ],
+    "value": 2
+  },
+  {
+    "name": "local-date",
+    "fixture": "crispr-50",
+    "path": [
+      "generation_metadata",
+      "generated_at"
+    ],
+    "value": "2026-10-21T10:00:00-03:00"
+  },
+  {
+    "name": "extra-field",
+    "fixture": "crispr-50",
+    "path": [
+      "secret"
+    ],
+    "value": "not-allowed"
+  }
+]
