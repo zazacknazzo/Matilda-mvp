@@ -1,0 +1,104 @@
+{
+  "source_documents": [
+    {
+      "id": "doc-no-coverage",
+      "project_id": "project-no-coverage",
+      "type": "paper_metadata",
+      "title": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid",
+      "content": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid",
+      "doi": "10.1038/171737a0",
+      "extraction_status": "ready"
+    }
+  ],
+  "scientific_context": {
+    "id": "context-no-coverage",
+    "origin_type": "doi",
+    "paper_ids": [
+      "https://openalex.org/W2126466006"
+    ],
+    "concept_ids": [
+      "https://openalex.org/T10432"
+    ],
+    "concept_labels": [
+      "DNA and Nucleic Acid Chemistry"
+    ],
+    "source_document_ids": [
+      "doc-no-coverage"
+    ],
+    "provenance": [
+      {
+        "source_document_id": "doc-no-coverage",
+        "concept_id": "https://openalex.org/T10432",
+        "method": "openalex_metadata",
+        "quote": null,
+        "retrieved_at": "2026-10-21T09:44:20.936194+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W2126466006"
+      }
+    ],
+    "limitations": [
+      "O OpenAlex não garante a completude das referências. Ausência no conjunto recuperado não prova omissão.",
+      "Conceitos extraídos por correspondência determinística de termos; nenhuma influência histórica é inferida.",
+      "Resumo indisponível. A análise conceitual está limitada ao título, tópicos e palavras-chave.",
+      "Metadados de cache identificado, recuperados em 2026-10-21T09:44:20.936194+00:00.",
+      "A ausência de cobertura no catálogo não indica inexistência de contribuições femininas."
+    ],
+    "analysis_id": null
+  },
+  "papers": [
+    {
+      "id": "https://openalex.org/W2126466006",
+      "doi": "10.1038/171737a0",
+      "openalex_id": "https://openalex.org/W2126466006",
+      "title": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid",
+      "abstract": null,
+      "year": 1953,
+      "authors": [
+        {
+          "id": "https://openalex.org/A5101495056",
+          "name": "James Dewey Watson"
+        },
+        {
+          "id": "https://openalex.org/A5109884453",
+          "name": "Francis Harry Compton Crick"
+        }
+      ],
+      "concepts": [
+        {
+          "id": "https://openalex.org/T10432",
+          "name": "DNA and Nucleic Acid Chemistry",
+          "aliases": [],
+          "provenance": [
+            "tópico atribuído pelo OpenAlex; relevância não auditada"
+          ]
+        }
+      ],
+      "referenced_work_ids": [
+        "https://openalex.org/W1984602737",
+        "https://openalex.org/W2036343636",
+        "https://openalex.org/W2040025357",
+        "https://openalex.org/W2091824841",
+        "https://openalex.org/W2136166906"
+      ],
+      "references_status": "retrieved_unverified_completeness",
+      "source_url": "https://openalex.org/W2126466006",
+      "retrieved_at": "2026-10-21T09:44:20.936194+00:00",
+      "from_cache": true,
+      "cache_stale": false,
+      "limitations": [
+        "O OpenAlex não garante a completude das referências. Ausência no conjunto recuperado não prova omissão.",
+        "Conceitos extraídos por correspondência determinística de termos; nenhuma influência histórica é inferida.",
+        "Resumo indisponível. A análise conceitual está limitada ao título, tópicos e palavras-chave.",
+        "Metadados de cache identificado, recuperados em 2026-10-21T09:44:20.936194+00:00."
+      ]
+    }
+  ],
+  "anchors": [
+    {
+      "source_document_id": "doc-no-coverage",
+      "quote": "Molecular Structure of Nucleic Acids: A Structure for Deoxyribose Nucleic Acid",
+      "occurrence": 0
+    }
+  ],
+  "expected_matches": []
+}

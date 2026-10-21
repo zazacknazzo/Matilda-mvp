@@ -1,0 +1,51 @@
+{
+  "source_documents": [
+    {
+      "id": "doc-rna-insufficient",
+      "project_id": "project-rna-insufficient",
+      "type": "concept_list",
+      "title": "Material do professor",
+      "content": "Immunogenicity",
+      "doi": null,
+      "extraction_status": "ready"
+    }
+  ],
+  "scientific_context": {
+    "id": "context-rna-insufficient",
+    "origin_type": "material",
+    "paper_ids": [],
+    "concept_ids": [
+      "rna-immunity"
+    ],
+    "concept_labels": [
+      "Reconhecimento imune de RNA"
+    ],
+    "source_document_ids": [
+      "doc-rna-insufficient"
+    ],
+    "provenance": [
+      {
+        "source_document_id": "doc-rna-insufficient",
+        "concept_id": "rna-immunity",
+        "method": "editorial_alias",
+        "quote": "Immunogenicity",
+        "retrieved_at": null,
+        "from_cache": null,
+        "source_url": null
+      }
+    ],
+    "limitations": [
+      "Sem cobertura elegível neste catálogo: imunogenicidade isolada não basta; RNA exige mrna ou nucleoside. A ausência de resultados não indica inexistência de contribuições femininas."
+    ],
+    "analysis_id": null
+  },
+  "anchors": [
+    {
+      "source_document_id": "doc-rna-insufficient",
+      "quote": "Immunogenicity",
+      "occurrence": 0
+    }
+  ],
+  "expected_matches": [],
+  "papers": []
+}

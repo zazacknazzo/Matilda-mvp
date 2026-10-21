@@ -1,0 +1,677 @@
+{
+  "10.1016/j.immuni.2005.06.008": {
+    "matches": [
+      {
+        "fixture": "rna",
+        "contribution_id": "rna-2005",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "nucleoside",
+              "name": "Modificação de nucleosídeos",
+              "aliases": [
+                "pseudouridine",
+                "nucleoside modification",
+                "modified nucleosides",
+                "modified nucleotides",
+                "nucleoside-modified"
+              ],
+              "provenance": [
+                "título",
+                "palavras-chave OpenAlex"
+              ]
+            },
+            {
+              "id": "rna-immunity",
+              "name": "Reconhecimento imune de RNA",
+              "aliases": [
+                "toll-like",
+                "immunogenicity",
+                "immunogenic",
+                "rna recognition",
+                "interferon-alpha"
+              ],
+              "provenance": [
+                "título",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "citation_status": "UNKNOWN",
+          "explanation": "O artigo e esta contribuição compartilham os conceitos: Modificação de nucleosídeos, Reconhecimento imune de RNA. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+            "Dados insuficientes para determinar citação; o artigo não pode citar a si próprio."
+          ],
+          "relevance": 2
+        }
+      },
+      {
+        "fixture": "rna",
+        "contribution_id": "rna-2008",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "nucleoside",
+              "name": "Modificação de nucleosídeos",
+              "aliases": [
+                "pseudouridine",
+                "nucleoside modification",
+                "modified nucleosides",
+                "modified nucleotides",
+                "nucleoside-modified"
+              ],
+              "provenance": [
+                "título",
+                "palavras-chave OpenAlex"
+              ]
+            },
+            {
+              "id": "rna-immunity",
+              "name": "Reconhecimento imune de RNA",
+              "aliases": [
+                "toll-like",
+                "immunogenicity",
+                "immunogenic",
+                "rna recognition",
+                "interferon-alpha"
+              ],
+              "provenance": [
+                "título",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "citation_status": "NOT_FOUND_IN_RETRIEVED_REFERENCES",
+          "explanation": "O artigo e esta contribuição compartilham os conceitos: Modificação de nucleosídeos, Reconhecimento imune de RNA. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+            "Publicação não localizada apenas nas referências recuperadas; a bibliografia completa não foi auditada."
+          ],
+          "relevance": 2
+        }
+      }
+    ]
+  },
+  "10.1038/171737a0": {
+    "fixture": "no-coverage"
+  },
+  "10.1038/mt.2008.200": {
+    "matches": [
+      {
+        "fixture": "rna",
+        "contribution_id": "rna-2005",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "mrna",
+              "name": "RNA mensageiro",
+              "aliases": [
+                "mrna",
+                "messenger rna",
+                "rna mensageiro"
+              ],
+              "provenance": [
+                "título",
+                "resumo",
+                "palavras-chave OpenAlex"
+              ]
+            },
+            {
+              "id": "nucleoside",
+              "name": "Modificação de nucleosídeos",
+              "aliases": [
+                "pseudouridine",
+                "nucleoside modification",
+                "modified nucleosides",
+                "modified nucleotides",
+                "nucleoside-modified"
+              ],
+              "provenance": [
+                "título",
+                "resumo",
+                "palavras-chave OpenAlex"
+              ]
+            },
+            {
+              "id": "rna-immunity",
+              "name": "Reconhecimento imune de RNA",
+              "aliases": [
+                "toll-like",
+                "immunogenicity",
+                "immunogenic",
+                "rna recognition",
+                "interferon-alpha"
+              ],
+              "provenance": [
+                "resumo",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "citation_status": "CITED",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada."
+          ]
+        }
+      },
+      {
+        "fixture": "rna",
+        "contribution_id": "rna-2008",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "mrna",
+              "name": "RNA mensageiro",
+              "aliases": [
+                "mrna",
+                "messenger rna",
+                "rna mensageiro"
+              ],
+              "provenance": [
+                "título",
+                "resumo",
+                "palavras-chave OpenAlex"
+              ]
+            },
+            {
+              "id": "nucleoside",
+              "name": "Modificação de nucleosídeos",
+              "aliases": [
+                "pseudouridine",
+                "nucleoside modification",
+                "modified nucleosides",
+                "modified nucleotides",
+                "nucleoside-modified"
+              ],
+              "provenance": [
+                "título",
+                "resumo",
+                "palavras-chave OpenAlex"
+              ]
+            },
+            {
+              "id": "rna-immunity",
+              "name": "Reconhecimento imune de RNA",
+              "aliases": [
+                "toll-like",
+                "immunogenicity",
+                "immunogenic",
+                "rna recognition",
+                "interferon-alpha"
+              ],
+              "provenance": [
+                "resumo",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "citation_status": "UNKNOWN",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+            "Dados insuficientes para determinar citação; o artigo não pode citar a si próprio."
+          ]
+        }
+      }
+    ]
+  },
+  "10.1038/nature09886": {
+    "matches": [
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2010",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "crispr",
+              "name": "CRISPR",
+              "aliases": [
+                "crispr",
+                "crisprs",
+                "clustered regularly interspaced short palindromic repeats"
+              ],
+              "provenance": [
+                "título",
+                "tópicos OpenAlex",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "citation_status": "CITED",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada."
+          ]
+        }
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2011",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "crispr",
+              "name": "CRISPR",
+              "aliases": [
+                "crispr",
+                "crisprs",
+                "clustered regularly interspaced short palindromic repeats"
+              ],
+              "provenance": [
+                "título",
+                "tópicos OpenAlex",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "citation_status": "UNKNOWN",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+            "Dados insuficientes para determinar citação; o artigo não pode citar a si próprio."
+          ]
+        }
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2012",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "crispr",
+              "name": "CRISPR",
+              "aliases": [
+                "crispr",
+                "crisprs",
+                "clustered regularly interspaced short palindromic repeats"
+              ],
+              "provenance": [
+                "título",
+                "tópicos OpenAlex",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "citation_status": "NOT_FOUND_IN_RETRIEVED_REFERENCES",
+          "explanation": "O artigo e esta contribuição compartilham os conceitos: CRISPR. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+            "Publicação não localizada apenas nas referências recuperadas; a bibliografia completa não foi auditada."
+          ],
+          "relevance": 1
+        }
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2014",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "crispr",
+              "name": "CRISPR",
+              "aliases": [
+                "crispr",
+                "crisprs",
+                "clustered regularly interspaced short palindromic repeats"
+              ],
+              "provenance": [
+                "título",
+                "tópicos OpenAlex",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "explanation": "O artigo e esta contribuição compartilham os conceitos: CRISPR. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+          "relevance": 1
+        }
+      }
+    ]
+  },
+  "10.1056/nejmoa2034577": {
+    "fixture": "rna"
+  },
+  "10.1056/nejmoa2035389": {
+    "matches": [
+      {
+        "fixture": "rna",
+        "contribution_id": "rna-2005",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "mrna",
+              "name": "RNA mensageiro",
+              "aliases": [
+                "mrna",
+                "messenger rna",
+                "rna mensageiro"
+              ],
+              "provenance": [
+                "título",
+                "resumo",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "explanation": "O artigo e esta contribuição compartilham os conceitos: RNA mensageiro. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+          "relevance": 1
+        }
+      },
+      {
+        "fixture": "rna",
+        "contribution_id": "rna-2008",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "mrna",
+              "name": "RNA mensageiro",
+              "aliases": [
+                "mrna",
+                "messenger rna",
+                "rna mensageiro"
+              ],
+              "provenance": [
+                "título",
+                "resumo",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "citation_status": "NOT_FOUND_IN_RETRIEVED_REFERENCES",
+          "explanation": "O artigo e esta contribuição compartilham os conceitos: RNA mensageiro. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+            "Publicação não localizada apenas nas referências recuperadas; a bibliografia completa não foi auditada."
+          ],
+          "relevance": 1
+        }
+      }
+    ]
+  },
+  "10.1126/science.1192272": {
+    "matches": [
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2010",
+        "overrides": {
+          "citation_status": "UNKNOWN",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+            "Dados insuficientes para determinar citação; o artigo não pode citar a si próprio."
+          ]
+        }
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2011",
+        "overrides": {
+          "citation_status": "NOT_FOUND_IN_RETRIEVED_REFERENCES",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+            "Publicação não localizada apenas nas referências recuperadas; a bibliografia completa não foi auditada."
+          ]
+        }
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2012",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "crispr",
+              "name": "CRISPR",
+              "aliases": [
+                "crispr",
+                "crisprs",
+                "clustered regularly interspaced short palindromic repeats"
+              ],
+              "provenance": [
+                "título",
+                "resumo",
+                "tópicos OpenAlex",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "citation_status": "NOT_FOUND_IN_RETRIEVED_REFERENCES",
+          "explanation": "O artigo e esta contribuição compartilham os conceitos: CRISPR. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+            "Publicação não localizada apenas nas referências recuperadas; a bibliografia completa não foi auditada."
+          ],
+          "relevance": 1
+        }
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2014",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "crispr",
+              "name": "CRISPR",
+              "aliases": [
+                "crispr",
+                "crisprs",
+                "clustered regularly interspaced short palindromic repeats"
+              ],
+              "provenance": [
+                "título",
+                "resumo",
+                "tópicos OpenAlex",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "explanation": "O artigo e esta contribuição compartilham os conceitos: CRISPR. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+          "relevance": 1
+        }
+      }
+    ]
+  },
+  "10.1126/science.1225829": {
+    "matches": [
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2012",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "crispr",
+              "name": "CRISPR",
+              "aliases": [
+                "crispr",
+                "crisprs",
+                "clustered regularly interspaced short palindromic repeats"
+              ],
+              "provenance": [
+                "resumo",
+                "tópicos OpenAlex",
+                "palavras-chave OpenAlex"
+              ]
+            },
+            {
+              "id": "cas9",
+              "name": "Cas9",
+              "aliases": [
+                "cas9",
+                "crispr-cas9",
+                "crispr/cas"
+              ],
+              "provenance": [
+                "resumo",
+                "palavras-chave OpenAlex"
+              ]
+            },
+            {
+              "id": "genome-editing",
+              "name": "Edição genômica",
+              "aliases": [
+                "genome editing",
+                "genome engineering",
+                "gene editing",
+                "edição genômica",
+                "genomic manipulation"
+              ],
+              "provenance": [
+                "resumo"
+              ]
+            }
+          ],
+          "citation_status": "UNKNOWN",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+            "Dados insuficientes para determinar citação; o artigo não pode citar a si próprio."
+          ]
+        }
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2014",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "crispr",
+              "name": "CRISPR",
+              "aliases": [
+                "crispr",
+                "crisprs",
+                "clustered regularly interspaced short palindromic repeats"
+              ],
+              "provenance": [
+                "resumo",
+                "tópicos OpenAlex",
+                "palavras-chave OpenAlex"
+              ]
+            },
+            {
+              "id": "cas9",
+              "name": "Cas9",
+              "aliases": [
+                "cas9",
+                "crispr-cas9",
+                "crispr/cas"
+              ],
+              "provenance": [
+                "resumo",
+                "palavras-chave OpenAlex"
+              ]
+            },
+            {
+              "id": "genome-editing",
+              "name": "Edição genômica",
+              "aliases": [
+                "genome editing",
+                "genome engineering",
+                "gene editing",
+                "edição genômica",
+                "genomic manipulation"
+              ],
+              "provenance": [
+                "resumo"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2010",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "crispr",
+              "name": "CRISPR",
+              "aliases": [
+                "crispr",
+                "crisprs",
+                "clustered regularly interspaced short palindromic repeats"
+              ],
+              "provenance": [
+                "resumo",
+                "tópicos OpenAlex",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ],
+          "citation_status": "CITED",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada."
+          ]
+        }
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2011",
+        "overrides": {
+          "matched_concepts": [
+            {
+              "id": "crispr",
+              "name": "CRISPR",
+              "aliases": [
+                "crispr",
+                "crisprs",
+                "clustered regularly interspaced short palindromic repeats"
+              ],
+              "provenance": [
+                "resumo",
+                "tópicos OpenAlex",
+                "palavras-chave OpenAlex"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "10.1126/science.1231143": {
+    "fixture": "crispr"
+  },
+  "10.1126/science.1258096": {
+    "matches": [
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2012",
+        "overrides": {}
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2014",
+        "overrides": {
+          "citation_status": "UNKNOWN",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+            "Dados insuficientes para determinar citação; o artigo não pode citar a si próprio."
+          ]
+        }
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2010",
+        "overrides": {
+          "citation_status": "CITED",
+          "limitations": [
+            "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+            "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada."
+          ]
+        }
+      },
+      {
+        "fixture": "crispr",
+        "contribution_id": "crispr-2011",
+        "overrides": {}
+      }
+    ]
+  }
+}

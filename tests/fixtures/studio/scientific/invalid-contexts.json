@@ -1,0 +1,20 @@
+[
+  {"name": "unknown-concept", "fixture": "text", "path": ["scientific_context", "concept_ids", 0], "value": "invented-concept", "error": "conceito|Conceito"},
+  {"name": "forged-label", "fixture": "text", "path": ["scientific_context", "concept_labels", 0], "value": "Inventado", "error": "label"},
+  {"name": "missing-source-document", "fixture": "text", "path": ["source_documents", 0, "id"], "value": "other-document", "error": "Documentos"},
+  {"name": "anchor-absent-quote", "fixture": "text", "path": ["anchors", 0, "quote"], "value": "Trecho inventado", "error": "Ocorrência"},
+  {"name": "anchor-absent-occurrence", "fixture": "text", "path": ["anchors", 0, "occurrence"], "value": 2, "error": "Ocorrência"},
+  {"name": "anchor-negative-occurrence", "fixture": "text", "path": ["anchors", 0, "occurrence"], "value": -1, "error": "greater_than_equal"},
+  {"name": "provenance-nonliteral-quote", "fixture": "text", "path": ["scientific_context", "provenance", 0, "quote"], "value": "crispr", "error": "literal"},
+  {"name": "paper-id-not-resolved", "fixture": "crispr", "path": ["scientific_context", "paper_ids", 0], "value": "https://openalex.org/W1", "error": "Artigos"},
+  {"name": "mixed-documents-from-different-projects", "fixture": "mixed", "path": ["source_documents", 1, "project_id"], "value": "other-project", "error": "projeto"},
+  {"name": "forged-paper-metadata", "fixture": "crispr", "path": ["source_documents", 0, "content"], "value": "Artigo inventado", "error": "Metadados"},
+  {"name": "forged-retrieval-cache", "fixture": "crispr", "path": ["scientific_context", "provenance", 0, "from_cache"], "value": false, "error": "consulta"},
+  {"name": "teacher-material-labelled-as-doi-only", "fixture": "mixed", "path": ["scientific_context", "origin_type"], "value": "doi", "error": "origem"},
+  {"name": "unresolved-concept-with-consistent-provenance", "fixture": "text", "path": ["scientific_context", "concept_labels", 1], "value": "Conceito desconhecido", "error": "Conceito"},
+  {"name": "alias-inside-a-word", "fixture": "text", "path": ["source_documents", 0, "content"], "value": "antiCRISPR edição genômica. antiCRISPR", "error": "alias"},
+  {"name": "alias-after-combining-mark-inside-a-word", "fixture": "text", "path": ["source_documents", 0, "content"], "value": "antíCRISPR edição genômica. antíCRISPR", "error": "alias"},
+  {"name": "ai-cannot-assign-a-real-editorial-id", "fixture": "text", "path": ["scientific_context", "provenance", 0, "method"], "value": "ai_suggested", "error": "IA"},
+  {"name": "uncovered-context-requires-a-limitation", "fixture": "uncovered-text", "path": ["scientific_context", "limitations"], "value": [], "error": "cobertura"},
+  {"name": "teacher-input-cannot-bypass-editorial-resolution", "fixture": "text", "path": ["scientific_context", "provenance", 0, "method"], "value": "teacher_input", "error": "resolução científica"}
+]

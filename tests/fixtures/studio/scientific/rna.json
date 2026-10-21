@@ -1,0 +1,503 @@
+{
+  "source_documents": [
+    {
+      "id": "doc-rna",
+      "project_id": "project-rna",
+      "type": "paper_metadata",
+      "title": "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
+      "content": "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine\n\nBACKGROUND: Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) infection and the resulting coronavirus disease 2019 (Covid-19) have afflicted tens of millions of people in a worldwide pandemic. Safe and effective vaccines are needed urgently. METHODS: In an ongoing multinational, placebo-controlled, observer-blinded, pivotal efficacy trial, we randomly assigned persons 16 years of age or older in a 1:1 ratio to receive two doses, 21 days apart, of either placebo or the BNT162b2 vaccine candidate (30 μg per dose). BNT162b2 is a lipid nanoparticle-formulated, nucleoside-modified RNA vaccine that encodes a prefusion stabilized, membrane-anchored SARS-CoV-2 full-length spike protein. The primary end points were efficacy of the vaccine against laboratory-confirmed Covid-19 and safety. RESULTS: A total of 43,548 participants underwent randomization, of whom 43,448 received injections: 21,720 with BNT162b2 and 21,728 with placebo. There were 8 cases of Covid-19 with onset at least 7 days after the second dose among participants assigned to receive BNT162b2 and 162 cases among those assigned to placebo; BNT162b2 was 95% effective in preventing Covid-19 (95% credible interval, 90.3 to 97.6). Similar vaccine efficacy (generally 90 to 100%) was observed across subgroups defined by age, sex, race, ethnicity, baseline body-mass index, and the presence of coexisting conditions. Among 10 cases of severe Covid-19 with onset after the first dose, 9 occurred in placebo recipients and 1 in a BNT162b2 recipient. The safety profile of BNT162b2 was characterized by short-term, mild-to-moderate pain at the injection site, fatigue, and headache. The incidence of serious adverse events was low and was similar in the vaccine and placebo groups. CONCLUSIONS: A two-dose regimen of BNT162b2 conferred 95% protection against Covid-19 in persons 16 years of age or older. Safety over a median of 2 months was similar to that of other viral vaccines. (Funded by BioNTech and Pfizer; ClinicalTrials.gov number, NCT04368728.).",
+      "doi": "10.1056/nejmoa2034577",
+      "extraction_status": "ready"
+    }
+  ],
+  "scientific_context": {
+    "id": "context-rna",
+    "origin_type": "doi",
+    "paper_ids": [
+      "https://openalex.org/W3111255098"
+    ],
+    "concept_ids": [
+      "mrna",
+      "nucleoside",
+      "rna-immunity",
+      "https://openalex.org/T10118"
+    ],
+    "concept_labels": [
+      "RNA mensageiro",
+      "Modificação de nucleosídeos",
+      "Reconhecimento imune de RNA",
+      "SARS-CoV-2 and COVID-19 Research"
+    ],
+    "source_document_ids": [
+      "doc-rna"
+    ],
+    "provenance": [
+      {
+        "source_document_id": "doc-rna",
+        "concept_id": "mrna",
+        "method": "openalex_metadata",
+        "quote": null,
+        "retrieved_at": "2026-10-21T09:44:20.132809+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W3111255098"
+      },
+      {
+        "source_document_id": "doc-rna",
+        "concept_id": "nucleoside",
+        "method": "openalex_metadata",
+        "quote": null,
+        "retrieved_at": "2026-10-21T09:44:20.132809+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W3111255098"
+      },
+      {
+        "source_document_id": "doc-rna",
+        "concept_id": "rna-immunity",
+        "method": "openalex_metadata",
+        "quote": null,
+        "retrieved_at": "2026-10-21T09:44:20.132809+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W3111255098"
+      },
+      {
+        "source_document_id": "doc-rna",
+        "concept_id": "https://openalex.org/T10118",
+        "method": "openalex_metadata",
+        "quote": null,
+        "retrieved_at": "2026-10-21T09:44:20.132809+00:00",
+        "from_cache": true,
+        "source_url": "https://openalex.org/W3111255098"
+      }
+    ],
+    "limitations": [
+      "O OpenAlex não garante a completude das referências. Ausência no conjunto recuperado não prova omissão.",
+      "Conceitos extraídos por correspondência determinística de termos; nenhuma influência histórica é inferida.",
+      "Metadados de cache identificado, recuperados em 2026-10-21T09:44:20.132809+00:00."
+    ],
+    "analysis_id": null
+  },
+  "papers": [
+    {
+      "id": "https://openalex.org/W3111255098",
+      "doi": "10.1056/nejmoa2034577",
+      "openalex_id": "https://openalex.org/W3111255098",
+      "title": "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
+      "abstract": "BACKGROUND: Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) infection and the resulting coronavirus disease 2019 (Covid-19) have afflicted tens of millions of people in a worldwide pandemic. Safe and effective vaccines are needed urgently. METHODS: In an ongoing multinational, placebo-controlled, observer-blinded, pivotal efficacy trial, we randomly assigned persons 16 years of age or older in a 1:1 ratio to receive two doses, 21 days apart, of either placebo or the BNT162b2 vaccine candidate (30 μg per dose). BNT162b2 is a lipid nanoparticle-formulated, nucleoside-modified RNA vaccine that encodes a prefusion stabilized, membrane-anchored SARS-CoV-2 full-length spike protein. The primary end points were efficacy of the vaccine against laboratory-confirmed Covid-19 and safety. RESULTS: A total of 43,548 participants underwent randomization, of whom 43,448 received injections: 21,720 with BNT162b2 and 21,728 with placebo. There were 8 cases of Covid-19 with onset at least 7 days after the second dose among participants assigned to receive BNT162b2 and 162 cases among those assigned to placebo; BNT162b2 was 95% effective in preventing Covid-19 (95% credible interval, 90.3 to 97.6). Similar vaccine efficacy (generally 90 to 100%) was observed across subgroups defined by age, sex, race, ethnicity, baseline body-mass index, and the presence of coexisting conditions. Among 10 cases of severe Covid-19 with onset after the first dose, 9 occurred in placebo recipients and 1 in a BNT162b2 recipient. The safety profile of BNT162b2 was characterized by short-term, mild-to-moderate pain at the injection site, fatigue, and headache. The incidence of serious adverse events was low and was similar in the vaccine and placebo groups. CONCLUSIONS: A two-dose regimen of BNT162b2 conferred 95% protection against Covid-19 in persons 16 years of age or older. Safety over a median of 2 months was similar to that of other viral vaccines. (Funded by BioNTech and Pfizer; ClinicalTrials.gov number, NCT04368728.).",
+      "year": 2020,
+      "authors": [
+        {
+          "id": "https://openalex.org/A5001090261",
+          "name": "Fernando P. Polack"
+        },
+        {
+          "id": "https://openalex.org/A5059606373",
+          "name": "Stephen James Thomas"
+        },
+        {
+          "id": "https://openalex.org/A5014880604",
+          "name": "Nicholas R.E. Kitchin"
+        },
+        {
+          "id": "https://openalex.org/A5087564717",
+          "name": "Judith Absalon"
+        },
+        {
+          "id": "https://openalex.org/A5067206456",
+          "name": "Alejandra Gurtman"
+        },
+        {
+          "id": "https://openalex.org/A5042729050",
+          "name": "Stephen P. Lockhart"
+        },
+        {
+          "id": "https://openalex.org/A5025483944",
+          "name": "John L. Perez"
+        },
+        {
+          "id": "https://openalex.org/A5109595342",
+          "name": "Gonzalo Pérez Marc"
+        },
+        {
+          "id": "https://openalex.org/A5042806017",
+          "name": "Edson Duarte Moreira"
+        },
+        {
+          "id": "https://openalex.org/A5091416598",
+          "name": "Cristiano A. F. Zerbini"
+        },
+        {
+          "id": "https://openalex.org/A5102369312",
+          "name": "Ruth E. Bailey"
+        },
+        {
+          "id": "https://openalex.org/A5023919527",
+          "name": "Kena A. Swanson"
+        },
+        {
+          "id": "https://openalex.org/A5016431348",
+          "name": "Satrajit Roychoudhury"
+        },
+        {
+          "id": "https://openalex.org/A5020500638",
+          "name": "Kenneth J. Koury"
+        },
+        {
+          "id": "https://openalex.org/A5100435537",
+          "name": "Ping Li"
+        },
+        {
+          "id": "https://openalex.org/A5072923693",
+          "name": "Warren V. Kalina"
+        },
+        {
+          "id": "https://openalex.org/A5101834037",
+          "name": "David Cooper"
+        },
+        {
+          "id": "https://openalex.org/A5039460332",
+          "name": "Robert W. Frenck"
+        },
+        {
+          "id": "https://openalex.org/A5081629035",
+          "name": "Laura L. Hammitt"
+        },
+        {
+          "id": "https://openalex.org/A5000036560",
+          "name": "Özlem Türeci"
+        },
+        {
+          "id": "https://openalex.org/A5073008232",
+          "name": "Haylene Nell"
+        },
+        {
+          "id": "https://openalex.org/A5111279142",
+          "name": "Axel Schaefer"
+        },
+        {
+          "id": "https://openalex.org/A5090594476",
+          "name": "Serhat Ünal"
+        },
+        {
+          "id": "https://openalex.org/A5051925652",
+          "name": "Dina B Tresnan"
+        },
+        {
+          "id": "https://openalex.org/A5060704252",
+          "name": "Susan Mather"
+        },
+        {
+          "id": "https://openalex.org/A5045224941",
+          "name": "Philip R. Dormitzer"
+        },
+        {
+          "id": "https://openalex.org/A5075617216",
+          "name": "Uğur Şahin"
+        },
+        {
+          "id": "https://openalex.org/A5044292989",
+          "name": "Kathrin Ute Jansen"
+        },
+        {
+          "id": "https://openalex.org/A5086524484",
+          "name": "William C. Gruber"
+        }
+      ],
+      "concepts": [
+        {
+          "id": "mrna",
+          "name": "RNA mensageiro",
+          "aliases": [
+            "mrna",
+            "messenger rna",
+            "rna mensageiro"
+          ],
+          "provenance": [
+            "título",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "nucleoside",
+          "name": "Modificação de nucleosídeos",
+          "aliases": [
+            "pseudouridine",
+            "nucleoside modification",
+            "modified nucleosides",
+            "modified nucleotides",
+            "nucleoside-modified"
+          ],
+          "provenance": [
+            "resumo"
+          ]
+        },
+        {
+          "id": "rna-immunity",
+          "name": "Reconhecimento imune de RNA",
+          "aliases": [
+            "toll-like",
+            "immunogenicity",
+            "immunogenic",
+            "rna recognition",
+            "interferon-alpha"
+          ],
+          "provenance": [
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "https://openalex.org/T10118",
+          "name": "SARS-CoV-2 and COVID-19 Research",
+          "aliases": [],
+          "provenance": [
+            "tópico atribuído pelo OpenAlex; relevância não auditada"
+          ]
+        }
+      ],
+      "referenced_work_ids": [
+        "https://openalex.org/W1420726270",
+        "https://openalex.org/W2058647478",
+        "https://openalex.org/W2994612945",
+        "https://openalex.org/W3007643904",
+        "https://openalex.org/W3010233963",
+        "https://openalex.org/W3092921648",
+        "https://openalex.org/W3093367571",
+        "https://openalex.org/W3164002264"
+      ],
+      "references_status": "retrieved_unverified_completeness",
+      "source_url": "https://openalex.org/W3111255098",
+      "retrieved_at": "2026-10-21T09:44:20.132809+00:00",
+      "from_cache": true,
+      "cache_stale": false,
+      "limitations": [
+        "O OpenAlex não garante a completude das referências. Ausência no conjunto recuperado não prova omissão.",
+        "Conceitos extraídos por correspondência determinística de termos; nenhuma influência histórica é inferida.",
+        "Metadados de cache identificado, recuperados em 2026-10-21T09:44:20.132809+00:00."
+      ]
+    }
+  ],
+  "anchors": [
+    {
+      "source_document_id": "doc-rna",
+      "quote": "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
+      "occurrence": 0
+    }
+  ],
+  "expected_matches": [
+    {
+      "contribution": {
+        "id": "rna-2005",
+        "title": "Modificações de nucleosídeos e reconhecimento imune de RNA",
+        "description": "O trabalho de Karikó, Buckstein, Ni e Weissman investiga a supressão do reconhecimento de RNA por receptores Toll-like a partir de modificações de nucleosídeos.",
+        "researcher_ids": [
+          "kariko"
+        ],
+        "participants": [
+          "Katalin Karikó",
+          "Michael H. Buckstein",
+          "Houping Ni",
+          "Drew Weissman"
+        ],
+        "concept_ids": [
+          "mrna",
+          "nucleoside",
+          "rna-immunity"
+        ],
+        "related_dois": [
+          "10.1016/j.immuni.2005.06.008"
+        ],
+        "scientific_field": "Biologia molecular e RNA",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "kariko",
+          "name": "Katalin Karikó",
+          "research_areas": [
+            "RNA mensageiro",
+            "Imunologia"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/medicine/2023/kariko/facts/",
+            "https://api.nobelprize.org/2.1/laureate/1024"
+          ],
+          "openalex_id": "https://openalex.org/A5030598859",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-rna-2005",
+          "contribution_id": "rna-2005",
+          "claim_supported": "O trabalho de Karikó, Buckstein, Ni e Weissman investiga a supressão do reconhecimento de RNA por receptores Toll-like a partir de modificações de nucleosídeos.",
+          "source_title": "Suppression of RNA Recognition by Toll-like Receptors: The Impact of Nucleoside Modification and the Evolutionary Origin of RNA",
+          "source_url": "https://doi.org/10.1016/j.immuni.2005.06.008",
+          "source_type": "documental",
+          "excerpt_or_location": "Título e resumo da publicação, Immunity 23(2), 165–175.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "mrna",
+          "name": "RNA mensageiro",
+          "aliases": [
+            "mrna",
+            "messenger rna",
+            "rna mensageiro"
+          ],
+          "provenance": [
+            "título",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "nucleoside",
+          "name": "Modificação de nucleosídeos",
+          "aliases": [
+            "pseudouridine",
+            "nucleoside modification",
+            "modified nucleosides",
+            "modified nucleotides",
+            "nucleoside-modified"
+          ],
+          "provenance": [
+            "resumo"
+          ]
+        },
+        {
+          "id": "rna-immunity",
+          "name": "Reconhecimento imune de RNA",
+          "aliases": [
+            "toll-like",
+            "immunogenicity",
+            "immunogenic",
+            "rna recognition",
+            "interferon-alpha"
+          ],
+          "provenance": [
+            "palavras-chave OpenAlex"
+          ]
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "NOT_FOUND_IN_RETRIEVED_REFERENCES",
+      "explanation": "O artigo e esta contribuição compartilham os conceitos: RNA mensageiro, Modificação de nucleosídeos, Reconhecimento imune de RNA. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+      "limitations": [
+        "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+        "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada.",
+        "Publicação não localizada apenas nas referências recuperadas; a bibliografia completa não foi auditada."
+      ],
+      "relevance": 3
+    },
+    {
+      "contribution": {
+        "id": "rna-2008",
+        "title": "Pseudouridina: tradução e estabilidade de mRNA",
+        "description": "Em experimentos com células, lisados e camundongos, a equipe observou maior capacidade de tradução e menor imunogenicidade de mRNAs contendo pseudouridina, nas condições estudadas.",
+        "researcher_ids": [
+          "kariko"
+        ],
+        "participants": [
+          "Katalin Karikó",
+          "Hiromi Muramatsu",
+          "Frank A. Welsh",
+          "János Ludwig",
+          "Hiroki Kato",
+          "Shizuo Akira",
+          "Drew Weissman"
+        ],
+        "concept_ids": [
+          "mrna",
+          "nucleoside",
+          "rna-immunity"
+        ],
+        "related_dois": [
+          "10.1038/mt.2008.200"
+        ],
+        "scientific_field": "Biologia molecular e RNA",
+        "verification_status": "verified"
+      },
+      "researchers": [
+        {
+          "id": "kariko",
+          "name": "Katalin Karikó",
+          "research_areas": [
+            "RNA mensageiro",
+            "Imunologia"
+          ],
+          "identity_status": "verified",
+          "verification_sources": [
+            "https://www.nobelprize.org/prizes/medicine/2023/kariko/facts/",
+            "https://api.nobelprize.org/2.1/laureate/1024"
+          ],
+          "openalex_id": "https://openalex.org/A5030598859",
+          "orcid": null
+        }
+      ],
+      "evidence": [
+        {
+          "id": "evidence-rna-2008",
+          "contribution_id": "rna-2008",
+          "claim_supported": "Em experimentos com células, lisados e camundongos, a equipe observou maior capacidade de tradução e menor imunogenicidade de mRNAs contendo pseudouridina, nas condições estudadas.",
+          "source_title": "Incorporation of Pseudouridine Into mRNA Yields Superior Nonimmunogenic Vector With Increased Translational Capacity and Biological Stability",
+          "source_url": "https://doi.org/10.1038/mt.2008.200",
+          "source_type": "documental",
+          "excerpt_or_location": "Resumo: comparação de mRNA com pseudouridina e mRNA não modificado; Molecular Therapy 16, 1833–1840.",
+          "verification_status": "verified"
+        }
+      ],
+      "matched_concepts": [
+        {
+          "id": "mrna",
+          "name": "RNA mensageiro",
+          "aliases": [
+            "mrna",
+            "messenger rna",
+            "rna mensageiro"
+          ],
+          "provenance": [
+            "título",
+            "palavras-chave OpenAlex"
+          ]
+        },
+        {
+          "id": "nucleoside",
+          "name": "Modificação de nucleosídeos",
+          "aliases": [
+            "pseudouridine",
+            "nucleoside modification",
+            "modified nucleosides",
+            "modified nucleotides",
+            "nucleoside-modified"
+          ],
+          "provenance": [
+            "resumo"
+          ]
+        },
+        {
+          "id": "rna-immunity",
+          "name": "Reconhecimento imune de RNA",
+          "aliases": [
+            "toll-like",
+            "immunogenicity",
+            "immunogenic",
+            "rna recognition",
+            "interferon-alpha"
+          ],
+          "provenance": [
+            "palavras-chave OpenAlex"
+          ]
+        }
+      ],
+      "relation_type": "RELATED_TO",
+      "citation_status": "CITED",
+      "explanation": "O artigo e esta contribuição compartilham os conceitos: RNA mensageiro, Modificação de nucleosídeos, Reconhecimento imune de RNA. A fonte documenta a contribuição descrita. Essa correspondência é temática; uma citação, quando identificada, é registrada separadamente.",
+      "limitations": [
+        "A contribuição está documentada; a conexão conceitual com o artigo não comprova influência histórica direta.",
+        "A autoria é coletiva. A lista de participantes preserva os coautores da publicação associada."
+      ],
+      "relevance": 3
+    }
+  ]
+}
