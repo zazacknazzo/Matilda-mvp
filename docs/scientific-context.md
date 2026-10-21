@@ -69,6 +69,11 @@ Títulos de publicações não herdam o limite de 160 do título pedagógico do 
 respeitam o teto documental de 20.000, inclusive quando excedem 160 caracteres.
 
 Procedência pode apontar para documento sem conceito (`concept_id = null`).
+`teacher_input` exige `concept_id = null`: registra o material docente original,
+mas não resolve IDs científicos. Uma correspondência editorial deve usar
+`editorial_alias`, com quote e alias conferidos, e conceitos de metadados usam
+`openalex_metadata`, com origem conferida no Paper. Trocar o método não permite
+atribuir CRISPR a texto sem correspondência científica.
 Para `ai_suggested`, esse nulo é obrigatório: nem IDs editoriais reais nem IDs
 OpenAlex podem ser atribuídos por essa origem. Uma resolução científica
 independente deve ter procedência autorizada própria; a sugestão pedagógica
@@ -195,6 +200,30 @@ npm run test:e2e
 
 A validação não exige chave Gemini nem chamada científica externa. Resultados
 finais de execução e revisão são registrados no PR vinculado à Issue #2.
+
+## Revisão final e compatibilidade com LessonBundle
+
+`teacher_input` não atribui IDs científicos, mesmo quando o ID existe no catálogo
+ou no OpenAlex. O contraexemplo compartilhado e os testes cobrem a troca indevida
+do método, texto sobre fluidos com IDs CRISPR e procedência literal ou sem quote;
+o material original sem ID permanece permitido.
+
+O verificador de fixtures lê UTF-8 e executa `node` com o compilador TypeScript,
+usando arquivo fechado e diretório temporário removido inclusive em falha.
+Isso permite executar o mesmo comando no Windows, Linux e macOS.
+
+Comparação com o LessonBundle do PR #17 (`cb7905f`): o bundle não redefine nem
+embute ScientificContext. Seu vínculo é a prévia/revisão resolvida pelo servidor.
+As quatro fixtures de aula passam no validador e na autorização de referências;
+as evidências usadas preservam os campos canônicos, IDs de contribuição e
+pesquisadoras e participantes dos exemplos científicos do #15. O adaptador de
+sugestões aceitas para LessonReference e a integração HTTP continuam em tickets
+futuros; esta conferência não declara fluxo integrado ou aceite M0.
+
+Após a revisão final: **164 testes backend aprovados**, sete fixtures científicas
+compiladas pelo próprio verificador corrigido no Windows e build TypeScript/Vite
+aprovado. E2E não reexecutado nesta correção de contratos. O aviso de depreciação
+preexistente Starlette/TestClient permanece sem falhas.
 
 Execução inicial do PR #15 em 21/10/2026: **128 testes backend aprovados**
 (59 anteriores + 69 de contrato/compatibilidade), **7 fixtures compiladas contra

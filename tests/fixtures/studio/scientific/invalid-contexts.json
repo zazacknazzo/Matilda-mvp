@@ -15,5 +15,6 @@
   {"name": "alias-inside-a-word", "fixture": "text", "path": ["source_documents", 0, "content"], "value": "antiCRISPR edição genômica. antiCRISPR", "error": "alias"},
   {"name": "alias-after-combining-mark-inside-a-word", "fixture": "text", "path": ["source_documents", 0, "content"], "value": "antíCRISPR edição genômica. antíCRISPR", "error": "alias"},
   {"name": "ai-cannot-assign-a-real-editorial-id", "fixture": "text", "path": ["scientific_context", "provenance", 0, "method"], "value": "ai_suggested", "error": "IA"},
-  {"name": "uncovered-context-requires-a-limitation", "fixture": "uncovered-text", "path": ["scientific_context", "limitations"], "value": [], "error": "cobertura"}
+  {"name": "uncovered-context-requires-a-limitation", "fixture": "uncovered-text", "path": ["scientific_context", "limitations"], "value": [], "error": "cobertura"},
+  {"name": "teacher-input-cannot-bypass-editorial-resolution", "fixture": "text", "path": ["scientific_context", "provenance", 0, "method"], "value": "teacher_input", "error": "resolução científica"}
 ]

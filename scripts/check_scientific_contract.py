@@ -10,22 +10,22 @@ FIXTURES = ROOT / 'tests/fixtures/studio/scientific'
 
 
 def main():
-    source = ['import type {ScientificContext, SourceDocument, SourceAnchor} from "./scientific-context";']
+    source = ['import type {ScientificContext, SourceDocument, SourceAnchor} from "../scientific-context";']
     count = 0
     for path in sorted(FIXTURES.glob('*.json')):
-        example = json.loads(path.read_text())
+        example = json.loads(path.read_text(encoding='utf-8'))
         if not isinstance(example, dict) or 'scientific_context' not in example:
             continue
         for key, shape in [('scientific_context', 'ScientificContext'), ('source_documents', 'SourceDocument[]'), ('anchors', 'SourceAnchor[]')]:
             source.append(f'({json.dumps(example[key], ensure_ascii=False)}) satisfies {shape};')
         count += 1
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.ts', dir=ROOT / 'frontend/src/types', encoding='utf-8') as check:
-        check.write('\n'.join(source))
-        check.flush()
+    with tempfile.TemporaryDirectory(dir=ROOT / 'frontend/src/types') as directory:
+        check = Path(directory) / 'contract.ts'
+        check.write_text('\n'.join(source), encoding='utf-8')
         subprocess.run([
-            str(ROOT / 'frontend/node_modules/.bin/tsc'), '--noEmit', '--strict',
+            'node', str(ROOT / 'frontend/node_modules/typescript/bin/tsc'), '--noEmit', '--strict',
             '--skipLibCheck', '--moduleResolution', 'bundler', '--module', 'ESNext',
-            '--target', 'ES2022', check.name,
+            '--target', 'ES2022', str(check),
         ], cwd=ROOT, check=True)
     print(f'{count} scientific fixtures conform to TypeScript contracts.')
 

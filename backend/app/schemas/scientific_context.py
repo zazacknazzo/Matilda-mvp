@@ -62,6 +62,8 @@ class Provenance(ScientificModel):
     def scientific_retrieval(self):
         if self.method == 'ai_suggested' and self.concept_id is not None:
             raise ValueError('Sugestão de IA não pode atribuir ID científico.')
+        if self.method == 'teacher_input' and self.concept_id is not None:
+            raise ValueError('Entrada docente exige resolução científica separada, sem concept_id.')
         metadata = (self.retrieved_at, self.from_cache, self.source_url)
         if self.method == 'openalex_metadata' or any(value is not None for value in metadata):
             if any(value is None for value in metadata):

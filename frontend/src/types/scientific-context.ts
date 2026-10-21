@@ -14,7 +14,7 @@ export interface SourceDocument {
 
 export interface Provenance {
   source_document_id: string;
-  concept_id: string | null; // Must be null for ai_suggested; resolved by the server otherwise.
+  concept_id: string | null; // Null for teacher_input/ai_suggested; scientific resolution is separate.
   method:
     | "teacher_input"
     | "editorial_alias"

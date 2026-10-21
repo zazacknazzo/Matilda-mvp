@@ -27,7 +27,7 @@ def validate_example(example):
 
 @pytest.mark.parametrize('name', ['crispr', 'rna', 'text', 'mixed', 'no-coverage', 'uncovered-text', 'rna-insufficient'])
 def test_shared_examples_are_valid(name):
-    validate_example(json.loads((FIXTURES / f'{name}.json').read_text()))
+    validate_example(json.loads((FIXTURES / f'{name}.json').read_text(encoding='utf-8')))
 
 
 def set_example_value(example, path, value):
@@ -37,9 +37,9 @@ def set_example_value(example, path, value):
     container[path[-1]] = value
 
 
-@pytest.mark.parametrize('case', json.loads((FIXTURES / 'invalid-contexts.json').read_text()), ids=lambda c: c['name'])
+@pytest.mark.parametrize('case', json.loads((FIXTURES / 'invalid-contexts.json').read_text(encoding='utf-8')), ids=lambda c: c['name'])
 def test_invalid_context_examples_are_rejected(case):
-    example = json.loads((FIXTURES / (case['fixture'] + '.json')).read_text())
+    example = json.loads((FIXTURES / (case['fixture'] + '.json')).read_text(encoding='utf-8'))
     set_example_value(example, case['path'], case['value'])
     with pytest.raises(ValueError, match=case['error']):
         validate_example(example)
@@ -47,7 +47,7 @@ def test_invalid_context_examples_are_rejected(case):
 
 @pytest.mark.parametrize('name', ['crispr', 'rna', 'no-coverage'])
 def test_forensics_matches_frozen_baseline(client, name):
-    example = json.loads((FIXTURES / f'{name}.json').read_text())
+    example = json.loads((FIXTURES / f'{name}.json').read_text(encoding='utf-8'))
     response = client.post('/api/analyses', json={'doi': example['papers'][0]['doi']})
     assert response.status_code == 201
     analysis = response.json()
@@ -55,7 +55,7 @@ def test_forensics_matches_frozen_baseline(client, name):
     assert analysis['contributions'] == example['expected_matches']
 
 
-@pytest.mark.parametrize('case', json.loads((FIXTURES / 'ineligible-catalog.json').read_text()), ids=lambda c: c['name'])
+@pytest.mark.parametrize('case', json.loads((FIXTURES / 'ineligible-catalog.json').read_text(encoding='utf-8')), ids=lambda c: c['name'])
 def test_existing_engine_rejects_ineligible_catalog_examples(monkeypatch, tmp_path, case):
     from app.services import storage
     from app.services.contribution_search import search_contributions
@@ -68,7 +68,7 @@ def test_existing_engine_rejects_ineligible_catalog_examples(monkeypatch, tmp_pa
     for name, records in catalogs.items():
         (tmp_path / name).write_text(json.dumps(records))
     monkeypatch.setattr(storage, 'DATA', tmp_path)
-    example = json.loads((FIXTURES / 'rna.json').read_text())
+    example = json.loads((FIXTURES / 'rna.json').read_text(encoding='utf-8'))
     matches = search_contributions(Paper(**example['papers'][0]))
     assert [match.contribution.id for match in matches] == case['expected_ids']
 
@@ -76,12 +76,12 @@ def test_existing_engine_rejects_ineligible_catalog_examples(monkeypatch, tmp_pa
 def test_immunogenicity_alone_is_not_specific_enough_for_the_existing_rna_engine():
     from app.services.contribution_search import search_contributions
 
-    example = json.loads((FIXTURES / 'rna.json').read_text())
+    example = json.loads((FIXTURES / 'rna.json').read_text(encoding='utf-8'))
     paper = Paper(**example['papers'][0])
     # A real bibliographic record with only the nonspecific editorial concept.
     paper.concepts = [Concept(**next(c for c in load_json('concepts.json') if c['id'] == 'rna-immunity'))]
     assert search_contributions(paper) == []
-    insufficient = json.loads((FIXTURES / 'rna-insufficient.json').read_text())
+    insufficient = json.loads((FIXTURES / 'rna-insufficient.json').read_text(encoding='utf-8'))
     assert validate_example(insufficient).concept_ids == ['rna-immunity']
     assert insufficient['expected_matches'] == []
 
@@ -103,7 +103,7 @@ def test_example_matches_preserve_canonical_science_and_citation_meaning(name):
     from app.schemas import DiscoveryMatch
     from app.services.gap_analysis import bibliography_index, classify_citation
 
-    example = json.loads((FIXTURES / f'{name}.json').read_text())
+    example = json.loads((FIXTURES / f'{name}.json').read_text(encoding='utf-8'))
     context = validate_example(example)
     contributions = {c['id']: c for c in load_json('contributions.json')}
     evidence = {e['id']: e for e in load_json('evidence.json')}
@@ -148,14 +148,14 @@ def test_anchor_counts_overlapping_literal_occurrences_and_checks_document_ident
 
 
 def test_resolved_editorial_alias_cannot_claim_a_different_concept():
-    example = json.loads((FIXTURES / 'text.json').read_text())
+    example = json.loads((FIXTURES / 'text.json').read_text(encoding='utf-8'))
     example['scientific_context']['provenance'][0]['quote'] = 'edição genômica'
     with pytest.raises(ValueError, match='alias'):
         validate_example(example)
 
 
 def test_text_context_preserves_original_without_a_paper():
-    example = json.loads((FIXTURES / 'text.json').read_text())
+    example = json.loads((FIXTURES / 'text.json').read_text(encoding='utf-8'))
     documents = [SourceDocument.model_validate_json(json.dumps(d)) for d in example['source_documents']]
     context = ScientificContext.model_validate_json(json.dumps(example['scientific_context']))
     context.validate_references(documents, concepts=[Concept(**c) for c in load_json('concepts.json')])
@@ -177,7 +177,7 @@ def test_text_context_preserves_original_without_a_paper():
     {'provenance': []},
 ])
 def test_material_rejects_inconsistent_context(change):
-    payload = json.loads((FIXTURES / 'text.json').read_text())['scientific_context']
+    payload = json.loads((FIXTURES / 'text.json').read_text(encoding='utf-8'))['scientific_context']
     with pytest.raises(ValidationError):
         ScientificContext.model_validate_json(json.dumps(payload | change))
 
@@ -193,7 +193,7 @@ def test_material_rejects_inconsistent_context(change):
     {'id': 123},
 ])
 def test_source_document_rejects_invalid_input(change):
-    document = json.loads((FIXTURES / 'text.json').read_text())['source_documents'][0]
+    document = json.loads((FIXTURES / 'text.json').read_text(encoding='utf-8'))['source_documents'][0]
     with pytest.raises(ValidationError):
         SourceDocument.model_validate_json(json.dumps(document | change))
 
@@ -207,7 +207,7 @@ def test_source_document_rejects_invalid_input(change):
 ])
 def test_provenance_rejects_incomplete_or_non_utc_retrieval(change):
     from app.schemas.scientific_context import Provenance
-    provenance = json.loads((FIXTURES / 'text.json').read_text())['scientific_context']['provenance'][0]
+    provenance = json.loads((FIXTURES / 'text.json').read_text(encoding='utf-8'))['scientific_context']['provenance'][0]
     with pytest.raises(ValidationError):
         Provenance.model_validate_json(json.dumps(provenance | change))
 
@@ -254,7 +254,7 @@ def test_ai_suggestions_cannot_resolve_scientific_ids(identifier):
 
 
 def test_ai_pedagogical_provenance_without_scientific_id_is_allowed():
-    example = json.loads((FIXTURES / 'text.json').read_text())
+    example = json.loads((FIXTURES / 'text.json').read_text(encoding='utf-8'))
     example['scientific_context']['provenance'].append({
         'source_document_id': 'doc-text', 'method': 'ai_suggested', 'concept_id': None,
         'quote': 'CRISPR',
@@ -264,19 +264,49 @@ def test_ai_pedagogical_provenance_without_scientific_id_is_allowed():
     assert context.provenance[-1].concept_id is None
 
 
+@pytest.mark.parametrize('quote', [None, 'Dinâmica de fluidos'])
+def test_teacher_input_cannot_attach_scientific_ids_to_unrelated_material(quote):
+    example = json.loads((FIXTURES / 'text.json').read_text(encoding='utf-8'))
+    example['source_documents'][0].update(title='Fluidos', content='Dinâmica de fluidos')
+    example['anchors'] = []
+    for provenance in example['scientific_context']['provenance']:
+        provenance.update(method='teacher_input', quote=quote)
+    with pytest.raises(ValidationError, match='resolução científica'):
+        validate_example(example)
+
+
+@pytest.mark.parametrize('identifier', ['crispr', 'https://openalex.org/T10878'])
+def test_teacher_input_requires_separate_scientific_resolution_even_for_real_ids(identifier):
+    from app.schemas.scientific_context import Provenance
+
+    with pytest.raises(ValidationError, match='resolução científica'):
+        Provenance(source_document_id='doc', method='teacher_input', concept_id=identifier, quote='CRISPR')
+
+
+def test_teacher_input_without_scientific_id_preserves_original_material():
+    example = json.loads((FIXTURES / 'text.json').read_text(encoding='utf-8'))
+    example['scientific_context']['provenance'].append({
+        'source_document_id': 'doc-text', 'method': 'teacher_input', 'concept_id': None,
+        'quote': example['source_documents'][0]['content'],
+    })
+    context = validate_example(example)
+    assert context.concept_ids == ['crispr', 'genome-editing']
+    assert context.provenance[-1].quote == example['source_documents'][0]['content']
+
+
 @pytest.mark.parametrize('name', ['no-coverage', 'uncovered-text', 'rna-insufficient'])
 def test_examples_without_eligible_matches_explain_the_coverage_limit(name):
-    example = json.loads((FIXTURES / f'{name}.json').read_text())
+    example = json.loads((FIXTURES / f'{name}.json').read_text(encoding='utf-8'))
     assert example['expected_matches'] == []
     assert any('cobertura' in limitation.lower() for limitation in validate_example(example).limitations)
 
 
 def frozen_forensics_matches(case):
     if 'fixture' in case:
-        return json.loads((FIXTURES / (case['fixture'] + '.json')).read_text())['expected_matches']
+        return json.loads((FIXTURES / (case['fixture'] + '.json')).read_text(encoding='utf-8'))['expected_matches']
     expected = []
     for reference in case['matches']:
-        matches = json.loads((FIXTURES / (reference['fixture'] + '.json')).read_text())['expected_matches']
+        matches = json.loads((FIXTURES / (reference['fixture'] + '.json')).read_text(encoding='utf-8'))['expected_matches']
         match = next(match for match in matches if match['contribution']['id'] == reference['contribution_id'])
         expected.append(match | reference['overrides'])
     return expected
