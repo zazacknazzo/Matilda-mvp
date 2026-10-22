@@ -155,6 +155,7 @@ def test_body_caps_and_failure_preserve_forensics(client, flow, monkeypatch):
         assert response.status_code == 413
     app.dependency_overrides.clear()
     monkeypatch.delenv('GEMINI_API_KEY', raising=False)
+    monkeypatch.delenv('NVIDIA_API_KEY', raising=False)
     response = generate(client, saved)
     assert response.status_code == 503
     assert response.json()['code'] == 'studio_not_configured'

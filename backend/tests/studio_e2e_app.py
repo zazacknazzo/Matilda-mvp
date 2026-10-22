@@ -37,4 +37,8 @@ class BrowserProvider(FlowProvider):
         return result
 
 
-app.dependency_overrides[get_provider] = BrowserProvider
+# Only external HTTP is substituted: the production NVIDIA adapter runs in E2E.
+import os
+from nvidia_transport import controlled_nvidia
+os.environ['NVIDIA_API_KEY'] = 'e2e-controlled-key'
+app.dependency_overrides[get_provider] = lambda: controlled_nvidia(BrowserProvider())

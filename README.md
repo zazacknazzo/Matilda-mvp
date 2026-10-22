@@ -101,7 +101,7 @@ Use as camadas do grafo, a alternativa em lista ou exporte Markdown/JSON.
 Selecione **Studio — Criar aula**, informe título, texto, conceitos ou DOI,
 confira os defaults e clique em **Criar prévia**. No Forensics, **Transformar em
 aula** reutiliza a investigação selecionada; confirme a origem antes de criar.
-O texto é enviado ao Gemini junto da configuração e do conjunto científico
+O texto é enviado ao provedor de IA configurado (NVIDIA por padrão) junto da configuração e do conjunto científico
 resolvido pelo mesmo motor do Forensics. A tela separa material original,
 propostas pedagógicas pendentes e evidências canônicas com participantes e fontes.
 Clique em **Revisar fontes e objetivos**, aceite ou rejeite cada sugestão, aprove
@@ -112,8 +112,18 @@ confira fontes, baixe Markdown ou imprima o plano/PDF pelo navegador.
 Voltar à revisão conserva as decisões confirmadas; alterar a revisão exige uma
 nova geração e mantém a aula anterior disponível até expirar.
 
-Configure `GEMINI_API_KEY` no `.env` da raiz, exclusivamente no backend, e
-reinicie a API. O modelo configurável é `GEMINI_MODEL=gemini-3.8-flash`.
+Configure o `.env` da raiz, exclusivamente no backend, e reinicie a API:
+
+```dotenv
+AI_PROVIDER=nvidia
+NVIDIA_API_KEY=
+NVIDIA_MODEL=nvidia/nemotron-3.5-super-vl-120b-a12b
+NVIDIA_BASE_URL=https://integrate.api.nvidia.com/v1
+```
+
+Preencha a chave somente no ambiente do backend. Para usar a alternativa Gemini,
+selecione explicitamente `AI_PROVIDER=gemini` e configure `GEMINI_API_KEY` e
+`GEMINI_MODEL`. Não há fallback automático entre provedores.
 Sem chave/quota ou com resposta inválida, a prévia falha explicitamente e conserva
 a entrada; o Forensics permanece disponível. Nenhum retorno simulado é selecionado
 pela aplicação de produção.
@@ -138,10 +148,23 @@ node node_modules/@playwright/test/cli.js test --config playwright.studio.config
 [integração e validação T10](docs/studio-flow-t10.md). O
 [candidato integrado T13](docs/integrated-demo-t13.md) registra a matriz P0,
 medições por etapa e os gates live/presenciais ainda pendentes. Testes com
-provedor controlado não atestam Gemini live. Para publicar, mantenha
+provedor controlado não atestam NVIDIA nem Gemini live. Para publicar, mantenha
 frontend e `/api` na mesma origem HTTPS, proxy com timeout de pelo menos 100 s
 e SQLite persistente. No desenvolvimento, `MATILDA_API_PROXY` altera o destino
 do proxy Vite; o navegador continua usando `/api` e não recebe a chave.
+
+O [guia da migração NVIDIA](docs/studio-nvidia.md) descreve limites, estimativa de
+tokens, classificação de falhas e smoke. O smoke existente Gemini não foi alterado.
+Nenhum ensaio cobrado deve ser executado sem autorização explícita. Após essa
+autorização, o comando NVIDIA tem teto de **3 chamadas / 180 segundos**:
+
+```sh
+.venv/bin/python scripts/smoke_studio_nvidia.py --allow-paid-nvidia
+```
+
+O relatório exige as prévias CRISPR/RNA e uma aula de 50 minutos com leitura e
+Markdown. O smoke usa fontes bibliográficas reais em cache datado e SQLite separado.
+O resultado controlado da suíte não comprova inferência NVIDIA em produção.
 
 ## Ampliação automática
 
@@ -174,8 +197,12 @@ não localizada nas referências recuperadas **não comprova exclusão**.
 |---|---|
 | `OPENALEX_API_KEY` | Chave opcional do OpenAlex, apenas no backend; pode ser exigida pelo serviço |
 | `OPENALEX_MAILTO` | Contato opcional para consultas acadêmicas |
-| `GEMINI_API_KEY` | Chave Gemini, somente no backend; exigida apenas pelo Studio |
-| `GEMINI_MODEL` | Modelo Studio; padrão `gemini-3.8-flash` |
+| `AI_PROVIDER` | Provedor Studio: `nvidia` (padrão) ou `gemini`; sem fallback |
+| `NVIDIA_API_KEY` | Chave NVIDIA, somente no backend e lida do ambiente |
+| `NVIDIA_MODEL` | Padrão `nvidia/nemotron-3.5-super-vl-120b-a12b` |
+| `NVIDIA_BASE_URL` | Padrão `https://integrate.api.nvidia.com/v1`; HTTPS sem credenciais/query |
+| `GEMINI_API_KEY` | Chave da alternativa Gemini, somente no backend |
+| `GEMINI_MODEL` | Modelo da alternativa Gemini; padrão `gemini-3.8-flash` |
 | `MATILDA_DB` | Banco SQLite; padrão `.runtime/matilda.db` na raiz |
 | `MATILDA_CACHE_TTL` | Validade do cache em segundos; padrão 86400; use 0 para tentar atualizar |
 | `MATILDA_CORS_ORIGINS` | Origens frontend permitidas, separadas por vírgula |
@@ -209,7 +236,8 @@ celular e teclado. Evidências de execução em [docs/validation.md](docs/valida
 
 React 19, TypeScript, Vite, React Flow e Lucide; FastAPI, Pydantic, HTTPX,
 SQLite e catálogo JSON. O Forensics mantém explicações determinísticas. O Studio
-usa Gemini real por meio do SDK oficial `google-genai`, com validação no servidor.
+usa NVIDIA NIM por HTTPX, com JSON Schema e validação científica no servidor.
+Gemini permanece selecionável pelo SDK `google-genai`.
 
 - [Arquitetura e API](docs/architecture.md)
 - [Método científico e fontes](docs/research-methodology.md)

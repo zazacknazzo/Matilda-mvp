@@ -27,8 +27,23 @@ def now():
 
 
 def get_provider():
-    from app.integrations.gemini_client import GeminiProvider
-    return GeminiProvider()
+    selected = os.getenv('AI_PROVIDER', 'nvidia').strip().lower()
+    if selected == 'nvidia':
+        from app.integrations.nvidia_client import NVIDIAProvider
+        return NVIDIAProvider()
+    if selected == 'gemini':
+        from app.integrations.gemini_client import GeminiProvider
+        return GeminiProvider()
+    return UnconfiguredProvider()
+
+
+class UnconfiguredProvider:
+    """Fail inside the operation so its normal error/preservation path runs."""
+    async def count_input_tokens(self, request):
+        raise conflict('studio_not_configured', 'AI_PROVIDER deve ser nvidia ou gemini no backend.')
+
+    async def complete(self, request):
+        return await self.count_input_tokens(request)
 
 
 def get_repository():
@@ -104,7 +119,7 @@ async def post_preview(http: Request, provider=Depends(get_provider), repository
     except (TimeoutError, ProviderFailure) as exc:
         reason = exc.reason if isinstance(exc, ProviderFailure) else 'timeout'
         code = 'generation_timeout' if reason == 'timeout' else 'invalid_generation' if reason in ('blocked', 'truncated') else 'provider_unavailable'
-        error = StudioError(code=code, detail='O Gemini não concluiu a prévia. O material foi preservado; confira a configuração ou tente novamente.', retryable=reason not in ('unauthorized', 'blocked'), project_id=project.id if admitted else None)
+        error = StudioError(code=code, detail='O provedor de IA não concluiu a prévia. O material foi preservado; confira a configuração ou tente novamente.', retryable=reason not in ('unauthorized', 'blocked'), project_id=project.id if admitted else None)
     except HTTPException as exc:
         code = {404: 'not_found', 422: 'invalid_input', 502: 'invalid_generation'}.get(exc.status_code, 'provider_unavailable')
         error = StudioError(code=code, detail='Não foi possível recuperar a fonte científica.', retryable=exc.status_code >= 500)

@@ -1,3 +1,8 @@
+> Atualização #31: a branch de migração seleciona NVIDIA por padrão e mantém
+> Gemini como alternativa explícita. A descrição e as medições Gemini abaixo são
+> o registro histórico da base T13. O [guia NVIDIA](studio-nvidia.md) registra a
+> validação da migração; ensaio NVIDIA live permanece pendente.
+
 # T13 — candidato integrado ao ensaio P0
 
 Issue: [#14](https://github.com/zazacknazzo/Matilda-mvp/issues/14).

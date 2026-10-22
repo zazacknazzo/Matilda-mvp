@@ -1,9 +1,10 @@
 """Bounded planner: model selects authorized IDs; the server owns science."""
 import asyncio
+import logging
 from time import monotonic
 from uuid import uuid4
 
-from pydantic import Field
+from pydantic import Field, ValidationError
 
 from app.schemas import Concept
 from app.schemas.lesson import Id, LessonModel, Text, LessonReference
@@ -135,7 +136,9 @@ async def create_preview(*, request, project, documents, session_id, provider, r
         except ProviderFailure as exc:
             if exc.reason not in ('rate_limited', 'unavailable') or attempt + 1 == POLICY.max_provider_attempts:
                 raise
-        except ValueError:
+        except ValueError as failure:
+            logging.getLogger('matilda.studio.validation').info('studio_validation stage=preview outcome=%s',
+                'pydantic_validation' if isinstance(failure, ValidationError) else 'scientific_validation')
             if attempt + 1 == POLICY.max_provider_attempts:
                 raise conflict('invalid_generation', 'O provedor retornou uma prévia inválida. O material foi preservado.', retryable=True, project_id=project.id)
         provider_request = ProviderRequest(**{**provider_request.__dict__, 'system_instruction': SYSTEM + '\nA tentativa anterior falhou. Confira o schema, IDs e âncora literal; retorne somente JSON válido.'})

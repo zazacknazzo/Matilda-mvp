@@ -120,8 +120,9 @@ produção ou botões que aparentem executar revisão/geração ainda não integ
 
 `api/studio_runtime.py` compõe POST de revisão, o router de geração T09, GET
 lesson e o router Markdown T11. `get_repository` fornece `StudioRepository`,
-que estende a persistência T05 no mesmo banco; `get_provider` continua criando
-apenas o adaptador Gemini real e permite substituição explícita nos testes.
+que estende a persistência T05 no mesmo banco; `get_provider` seleciona
+o adaptador real NVIDIA por padrão ou Gemini explicitamente; permite substituição
+explícita somente nos testes. Não há fallback automático.
 
 `services/studio/runtime_repository.py` grava revisão e operações de geração em
 transações curtas, com comparação da revisão, ownership, expiração e idempotência.
@@ -164,3 +165,23 @@ e eventos sem material/chave. Não altera deadlines, schemas, validação ou ret
 Os routers de exportação T11 e persistência/autorização T10 são reutilizados
 integralmente; os testes T13 verificam sua composição no host real.
 Ver `integrated-demo-t13.md` para evidências e limitações.
+
+
+## Studio — NVIDIA NIM (#31)
+
+`integrations/nvidia_client.py` implementa as mesmas portas sem mudar API, schemas,
+tabelas ou catálogo. HTTPX envia `response_format.json_schema` com o schema privado
+integral: PreviewPlan na prévia e LessonDraft na geração. O serviço materializa e
+valida LessonBundle contra a revisão e o snapshot científico existentes. O provedor
+não recebe autoridade para inventar referências ou identidades.
+
+NVIDIA_API_KEY vem exclusivamente do ambiente do backend. AI_PROVIDER seleciona
+nvidia (padrão) ou gemini (explícito); valor desconhecido falha dentro da operação,
+preservando material/revisão. Nenhum SDK realiza retries ocultos no adaptador NVIDIA.
+A admissão SQLite continua impondo uma operação por sessão e duas globais, comuns
+à prévia e geração; limites HTTPX não substituem essa admissão persistida.
+
+Contagem NVIDIA é estimada conservadoramente antes da rede, sem endpoint de
+inferência adicional. Payload completo UTF-8 + reserva de 1.024 tokens; nunca
+chars/4 nem tokenizer de outro modelo. Uso efetivo é verificado no retorno e
+registrado junto da estimativa e diferença. Ver [guia NVIDIA](studio-nvidia.md).

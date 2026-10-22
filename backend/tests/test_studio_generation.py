@@ -412,10 +412,11 @@ def test_wall_deadline_cancels_uncooperative_async_transport_and_preserves_revie
     run(scenario())
 
 
-def test_production_mounts_generation_with_real_provider_only():
+def test_production_mounts_generation_with_real_provider_only(monkeypatch):
     from app.main import app
     assert '/api/studio/generate' in app.openapi()['paths']
     from app.api.studio_preview import get_provider
-    from app.integrations.gemini_client import GeminiProvider
-    assert isinstance(get_provider(), GeminiProvider)
+    from app.integrations.nvidia_client import NVIDIAProvider
+    monkeypatch.delenv('AI_PROVIDER', raising=False)
+    assert isinstance(get_provider(), NVIDIAProvider)
     assert get_provider not in app.dependency_overrides

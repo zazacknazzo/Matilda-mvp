@@ -1,5 +1,8 @@
 """T09 bounded generation against frozen M0 ports; no SDK or fixture selection."""
 import asyncio
+import logging
+
+from pydantic import ValidationError
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -167,7 +170,9 @@ class GenerationService:
                     raise generation_error('invalid_generation', retryable=True, project_id=preview.project_id) from None
                 if attempt + 1 == POLICY.max_provider_attempts:
                     raise generation_error('provider_unavailable', retryable=True, project_id=preview.project_id) from None
-            except (ValueError, KeyError, TypeError):
+            except (ValueError, KeyError, TypeError) as failure:
+                logging.getLogger('matilda.studio.validation').info('studio_validation stage=lesson outcome=%s',
+                    'pydantic_validation' if isinstance(failure, ValidationError) else 'scientific_validation')
                 if attempt + 1 == POLICY.max_provider_attempts:
                     raise generation_error('invalid_generation', retryable=True, project_id=preview.project_id) from None
         raise generation_error('invalid_generation', project_id=preview.project_id)
