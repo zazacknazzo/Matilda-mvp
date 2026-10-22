@@ -72,7 +72,7 @@ Ambiente: macOS arm64, Python 3.14, Node 26.10, SDK Google 2.32.0,
 SQLite local temporário. Os requisitos mínimos do README permanecem Python 3.12+
 e Node 22+. Testes não declaram ensaio em todas essas versões.
 
-- `.venv/bin/python -m pytest backend/tests -q`: 429 testes aprovados, incluindo
+- `.venv/bin/python -m pytest backend/tests -q`: 450 testes aprovados, incluindo
   43 novos testes T05 na fronteira HTTP com SQLite real e provedor controlado.
 - `npm run build` em frontend: TypeScript e Vite aprovados.
 - `scripts/check_studio_contract.py`: 40 payloads; `check_scientific_contract.py`:
@@ -127,3 +127,18 @@ A conferência operacional de retenção, com relógio controlado e reinício re
 lifespan, removeu 2 documentos expirados antes de qualquer acesso Studio e
 preservou a investigação Forensics. Essa verificação de armazenamento é registrada
 separadamente dos testes de comportamento HTTP.
+
+
+Reconferência dos dois revisores: Standards **0 pendências** (1 P2 corrigido),
+Spec **0 pendências** (2 P2 corrigidos). A revisão foi feita por agentes separados,
+sem alegar aceite humano independente. O revisor Spec reexecutou as duas regressões
+HTTP de upload lento e preservação da prévia anterior: ambas passaram.
+
+Durante o trabalho entrou na main o PR #23/T11 (`666be8d`). A branch foi atualizada
+por rebase sem conflitos e o backend completo foi repetido: **450 aprovados**;
+build repetido e aprovado. A suíte adicional `playwright.export.config.ts` passou
+com **11 testes**. Somada às suítes já registradas: **53 testes Playwright**.
+O comando padrão `test:e2e` continua selecionando somente Forensics, sem Gemini;
+a configuração Studio inicia explicitamente API/banco/provedor controlado.
+Capturas da prévia desktop e mobile foram geradas nos artefatos ignorados do
+Playwright e conferidas visualmente, sem cortes ou rolagem horizontal da página.
