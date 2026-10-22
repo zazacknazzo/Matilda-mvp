@@ -69,8 +69,8 @@ O sistema está em [`.interface-design/system.md`](../.interface-design/system.m
 e os tokens em [`design-system.css`](../frontend/src/design-system.css). Os CSS
 de produção e dos harnesses compartilham os mesmos tokens. Controles continuam
 nativos; `details` permite abrir todo o texto com Enter/Espaço. Não há clipping
-ou remoção das fontes para obter uma composição menor. Em mobile, a revisão
-prioriza as sugestões, com o material original disponível em seguida.
+ou remoção das fontes para obter uma composição menor. A ordem visual e a ordem
+de teclado permanecem iguais em desktop e mobile.
 
 A revisão visual identificou uma regressão introduzida durante o refinamento:
 o título de foco mudava de altura ao perder foco, deslocando o botão durante o

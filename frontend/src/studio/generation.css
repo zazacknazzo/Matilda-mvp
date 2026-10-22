@@ -33,13 +33,22 @@
   font: inherit;
   padding: 12px 18px;
   min-height: 44px;
-  border: 1px solid var(--matilda-action);
-  background: var(--matilda-action);
-  color: #fff;
+  border: 1px solid var(--matilda-line);
+  background: var(--matilda-sheet);
+  color: var(--matilda-action);
   border-radius: 6px;
   cursor: pointer;
 }
-.generation-panel button:disabled {
+.generation-panel button.generation-primary {
+  background: var(--matilda-action);
+  color: var(--matilda-on-action);
+  border-color: var(--matilda-action);
+}
+.generation-panel button.generation-primary:hover:not(:disabled) {
+  background: var(--matilda-action-hover);
+}
+.generation-panel button:disabled,
+.generation-panel button.generation-primary:disabled {
   background: #e0e6dc;
   color: #586451;
   border-color: #b8c3b1;

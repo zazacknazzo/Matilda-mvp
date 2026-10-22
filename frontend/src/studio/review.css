@@ -211,9 +211,6 @@
   .review-columns {
     grid-template-columns: 1fr;
   }
-  .review-material {
-    order: 2;
-  }
   .review-heading {
     flex-direction: column;
     gap: 0;

@@ -205,7 +205,6 @@
 }
 .studio-reference {
   border-left: 3px solid var(--matilda-copper);
-  padding-left: 16px;
   margin-bottom: 24px;
 }
 .studio-reference:focus {
@@ -246,6 +245,9 @@
 .studio-reference {
   padding: 1rem 0;
   border-top: 1px solid #d4ded7;
+}
+.studio-reference {
+  padding-inline-start: 16px;
 }
 .studio-reference-link {
   display: block;
