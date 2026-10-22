@@ -1,5 +1,8 @@
 # Diagnóstico da primeira prévia NVIDIA — PR #32 / Issue #31
 
+Documento histórico da primeira correção. A geração livre e os exemplos de
+âncoras descritos aqui foram substituídos por [seleção canônica](studio-canonical-anchors.md).
+
 Base da investigação: `d42432b` (cabeça do PR #32 antes desta correção).
 Nenhuma nova inferência NVIDIA/Gemini foi executada nesta investigação.
 

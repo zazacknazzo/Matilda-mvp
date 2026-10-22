@@ -162,7 +162,7 @@ class EnrichmentPreview(LessonModel):
                 raise PydanticCustomError('invalid_concept', 'Sugestão fora do projeto/contexto.')
             document = documents.get(suggestion.source_anchor.source_document_id)
             if document is None:
-                raise PydanticCustomError('invalid_source_anchor', 'Âncora fora dos documentos da prévia.')
+                raise PydanticCustomError('invalid_source_anchor', 'Âncora fora dos documentos da prévia.', {'anchor_error': 'invalid_source_document'})
             suggestion.source_anchor.locate(document)
             for identifier in suggestion.evidence_ids:
                 reference = references.get(identifier)

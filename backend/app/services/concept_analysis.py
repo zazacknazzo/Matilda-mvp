@@ -10,17 +10,26 @@ def contains(text, phrase):
     return bool(re.search(r'(?<!\w)' + re.escape(normalized(phrase)) + r'(?!\w)', normalized(text)))
 
 
-def editorial_alias_quote(text, aliases):
-    """Find a literal quote with the same normalization/boundaries as contains."""
+def editorial_alias_spans(text, aliases):
+    """Yield original character spans for deterministic editorial alias matches."""
+    content = normalized(text)
     offsets = [index for index, char in enumerate(text) for _ in normalized(char)]
+    seen = set()
     for alias in aliases:
-        match = re.search(r'(?<!\w)' + re.escape(normalized(alias)) + r'(?!\w)', normalized(text))
-        if match:
+        for match in re.finditer(r'(?<!\w)' + re.escape(normalized(alias)) + r'(?!\w)', content):
             start, end = offsets[match.start()], offsets[match.end() - 1] + 1
             while end < len(text) and unicodedata.combining(text[end]):
                 end += 1
-            return text[start:end]
-    return None
+            if (start, end) not in seen:
+                seen.add((start, end))
+                yield start, end
+
+
+def editorial_alias_quote(text, aliases):
+    """Keep the same first editorial match, copied literally from the document."""
+    span = next(editorial_alias_spans(text, aliases), None)
+    return text[span[0]:span[1]] if span is not None else None
+
 
 def extract_concepts(raw, abstract):
     sources = {'título': raw.get('title') or raw.get('display_name') or '', 'resumo': abstract or ''}

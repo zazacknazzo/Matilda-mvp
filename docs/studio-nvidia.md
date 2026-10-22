@@ -1,6 +1,8 @@
 # Studio com NVIDIA NIM — Issue #31
 
-Atualização após o primeiro smoke relatado pelo usuário: ver
+Atualização estrutural de âncoras: [seleção canônica pelo servidor](studio-canonical-anchors.md).
+
+Histórico após o primeiro smoke relatado pelo usuário: ver
 [diagnóstico da prévia e limites da evidência](nvidia-preview-diagnosis.md).
 A correção não realizou novas inferências reais. O registro de validação abaixo
 refere-se à implementação inicial da migração.
@@ -59,7 +61,9 @@ A API do modelo não recebe LessonBundle diretamente: a fronteira T09 existente
 é LessonDraft. IDs finais, metadados, evidências, participantes e referências
 canônicas são acrescentados e conferidos pelo servidor. Exigir LessonBundle do
 modelo permitiria que ele escrevesse campos que pertencem ao servidor. A prévia
-continua usando PreviewPlan e a validação científica de EnrichmentPreview.
+usa PreviewPlan privado com source_anchor_id; o servidor resolve a seleção para
+o SourceAnchor público original antes de validar EnrichmentPreview. Não aceita
+source_anchor escrito pelo modelo. A aula continua recebendo a prévia pública completa.
 
 O contrato completo ainda precisa ser aceito pelo endpoint live: testes de
 transporte validam o payload, mas não executam o compilador de schema da NVIDIA.

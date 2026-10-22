@@ -29,7 +29,8 @@ class FlowProvider(PreviewProvider):
             matches = request.material['authorized_contributions']
             if len(matches) > 1:
                 item = dict(value['suggestions'][0])
-                item.update(contribution_id=matches[1]['contribution_id'], concept_ids=matches[1]['concept_ids'][:1], evidence_ids=matches[1]['evidence_ids'][:1])
+                anchor = next(a for a in request.material['authorized_source_anchors'] if a['id'] in matches[1]['source_anchor_ids'])
+                item.update(contribution_id=matches[1]['contribution_id'], concept_ids=anchor['concept_ids'], evidence_ids=matches[1]['evidence_ids'][:1], source_anchor_id=anchor['id'])
                 value['suggestions'].append(item)
             return ProviderResult(json.dumps(value).encode(), result.metadata)
         self.lesson_requests.append(request)

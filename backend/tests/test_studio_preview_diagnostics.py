@@ -46,11 +46,12 @@ def rejected_plan(client, monkeypatch, caplog, mutate):
     caplog.set_level('INFO', logger='matilda.studio.validation')
     def upstream(http):
         material = json.loads(json.loads(http.content)['messages'][1]['content'])
-        match, document = material['authorized_contributions'][0], material['source_documents'][0]
+        match = material['authorized_contributions'][0]
+        anchor = next(a for a in material['authorized_source_anchors'] if a['id'] in match['source_anchor_ids'])
         plan = {'suggested_objectives': ['Conferir as fontes documentais.'], 'suggestions': [{
-            'contribution_id': match['contribution_id'], 'concept_ids': match['concept_ids'][:1],
+            'contribution_id': match['contribution_id'], 'concept_ids': anchor['concept_ids'],
             'evidence_ids': match['evidence_ids'][:1],
-            'source_anchor': {'source_document_id': document['id'], 'quote': document['content'], 'occurrence': 0},
+            'source_anchor_id': anchor['id'],
             'pedagogical_rationale': 'Comparar o mecanismo e sua documentação.',
             'suggested_content': 'Leia a evidência e discuta o mecanismo.',
         }]}
@@ -78,12 +79,13 @@ def test_unknown_contribution_is_distinguished_from_evidence_failure(client, mon
                and e['returned_suggestions'] == 1 for e in diagnostics)
 
 
-def test_nonliteral_source_anchor_is_reported_without_logging_quote(client, monkeypatch, caplog):
+def test_unknown_anchor_selection_is_reported_without_logging_identifier(client, monkeypatch, caplog):
     def mutate(plan, _):
-        plan['suggestions'][0]['source_anchor']['quote'] = 'PRIVATE_INVALID_ID'
+        plan['suggestions'][0]['source_anchor_id'] = 'PRIVATE_INVALID_ID'
     response, diagnostics = rejected_plan(client, monkeypatch, caplog, mutate)
     assert response.status_code == 502
-    assert diagnostics and all(e['code'] == 'invalid_source_anchor' and e['plan_pydantic_valid'] is True for e in diagnostics)
+    assert diagnostics and all(e['code'] == 'invalid_source_anchor' and e['plan_pydantic_valid'] is True
+                               and e['anchor_error'] == 'unknown_anchor_id' for e in diagnostics)
 
 
 def test_invalid_concept_is_distinguished_from_structural_pydantic_failure(client, monkeypatch, caplog):
@@ -131,7 +133,7 @@ def test_provider_schema_requires_suggestion_only_when_scientific_coverage_exist
         app.dependency_overrides.clear()
 
 
-def test_model_receives_bound_ids_and_real_literal_anchor_examples(client, monkeypatch):
+def test_model_receives_bound_ids_and_canonical_literal_anchor_choices(client, monkeypatch):
     from types import SimpleNamespace
     from studio_flow_provider import FlowProvider
     monkeypatch.setenv('NVIDIA_API_KEY', 'test-private-key')
@@ -148,12 +150,16 @@ def test_model_receives_bound_ids_and_real_literal_anchor_examples(client, monke
         assert set(suggestion['concept_ids']['items']['enum']) == {cid for a in authorized for cid in a['concept_ids']}
         assert set(suggestion['evidence_ids']['items']['enum']) == {eid for a in authorized for eid in a['evidence_ids']}
         documents = {doc['id']: doc['content'] for doc in material['source_documents']}
-        assert set(schema['$defs']['SourceAnchor']['properties']['source_document_id']['enum']) == set(documents)
-        examples = material['source_anchor_examples']
-        assert len(examples) == len(documents) == 2
-        for example in examples:
-            assert example['occurrence'] == 0 and example['quote'].strip()
-            assert example['quote'] in documents[example['source_document_id']]
+        assert 'SourceAnchor' not in schema['$defs'] and 'source_anchor' not in suggestion
+        choices = material['authorized_source_anchors']
+        assert 1 <= len(choices) <= 8
+        assert set(suggestion['source_anchor_id']['enum']) == {a['id'] for a in choices}
+        assert all(entry['source_anchor_ids'] for entry in authorized)
+        for choice in choices:
+            anchor = choice['source_anchor']
+            assert anchor['quote'].strip() and anchor['quote'] in documents[anchor['source_document_id']]
+            assert any(choice['id'] in entry['source_anchor_ids'] and set(choice['concept_ids']) <= set(entry['concept_ids'])
+                       for entry in authorized)
         inspected.append(True)
         result = await external.complete(SimpleNamespace(stage='preview', material=material, prompt_version='controlled'))
         return httpx.Response(200, json={'model': 'controlled', 'usage': {'prompt_tokens': 1000, 'completion_tokens': 200},
@@ -225,14 +231,12 @@ def test_invalid_plan_shape_is_distinguished_from_scientific_failure(client, mon
                                and e['returned_suggestions'] is None for e in diagnostics)
 
 
-def test_missing_anchor_document_and_nonexistent_occurrence_are_never_accepted(client, monkeypatch, caplog):
-    for change in ({'source_document_id': 'PRIVATE_INVALID_ID'}, {'occurrence': 2}):
-        caplog.clear()
-        def mutate(plan, _, change=change):
-            plan['suggestions'][0]['source_anchor'].update(change)
-        response, diagnostics = rejected_plan(client, monkeypatch, caplog, mutate)
-        assert response.status_code == 502
-        assert diagnostics and all(e['code'] == 'invalid_source_anchor' for e in diagnostics)
+def test_model_authored_source_anchor_is_forbidden_even_if_it_is_literal(client, monkeypatch, caplog):
+    def mutate(plan, material):
+        plan['suggestions'][0]['source_anchor'] = material['authorized_source_anchors'][0]['source_anchor']
+    response, diagnostics = rejected_plan(client, monkeypatch, caplog, mutate)
+    assert response.status_code == 502
+    assert diagnostics and all(e['code'] == 'pydantic_validation' and e['plan_pydantic_valid'] is False for e in diagnostics)
 
 
 @pytest.mark.parametrize('status', [202, 401, 429, 503])
@@ -254,3 +258,15 @@ def test_smoke_does_not_spend_a_second_inference_after_upstream_failure(client, 
     assert calls == [1] and provider.calls == 1
     assert 'PRIVATE_TEACHER_TEXT' not in json.dumps(report)
     assert 'test-private-key' not in json.dumps(report)
+
+
+def test_known_anchor_with_different_authorized_concept_still_fails_binding(client, monkeypatch, caplog):
+    def mutate(plan, material):
+        item = plan['suggestions'][0]
+        match = material['authorized_contributions'][0]
+        other = next(cid for cid in match['concept_ids'] if cid not in item['concept_ids'])
+        item['concept_ids'] = [other]
+    response, diagnostics = rejected_plan(client, monkeypatch, caplog, mutate)
+    assert response.status_code == 502
+    assert diagnostics and all(e['code'] == 'invalid_source_anchor' and e['plan_pydantic_valid'] is True
+                               and e['anchor_error'] == 'anchor_binding_mismatch' for e in diagnostics)

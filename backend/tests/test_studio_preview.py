@@ -25,16 +25,16 @@ class PreviewProvider:
 
     async def complete(self, request):
         self.requests.append(request)
-        source = request.material['source_documents'][0]
         matches = request.material['authorized_contributions']
         suggestions = []
         if matches:
             match = matches[0]
+            anchor = next(a for a in request.material['authorized_source_anchors'] if a['id'] in match['source_anchor_ids'])
             suggestions.append({
                 'contribution_id': match['contribution_id'],
-                'concept_ids': match['concept_ids'][:1],
+                'concept_ids': anchor['concept_ids'],
                 'evidence_ids': match['evidence_ids'][:1],
-                'source_anchor': {'source_document_id': source['id'], 'quote': source['content'], 'occurrence': 0},
+                'source_anchor_id': anchor['id'],
                 'pedagogical_rationale': 'Relacionar mecanismo molecular e análise documental.',
                 'suggested_content': 'Compare a afirmação documental com o mecanismo apresentado no material.',
             })
@@ -61,7 +61,8 @@ def test_text_creates_canonical_preview_and_survives_new_api_client(client, prov
     assert preview.source_documents[0].content == MATERIAL
     assert preview.scientific_context.paper_ids == []
     assert preview.suggestions[0].status == 'pending'
-    assert preview.suggestions[0].source_anchor.quote == MATERIAL
+    assert preview.suggestions[0].source_anchor.quote in MATERIAL
+    assert preview.suggestions[0].source_anchor.locate(preview.source_documents[0])
     reference = preview.evidence_references[0]
     assert preview.suggestions[0].historical_claim == reference.claim_supported
     assert reference.source_url.startswith('https://')
@@ -111,11 +112,11 @@ def test_sdk_transport_is_real_and_disables_tools(client, monkeypatch):
             return httpx.Response(200, json={'totalTokens': 600})
         material = json.loads(body['contents'][0]['parts'][0]['text'])
         match = material['authorized_contributions'][0]
-        document = material['source_documents'][0]
+        anchor = next(a for a in material['authorized_source_anchors'] if a['id'] in match['source_anchor_ids'])
         plan = {'suggested_objectives': ['Explicar o mecanismo.'], 'suggestions': [{
-            'contribution_id': match['contribution_id'], 'concept_ids': match['concept_ids'][:1],
+            'contribution_id': match['contribution_id'], 'concept_ids': anchor['concept_ids'],
             'evidence_ids': match['evidence_ids'][:1],
-            'source_anchor': {'source_document_id': document['id'], 'quote': 'CRISPR-Cas9', 'occurrence': 0},
+            'source_anchor_id': anchor['id'],
             'pedagogical_rationale': 'Conferir a documentação.', 'suggested_content': 'Leia a evidência e compare os mecanismos.'}]}
         return httpx.Response(200, json={'candidates': [{'content': {'role': 'model', 'parts': [{'text': json.dumps(plan)}]}, 'finishReason': 'STOP'}],
             'modelVersion': 'gemini-3.8-flash', 'usageMetadata': {'promptTokenCount': 600, 'candidatesTokenCount': 100, 'thoughtsTokenCount': 20}})
