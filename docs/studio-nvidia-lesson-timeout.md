@@ -151,6 +151,11 @@ nvidia/nemotron-3.5-super-vl-120b-a12b e endpoint hospedado fixo. Nenhuma segund
 chamada é permitida, inclusive em erro HTTP/schema ou correção. O contador reserva
 uma tentativa; preflight pode consumir a reserva sem enviar HTTP.
 
+Antes da preparação, um preflight exige fonte em cache com validade suficiente
+para a janela de recuperação científica. Sem cache fresco, falha como
+preparation_cache_unavailable, sem consulta bibliográfica nem inferência. O teste
+com cache ausente bloqueia qualquer HTTP externo e confirma zero chamadas.
+
 Preparação usa seleção pedagógica determinística identificada como
 simulated-preparation, com material científico público e ciência real do cache.
 Cria prévia e aprova objetivos/sugestões pelas rotas normais, com sessão/cookie e
@@ -177,4 +182,4 @@ independentes serão registrados ao concluir.
 O primeiro E2E integrado passou 19/20: o mock BrowserProvider do cenário de falha
 única ainda exigia um ID administrativo removido do payload. O identificador de
 teste foi adaptado ao conteúdo recebido (somente harness, sem alterar frontend).
-A reprodução isolada passou após a correção; o rerun completo está em andamento.
+A reprodução isolada passou após a correção; o rerun completo passou **20/20**.

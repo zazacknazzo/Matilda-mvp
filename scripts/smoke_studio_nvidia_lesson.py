@@ -99,6 +99,12 @@ def run_lesson_smoke(provider, *, scenario='crispr'):
             'crispr': ('10.1126/science.1231143', 'CRISPR-Cas9 permite discutir edição genética e clivagem do DNA.'),
             'rna': ('10.1056/NEJMoa2034577', 'RNA mensageiro e modificação de nucleosídeos permitem discutir imunidade.'),
         }[scenario]
+        from app.services.storage import cached
+        cache = cached(source[0])
+        # Keep preparation offline; normal API retrieval still validates the cached paper.
+        if cache is None or cache[2] + 15 >= int(os.getenv('MATILDA_CACHE_TTL', '86400')):
+            stage, report['code'] = 'preparation', 'preparation_cache_unavailable'
+            raise SmokeFailure()
         app.dependency_overrides[get_provider] = lambda: SimulatedPreparation()
         with TestClient(app) as client:
             origin = {'Origin': 'http://localhost:5173'}

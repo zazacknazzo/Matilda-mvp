@@ -60,3 +60,22 @@ def test_isolated_smoke_never_pays_for_retry_or_correction(client, monkeypatch, 
     assert report['status'] == 'failed' and report['failed_stage'] == 'lesson'
     assert calls == [1] and provider.calls == 1
     assert 'private-teacher-material' not in json.dumps(report)
+
+
+def test_isolated_smoke_refuses_missing_cache_before_any_external_http(client, monkeypatch, tmp_path):
+    from app.services import storage
+    smoke = module()
+    monkeypatch.setattr(storage, 'DATA', tmp_path)
+    monkeypatch.setenv('NVIDIA_API_KEY', 'controlled-private-key')
+    original_client, calls = httpx.AsyncClient, []
+    def upstream(_):
+        calls.append(1)
+        return httpx.Response(503)
+    def controlled_client(*args, **kwargs):
+        kwargs['transport'] = httpx.MockTransport(upstream)
+        return original_client(*args, **kwargs)
+    monkeypatch.setattr(httpx, 'AsyncClient', controlled_client)
+    provider = smoke.SingleCallNVIDIA(transport=httpx.MockTransport(upstream))
+    report = smoke.run_lesson_smoke(provider)
+    assert report['status'] == 'failed' and report['code'] == 'preparation_cache_unavailable'
+    assert provider.calls == 0 and calls == []
