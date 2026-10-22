@@ -19,6 +19,30 @@ MAX_CALLS = 3
 MAX_SECONDS = 180
 
 
+from app.integrations.nvidia_client import NVIDIAProvider, DEFAULT_MODEL
+from app.services.studio.repository import conflict
+
+
+class BudgetedNVIDIA(NVIDIAProvider):
+    def __init__(self, *, transport=None):
+        super().__init__(transport=transport)
+        self.calls = 0
+        self.operations = set()
+
+    @property
+    def model(self):
+        # A smoke authorization is scoped to this exact requested model.
+        return DEFAULT_MODEL
+
+    async def complete(self, request):
+        operation = (request.stage, request.deadline)
+        # One attempt per operation. No silent paid correction/retry in smoke.
+        if self.calls >= MAX_CALLS or operation in self.operations:
+            raise conflict('invalid_generation', 'Limite de chamadas do ensaio atingido.', retryable=False)
+        self.operations.add(operation)
+        self.calls += 1
+        return await super().complete(request)
+
 class Recorder(logging.Handler):
     def __init__(self):
         super().__init__()
@@ -26,7 +50,7 @@ class Recorder(logging.Handler):
 
     def emit(self, record):
         message = record.getMessage()
-        for prefix in ('nvidia_attempt ', 'studio_stage '):
+        for prefix in ('nvidia_attempt ', 'studio_stage ', 'studio_preview_validation '):
             if message.startswith(prefix):
                 self.events.append({'type': prefix.strip(), **json.loads(message[len(prefix):])})
                 break
@@ -177,23 +201,7 @@ def main():
     os.environ['MATILDA_DB'] = str(ROOT / '.runtime' / ('nvidia-smoke-' + str(uuid4()) + '.sqlite'))
     os.environ['MATILDA_CACHE_TTL'] = '999999999'
     os.environ['MATILDA_CORS_ORIGINS'] = 'http://localhost:5173'
-    from app.integrations.nvidia_client import NVIDIAProvider
-    from app.services.studio.repository import conflict
 
-    class BudgetedNVIDIA(NVIDIAProvider):
-        def __init__(self):
-            super().__init__()
-            self.calls = 0
-            self.operations = set()
-
-        async def complete(self, request):
-            operation = (request.stage, request.deadline)
-            # One attempt per operation. No silent paid correction/retry in smoke.
-            if self.calls >= MAX_CALLS or operation in self.operations:
-                raise conflict('invalid_generation', 'Limite de chamadas do ensaio atingido.', retryable=False)
-            self.operations.add(operation)
-            self.calls += 1
-            return await super().complete(request)
 
     provider = BudgetedNVIDIA()
     report = run_smoke(provider, lesson_scenario=options.lesson_scenario)

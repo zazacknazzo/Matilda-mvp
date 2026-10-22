@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from typing import Annotated, Literal, TypeVar
 
 from pydantic import Field, field_validator, model_validator
+from pydantic_core import PydanticCustomError
 
 from .lesson import (
     Id, Text, LessonModel, LessonBundle, LessonReference, LessonGenerationMetadata,
@@ -158,10 +159,10 @@ class EnrichmentPreview(LessonModel):
         used = set()
         for suggestion in self.suggestions:
             if suggestion.project_id != self.project_id or not set(suggestion.concept_ids) <= set(context.concept_ids):
-                raise ValueError('Sugestão fora do projeto/contexto.')
+                raise PydanticCustomError('invalid_concept', 'Sugestão fora do projeto/contexto.')
             document = documents.get(suggestion.source_anchor.source_document_id)
             if document is None:
-                raise ValueError('Âncora fora dos documentos da prévia.')
+                raise PydanticCustomError('invalid_source_anchor', 'Âncora fora dos documentos da prévia.')
             suggestion.source_anchor.locate(document)
             for identifier in suggestion.evidence_ids:
                 reference = references.get(identifier)
@@ -206,12 +207,16 @@ class EnrichmentPreview(LessonModel):
         by_evidence = {ref.id: ref for ref in self.evidence_references}
         for suggestion in self.suggestions:
             match = by_contribution.get(suggestion.contribution_id)
-            if match is None or match.contribution.verification_status != 'verified' or any(r.identity_status != 'verified' for r in match.researchers):
-                raise ValueError('Contribuição/identidade não elegível na ciência autorizada.')
+            if match is None:
+                raise PydanticCustomError('unknown_contribution', 'Contribuição/identidade não elegível na ciência autorizada.')
+            if match.contribution.verification_status != 'verified':
+                raise PydanticCustomError('ineligible_contribution', 'Contribuição/identidade não elegível na ciência autorizada.')
+            if any(r.identity_status != 'verified' for r in match.researchers):
+                raise PydanticCustomError('invalid_identity', 'Contribuição/identidade não elegível na ciência autorizada.')
             if suggestion.researcher_ids != match.contribution.researcher_ids or [r.id for r in match.researchers] != suggestion.researcher_ids:
-                raise ValueError('Pesquisadores não correspondem à contribuição autorizada.')
+                raise PydanticCustomError('invalid_identity', 'Pesquisadores não correspondem à contribuição autorizada.')
             if not set(suggestion.concept_ids) <= ({c.id for c in match.matched_concepts} & set(match.contribution.concept_ids)):
-                raise ValueError('Conceitos não correspondem à contribuição autorizada.')
+                raise PydanticCustomError('invalid_concept', 'Conceitos não correspondem à contribuição autorizada.')
             for identifier in suggestion.evidence_ids:
                 evidence = next((e for e in match.evidence if e.id == identifier), None)
                 reference = by_evidence[identifier]

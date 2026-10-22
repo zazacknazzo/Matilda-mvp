@@ -1,5 +1,10 @@
 # Studio com NVIDIA NIM — Issue #31
 
+Atualização após o primeiro smoke relatado pelo usuário: ver
+[diagnóstico da prévia e limites da evidência](nvidia-preview-diagnosis.md).
+A correção não realizou novas inferências reais. O registro de validação abaixo
+refere-se à implementação inicial da migração.
+
 Migração baseada na T13 `a88698e` / PR #30, com PR dirigido à branch
 `feat/issue-14-integrated-demo`. API, schemas Pydantic públicos, tipos TypeScript,
 FastAPI, SQLite, snapshots e catálogo científico permanecem os da T13.
@@ -46,9 +51,9 @@ explícita; o estado docente local é preservado para consulta/tentativa explíc
 O endpoint específico documenta `response_format.json_schema.schema`. O envelope
 usado é `{"type":"json_schema","json_schema":{"name":"PreviewPlan ou LessonDraft","schema":{...}}}`.
 Não são enviados `strict`, `nvext`, parâmetros de SDK não documentados ou um
-schema vazio como alternativa. Todo `model_json_schema()` existente é enviado,
+schema vazio como alternativa. O `model_json_schema()` existente é enviado com refinamentos de cobertura e enums de IDs autorizados na prévia,
 incluindo `$defs`, `$ref`, limites, campos obrigatórios, uniões e
-`additionalProperties=false`. Não há adaptação que retire validações.
+`additionalProperties=false`. Não há adaptação que retire validações. O schema da prévia agora exige sugestões com cobertura e proíbe sugestões sem cobertura, mantendo a validação científica independente.
 
 A API do modelo não recebe LessonBundle diretamente: a fronteira T09 existente
 é LessonDraft. IDs finais, metadados, evidências, participantes e referências
@@ -150,7 +155,7 @@ aceita a primeira sugestão e rejeita as demais; não equivale à revisão human
 conteúdo para uso em sala. O limite permite uma tentativa externa por operação;
 uma correção/retry cobrado não é iniciado. Contagem é local, exportação e leitura
 não chamam IA. O processo supervisor interrompe após 180 s; não aumenta os
-45/75 s do backend. O argumento interno worker é exclusivo do supervisor.
+45/75 s do backend. O argumento interno worker é exclusivo do supervisor. O modelo solicitado pelo smoke é fixo no Nemotron escolhido; NVIDIA_MODEL não o substitui.
 
 O relatório só passa após duas prévias válidas, aula LessonBundle de 50 minutos
 com referências, leitura idêntica persistida e Markdown. Registra HTTP/tempo por
