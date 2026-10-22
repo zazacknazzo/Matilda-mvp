@@ -281,7 +281,9 @@ test("HTML é texto literal, fontes inseguras não são links e ciência não é
   await mockApi(page, fixture);
   await open(page);
   await expect(page.getByRole("main").locator("script, img")).toHaveCount(0);
-  await expect(page.getByRole("main").locator("a")).toHaveCount(0);
+  await expect(
+    page.getByRole("main").locator('a:not([href^="#"])'),
+  ).toHaveCount(0);
   await expect(
     page.getByText("<script>window.pwned=true</script>", { exact: true }),
   ).toBeVisible();

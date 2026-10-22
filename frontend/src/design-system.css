@@ -1,0 +1,60 @@
+:root {
+  color-scheme: light;
+  --matilda-ink: #233e33;
+  --matilda-text: #52665a;
+  --matilda-caption: #626e60;
+  --matilda-canvas: #f6f5ef;
+  --matilda-sheet: #fffdf7;
+  --matilda-field: #f1f2eb;
+  --matilda-line: #d5dbcf;
+  --matilda-input-line: #7c8c7b;
+  --matilda-action: #264f43;
+  --matilda-action-hover: #163f31;
+  --matilda-on-action: #fffdf7;
+  --matilda-wash: #e8eee1;
+  --matilda-copper: #97532e;
+  --matilda-error: #852f26;
+  --matilda-error-wash: #fff0ec;
+  --matilda-sans: Arial, Helvetica, sans-serif;
+  --matilda-editorial: Georgia, "Times New Roman", serif;
+  --matilda-radius-control: 6px;
+  --matilda-radius-sheet: 12px;
+  --matilda-slide-shadow: 0 12px 35px rgb(35 62 51 / 4%);
+  --matilda-space-1: 4px;
+  --matilda-space-2: 8px;
+  --matilda-space-3: 12px;
+  --matilda-space-4: 16px;
+  --matilda-space-6: 24px;
+  --matilda-space-8: 32px;
+}
+
+.matilda-disclosure {
+  margin-block: var(--matilda-space-4);
+  padding: var(--matilda-space-3) var(--matilda-space-4);
+  background: var(--matilda-field);
+  border-radius: var(--matilda-radius-control);
+  color: var(--matilda-ink);
+  font-size: 14px;
+}
+.matilda-disclosure > summary {
+  min-height: 44px;
+  padding-block: var(--matilda-space-1);
+  font: 600 14px/1.6 var(--matilda-sans);
+  color: var(--matilda-action);
+  cursor: pointer;
+}
+.matilda-disclosure[open] > summary {
+  margin-bottom: var(--matilda-space-3);
+}
+.matilda-disclosure :is(p, pre, blockquote) {
+  font-size: 14px;
+  line-height: 1.65;
+}
+.matilda-disclosure > summary:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.matilda-disclosure > summary:focus-visible {
+  outline: 3px solid var(--matilda-copper);
+  outline-offset: 4px;
+}

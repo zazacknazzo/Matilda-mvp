@@ -306,13 +306,22 @@ function GenerationSession({ request, api, onOpenLesson }: Props) {
         </p>
       )}
       <div className="generation-actions">
-        <button disabled={!canGenerate} onClick={() => void generate()}>
+        <button
+          className={!readyId && !uncertain ? "generation-primary" : undefined}
+          disabled={!canGenerate}
+          onClick={() => void generate()}
+        >
           Gerar minha aula
         </button>
-        <button disabled={checking || !online} onClick={() => void refresh()}>
+        <button
+          className={uncertain && !readyId ? "generation-primary" : undefined}
+          disabled={checking || !online}
+          onClick={() => void refresh()}
+        >
           {checking ? "Consultando…" : "Consultar estado salvo"}
         </button>
         <button
+          className={readyId ? "generation-primary" : undefined}
           disabled={!readyId || !validReview || posting}
           onClick={() => {
             if (readyId) onOpenLesson(readyId);

@@ -1,0 +1,361 @@
+{
+  "date": "2026-10-22",
+  "baseline": "a88698efc34cc03d9c03de3fc4cd1e74922c28fb",
+  "browser": "Chromium headless",
+  "provider": "controlled (test only); no real inference",
+  "api": "real FastAPI and SQLite; external providers controlled",
+  "axeTags": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21aa"
+  ],
+  "viewportChecks": [
+    {
+      "width": 1440,
+      "stage": "forensics",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "stage": "discovery",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "stage": "setup",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "stage": "preview",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "stage": "review",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "stage": "generation",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "stage": "generation-ready",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "stage": "lesson",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "stage": "presentation",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "stage": "presentation-content",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "stage": "plan",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "forensics",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "discovery",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "setup",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "preview",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "review",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "generation",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "generation-ready",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "lesson",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "presentation",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "presentation-content",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "plan",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "forensics",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "discovery",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "setup",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "preview",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "review",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "generation",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "generation-ready",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "lesson",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "presentation",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "presentation-content",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "plan",
+      "overflow": false
+    }
+  ],
+  "accessibility": [
+    {
+      "width": 1440,
+      "stage": "forensics",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "stage": "discovery",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "stage": "setup",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "stage": "preview",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "stage": "review",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "stage": "generation",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "stage": "generation-ready",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "stage": "lesson",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "stage": "presentation",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "stage": "presentation-content",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "stage": "plan",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "forensics",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "discovery",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "setup",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "preview",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "review",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "generation",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "generation-ready",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "lesson",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "presentation",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "presentation-content",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "plan",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "forensics",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "discovery",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "setup",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "preview",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "review",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "generation",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "generation-ready",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "lesson",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "presentation",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "presentation-content",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "plan",
+      "violations": []
+    }
+  ],
+  "productionDependenciesAdded": 0,
+  "tests": {
+    "backend": 558,
+    "playwright": {
+      "studioAndForensics": 23,
+      "review": 19,
+      "generation": 18,
+      "lesson": 14,
+      "export": 11,
+      "bridge": 5,
+      "total": 90
+    },
+    "typescript": "production and four harnesses passed",
+    "build": "passed; pre-existing >500kB chunk warning"
+  }
+}
