@@ -33,3 +33,6 @@ export const expandDiscovery = (id: string) =>
   request<Analysis>(`/api/analyses/${encodeURIComponent(id)}/discovery`, {
     method: "POST",
   });
+
+export const getAnalysis = (id: string) =>
+  request<Analysis>(`/api/analyses/${encodeURIComponent(id)}`);

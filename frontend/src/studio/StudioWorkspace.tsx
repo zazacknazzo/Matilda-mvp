@@ -14,6 +14,8 @@ import { ReviewWorkspace } from "./ReviewWorkspace";
 import { createReviewApi } from "./review-api";
 import { GenerationPanel } from "./GenerationPanel";
 import { createGenerationApi } from "./generation-api";
+import type { ExploreAnalysis } from "./ForensicsStudioBridge";
+import { ScientificDossier } from "./ScientificDossier";
 import "./studio.css";
 
 const reviewApi = createReviewApi();
@@ -42,7 +44,13 @@ function setupFrom(value: EnrichmentPreview): PreviewRequest {
   };
 }
 
-export function StudioWorkspace() {
+export function StudioWorkspace({
+  origin,
+  onExploreAnalysis,
+}: {
+  onExploreAnalysis?: ExploreAnalysis;
+  origin?: { analysis_id: string; title: string } | null;
+}) {
   const [setup, setSetup] = useState<PreviewRequest>(initialSetup);
   const [preview, setPreview] = useState<EnrichmentPreview | null>(null);
   const [bundle, setBundle] = useState<LessonBundle | null>(null);
@@ -51,12 +59,34 @@ export function StudioWorkspace() {
   const [busy, setBusy] = useState(false);
   const [slow, setSlow] = useState(false);
   const [error, setError] = useState("");
+  const [exploring, setExploring] = useState<string | null>(null);
+  const exploreTrigger = useRef<HTMLButtonElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
+  const operationRevision = useRef(0);
+  useEffect(() => {
+    if (!origin) return;
+    operationRevision.current++;
+    setBusy(false);
+    setExploring(null);
+    setSetup((value) => ({
+      ...value,
+      title: origin.title,
+      analysis_id: origin.analysis_id,
+      doi: null,
+      project_id: null,
+    }));
+    setPreview(null);
+    setGeneration(null);
+    setBundle(null);
+    setView("setup");
+    setError("");
+    heading.current?.focus();
+  }, [origin]);
   useEffect(() => {
     let active = true;
-    let revision = 0;
     const restore = async () => {
-      const current = ++revision;
+      const current = ++operationRevision.current;
+      setExploring(null);
       const lesson = location.hash.match(/^#studio\/lessons\/([^/]+)$/);
       const match = location.hash.match(
         /^#studio\/previews\/([^/]+)(?:\/(review|generate))?$/,
@@ -70,6 +100,7 @@ export function StudioWorkspace() {
       setError("");
       if (lesson) {
         setBundle(null);
+        setPreview(null);
         setView("lesson");
       } else {
         setPreview(null);
@@ -85,14 +116,22 @@ export function StudioWorkspace() {
       try {
         if (lesson) {
           const result = await getLesson(decodeURIComponent(lesson[1]));
-          if (!active || current !== revision) return;
+          if (!active || current !== operationRevision.current) return;
           setBundle(result);
           setView("lesson");
+          // Lesson delivery remains usable if its original preview is unavailable.
+          try {
+            const science = await studioApi.getPreview(result.preview_id);
+            if (active && current === operationRevision.current)
+              setPreview(science);
+          } catch {
+            /* Existing bundle references remain available in the lesson. */
+          }
         } else if (match) {
           const result = await studioApi.getPreview(
             decodeURIComponent(match[1]),
           );
-          if (!active || current !== revision) return;
+          if (!active || current !== operationRevision.current) return;
           setPreview(result);
           setSetup(setupFrom(result));
           setError(
@@ -110,10 +149,10 @@ export function StudioWorkspace() {
           } else setView(match[2] === "review" ? "review" : "preview");
         }
       } catch (failure) {
-        if (active && current === revision)
+        if (active && current === operationRevision.current)
           setError((failure as Error).message);
       } finally {
-        if (active && current === revision) setBusy(false);
+        if (active && current === operationRevision.current) setBusy(false);
       }
     };
     void restore();
@@ -141,6 +180,7 @@ export function StudioWorkspace() {
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (busy) return;
+    const current = ++operationRevision.current;
     setBusy(true);
     setError("");
     try {
@@ -153,6 +193,7 @@ export function StudioWorkspace() {
           .map((value) => value.trim())
           .filter(Boolean),
       });
+      if (current !== operationRevision.current) return;
       setPreview(result);
       setSetup(setupFrom(result));
       setView("preview");
@@ -162,6 +203,7 @@ export function StudioWorkspace() {
         `#studio/previews/${encodeURIComponent(result.preview_id)}`,
       );
     } catch (failure) {
+      if (current !== operationRevision.current) return;
       setError((failure as Error).message);
       if (failure instanceof StudioApiError && failure.projectId)
         setSetup((previous) => ({
@@ -169,7 +211,7 @@ export function StudioWorkspace() {
           project_id: failure.projectId,
         }));
     } finally {
-      setBusy(false);
+      if (current === operationRevision.current) setBusy(false);
     }
   }
   function edit() {
@@ -184,95 +226,164 @@ export function StudioWorkspace() {
     lesson: "Aula salva",
   };
   return (
-    <div className="studio-workspace" id="studio-main">
-      <h2 ref={heading} tabIndex={-1}>
+    <div className="studio-workspace" id="studio-main" tabIndex={-1}>
+      <ol className="studio-steps" aria-label="Etapas da aula">
+        {(["setup", "preview", "review", "generation", "lesson"] as const).map(
+          (step, index) => (
+            <li key={step} aria-current={view === step ? "step" : undefined}>
+              <span aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              {
+                {
+                  setup: "Preparar",
+                  preview: "Conferir",
+                  review: "Revisar",
+                  generation: "Gerar",
+                  lesson: "Aula",
+                }[step]
+              }
+            </li>
+          ),
+        )}
+      </ol>
+      <h2 ref={heading} tabIndex={-1} className="studio-view-label">
         {labels[view]}
       </h2>
-      {view === "setup" && (
-        <StudioSetup
-          value={setup}
-          onChange={setSetup}
-          onSubmit={submit}
-          busy={busy}
-        />
-      )}
-      {view === "preview" && preview && (
-        <>
-          <PreviewPanel preview={preview} onEdit={edit} />
-          <button
-            disabled={busy}
-            onClick={() =>
-              navigate(
-                `studio/previews/${encodeURIComponent(preview.preview_id)}/review`,
-              )
-            }
-          >
-            Revisar fontes e objetivos
-          </button>
-        </>
-      )}
-      {view === "review" && preview && !busy && (
-        <ReviewWorkspace
-          previewId={preview.preview_id}
-          api={reviewApi}
-          onRequestNewPreview={edit}
-          onContinue={(request) => {
-            setGeneration(request);
-            setView("generation");
-            setError("");
-            history.replaceState(
-              null,
-              "",
-              `#studio/previews/${encodeURIComponent(request.preview_id)}/generate`,
-            );
+      <div hidden={exploring !== null}>
+        {view === "setup" && (
+          <StudioSetup
+            value={setup}
+            onChange={setSetup}
+            onSubmit={submit}
+            busy={busy}
+          />
+        )}
+        {view === "preview" && preview && (
+          <>
+            <PreviewPanel
+              preview={preview}
+              onEdit={edit}
+              busy={busy}
+              onReview={() =>
+                navigate(
+                  `studio/previews/${encodeURIComponent(preview.preview_id)}/review`,
+                )
+              }
+            />
+          </>
+        )}
+        {view === "review" && preview && !busy && (
+          <ReviewWorkspace
+            onExploreAnalysis={onExploreAnalysis}
+            previewId={preview.preview_id}
+            api={reviewApi}
+            onRequestNewPreview={edit}
+            onContinue={(request) => {
+              setGeneration(request);
+              setView("generation");
+              setError("");
+              history.replaceState(
+                null,
+                "",
+                `#studio/previews/${encodeURIComponent(request.preview_id)}/generate`,
+              );
+            }}
+          />
+        )}
+        {view === "generation" && generation && !busy && (
+          <>
+            <button
+              onClick={() =>
+                navigate(
+                  `studio/previews/${encodeURIComponent(generation.preview_id)}/review`,
+                )
+              }
+            >
+              Voltar à revisão
+            </button>
+            <GenerationPanel
+              request={generation}
+              api={generationApi}
+              onOpenLesson={(id) =>
+                navigate(`studio/lessons/${encodeURIComponent(id)}`)
+              }
+            />
+          </>
+        )}
+        {view === "lesson" && bundle && !busy && (
+          <>
+            {preview?.preview_id === bundle.preview_id &&
+              bundle.references.length > 0 && (
+                <ul aria-label="Contribuições científicas da aula">
+                  {bundle.references
+                    .filter(
+                      (ref, index, all) =>
+                        all.findIndex(
+                          (item) =>
+                            item.contribution_id === ref.contribution_id,
+                        ) === index,
+                    )
+                    .map((reference) => (
+                      <li key={reference.contribution_id}>
+                        <button
+                          onClick={async (event) => {
+                            const trigger = event.currentTarget;
+                            exploreTrigger.current = trigger;
+                            const id = preview.scientific_context.analysis_id;
+                            if (
+                              id &&
+                              onExploreAnalysis &&
+                              (await onExploreAnalysis(
+                                id,
+                                reference.contribution_id,
+                                () => trigger.focus(),
+                              ))
+                            )
+                              return;
+                            setExploring(reference.contribution_id);
+                          }}
+                        >
+                          Explorar fontes da aula · {reference.source_title}
+                        </button>
+                      </li>
+                    ))}
+                </ul>
+              )}
+            <button
+              onClick={() =>
+                navigate(
+                  `studio/previews/${encodeURIComponent(bundle.preview_id)}/review`,
+                )
+              }
+            >
+              Voltar à revisão
+            </button>
+            <LessonWorkspace bundle={bundle} />
+          </>
+        )}
+        {busy && (
+          <p role="status" aria-live="polite" className="studio-notice">
+            {slow
+              ? "A prévia está demorando mais que a meta de 30 segundos. A operação continua até o limite do servidor."
+              : "Preparando a prévia ou consultando material salvo…"}
+          </p>
+        )}
+        {error && (
+          <p role="alert" className="studio-error">
+            {error}
+          </p>
+        )}
+      </div>
+      {exploring && preview && (
+        <ScientificDossier
+          preview={preview}
+          contributionId={exploring}
+          onBack={() => {
+            setExploring(null);
+            requestAnimationFrame(() => exploreTrigger.current?.focus());
           }}
         />
-      )}
-      {view === "generation" && generation && !busy && (
-        <>
-          <button
-            onClick={() =>
-              navigate(
-                `studio/previews/${encodeURIComponent(generation.preview_id)}/review`,
-              )
-            }
-          >
-            Voltar à revisão
-          </button>
-          <GenerationPanel
-            request={generation}
-            api={generationApi}
-            onOpenLesson={(id) =>
-              navigate(`studio/lessons/${encodeURIComponent(id)}`)
-            }
-          />
-        </>
-      )}
-      {view === "lesson" && bundle && !busy && (
-        <>
-          <button
-            onClick={() =>
-              navigate(
-                `studio/previews/${encodeURIComponent(bundle.preview_id)}/review`,
-              )
-            }
-          >
-            Voltar à revisão
-          </button>
-          <LessonWorkspace bundle={bundle} />
-        </>
-      )}
-      {busy && (
-        <p role="status" aria-live="polite" className="studio-notice">
-          {slow
-            ? "A prévia está demorando mais que a meta de 30 segundos. A operação continua até o limite do servidor."
-            : "Preparando a prévia ou consultando material salvo…"}
-        </p>
-      )}
-      {error && (
-        <p role="alert" className="studio-error">
-          {error}
-        </p>
       )}
     </div>
   );

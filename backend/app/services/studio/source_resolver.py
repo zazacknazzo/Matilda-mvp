@@ -15,6 +15,7 @@ from app.schemas.scientific_context import ScientificContext, SourceDocument
 from app.services.contribution_search import search_context_contributions
 from app.services.scientific_context import build_scientific_context
 from app.services.storage import get_analysis
+from .timings import measure
 
 
 @dataclass(frozen=True)
@@ -55,30 +56,32 @@ async def resolve_scientific_source(
     if any(document.type == 'paper_metadata' for document in documents):
         raise ValueError('Metadados são construídos somente a partir do artigo resolvido.')
     source_documents = [document.model_copy(deep=True) for document in documents]
-    analysis = None
-    if analysis_id is not None:
-        stored = get_analysis(analysis_id)
-        if stored is None:
-            raise HTTPException(404, 'Investigação não encontrada ou expirada (retenção: 7 dias).')
-        analysis = Analysis.model_validate(stored)
-        papers = [analysis.paper]
-    else:
-        papers = [await retrieve_paper(doi)] if doi is not None else []
+    with measure('scientific_retrieval'):
+        analysis = None
+        if analysis_id is not None:
+            stored = get_analysis(analysis_id)
+            if stored is None:
+                raise HTTPException(404, 'Investigação não encontrada ou expirada (retenção: 7 dias).')
+            analysis = Analysis.model_validate(stored)
+            papers = [analysis.paper]
+        else:
+            papers = [await retrieve_paper(doi)] if doi is not None else []
     if papers:
         paper = papers[0]
         source_documents.append(SourceDocument(
             id=str(uuid4()), project_id=project_id, type='paper_metadata',
             title=paper.title, content=paper.title + ('\n\n' + paper.abstract if paper.abstract else ''), doi=paper.doi,
         ))
-    context = build_scientific_context(source_documents, papers=papers, analysis_id=analysis_id)
-    if analysis is not None:
-        # The unchanged investigation's warnings must describe its recorded
-        # matches, not an empty result from a later editorial catalog revision.
-        limitations = context.limitations if documents else analysis.paper.limitations
-        context.limitations = list(dict.fromkeys([*limitations, *analysis.coverage_warnings]))
-    # An unchanged investigation is a recorded scientific snapshot, not a request
-    # to silently replace its participants/claims with a later catalog revision.
-    matches = analysis.contributions if analysis is not None and not documents else search_context_contributions(
-        context, comparison_paper=papers[0] if papers else None,
-    )
+    with measure('context'):
+        context = build_scientific_context(source_documents, papers=papers, analysis_id=analysis_id)
+        if analysis is not None:
+            # The unchanged investigation's warnings must describe its recorded
+            # matches, not an empty result from a later editorial catalog revision.
+            limitations = context.limitations if documents else analysis.paper.limitations
+            context.limitations = list(dict.fromkeys([*limitations, *analysis.coverage_warnings]))
+        # An unchanged investigation is a recorded scientific snapshot, not a request
+        # to silently replace its participants/claims with a later catalog revision.
+        matches = analysis.contributions if analysis is not None and not documents else search_context_contributions(
+            context, comparison_paper=papers[0] if papers else None,
+        )
     return ResolvedScientificSource(context, source_documents, papers, matches)

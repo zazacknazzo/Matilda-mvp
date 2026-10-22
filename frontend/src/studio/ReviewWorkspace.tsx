@@ -8,8 +8,11 @@ import type {
 import { type ReviewApi, reviewErrorMessage } from "./review-api";
 import { SuggestionCard, type SuggestionEdit } from "./SuggestionCard";
 import "./review.css";
+import type { ExploreAnalysis } from "./ForensicsStudioBridge";
+import { ScientificDossier } from "./ScientificDossier";
 
 interface Props {
+  onExploreAnalysis?: ExploreAnalysis;
   previewId: string;
   api: ReviewApi;
   onContinue: (request: GenerateRequest) => void;
@@ -75,6 +78,7 @@ function ReviewSession({
   api,
   onContinue,
   onRequestNewPreview,
+  onExploreAnalysis,
 }: Props) {
   const [preview, setPreview] = useState<EnrichmentPreview | null>(null);
   const [loadError, setLoadError] = useState("");
@@ -113,6 +117,7 @@ function ReviewSession({
     );
   return (
     <ReviewEditor
+      onExploreAnalysis={onExploreAnalysis}
       initialPreview={preview}
       api={api}
       onContinue={onContinue}
@@ -123,11 +128,14 @@ function ReviewSession({
 
 function ReviewEditor({
   initialPreview,
+  onExploreAnalysis,
   api,
   onContinue,
   onRequestNewPreview,
 }: Omit<Props, "previewId"> & { initialPreview: EnrichmentPreview }) {
   const [preview, setPreview] = useState(initialPreview);
+  const [exploring, setExploring] = useState<string | null>(null);
+  const exploreTrigger = useRef<HTMLButtonElement | null>(null);
   const [edits, setEdits] = useState(() => editsFrom(initialPreview));
   const [objectives, setObjectives] = useState(() =>
     (initialPreview.approved_objectives.length
@@ -152,9 +160,14 @@ function ReviewEditor({
   const confirmationTrigger = useRef<HTMLButtonElement | null>(null);
   useEffect(() => () => operation.current?.abort(), []);
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
+    // The clock only affects expiry. Avoid rerendering every document and
+    // controlled editor each second while the teacher reads or types.
+    setNow(Date.now());
+    const remaining = Date.parse(preview.expires_at) - Date.now();
+    if (remaining <= 0) return;
+    const timer = window.setTimeout(() => setNow(Date.now()), remaining + 1);
+    return () => window.clearTimeout(timer);
+  }, [preview.expires_at]);
   useEffect(() => {
     if (error || notice) feedback.current?.focus();
   }, [error, notice]);
@@ -269,241 +282,306 @@ function ReviewEditor({
   }
 
   return (
-    <main className="review-workspace" aria-label="Revisão docente">
-      <header className="review-heading">
-        <div>
-          <p>Matilda Studio · Revisão docente</p>
-          <h1>{preview.project.title}</h1>
+    <>
+      <main
+        className="review-workspace"
+        aria-label="Revisão docente"
+        hidden={exploring !== null}
+      >
+        <header className="review-heading">
+          <div>
+            <p>Matilda Studio · Revisão docente</p>
+            <h1>{preview.project.title}</h1>
+            <p>
+              {preview.project.subject} · {preview.project.education_level} ·{" "}
+              {preview.project.duration_minutes} minutos
+            </p>
+          </div>
           <p>
-            {preview.project.subject} · {preview.project.education_level} ·{" "}
-            {preview.project.duration_minutes} minutos
+            Disponível até{" "}
+            <time dateTime={preview.expires_at}>
+              {new Intl.DateTimeFormat("pt-BR", {
+                dateStyle: "short",
+                timeStyle: "short",
+              }).format(new Date(preview.expires_at))}
+            </time>
+            <br />
+            Revisão {preview.review_revision}
           </p>
-        </div>
+        </header>
         <p>
-          Disponível até{" "}
-          <time dateTime={preview.expires_at}>
-            {new Intl.DateTimeFormat("pt-BR", {
-              dateStyle: "short",
-              timeStyle: "short",
-            }).format(new Date(preview.expires_at))}
-          </time>
-          <br />
-          Revisão {preview.review_revision}
+          Revise as fontes, decida sobre cada sugestão e aprove os objetivos.
+          Apenas a proposta pedagógica e sua justificativa podem ser editadas.
         </p>
-      </header>
-      <p>
-        Revise as fontes, decida sobre cada sugestão e aprove os objetivos.
-        Apenas a proposta pedagógica e sua justificativa podem ser editadas.
-      </p>
-      {expired && (
-        <p role="alert">
-          Esta prévia expirou. Prepare uma nova prévia para continuar.
-        </p>
-      )}
-      {frozen && (
-        <p role="status">
-          Geração em andamento. A revisão está bloqueada; consulte a versão
-          salva para atualizar o estado.
-        </p>
-      )}
-      {invalidated && (
-        <p role="alert">
-          A revisão anterior foi invalidada. Alterar material, origem ou
-          configuração exige nova prévia e nova aprovação.
-        </p>
-      )}
-      <div className="review-columns">
-        <section aria-label="Material original" className="review-material">
-          <h2>Material original</h2>
-          {preview.source_documents.map((doc) => (
-            <div key={doc.id}>
-              <h3>{doc.title}</h3>
-              <p className="review-literal">{doc.content}</p>
-            </div>
-          ))}
-          <h3>Conceitos e procedência</h3>
+        <div className="review-checkpoint">
+          <p>
+            <strong>
+              {preview.suggestions.length - pending} de{" "}
+              {preview.suggestions.length}
+            </strong>{" "}
+            sugestões revisadas ·{" "}
+            {approved ? "Objetivos aprovados" : "Objetivos aguardam aprovação"}
+          </p>
+          <a
+            href="#review-actions"
+            onClick={(event) => {
+              event.preventDefault();
+              document.getElementById("review-actions")?.focus();
+            }}
+          >
+            Ir para objetivos e salvar
+          </a>
+        </div>
+        {expired && (
+          <p role="alert">
+            Esta prévia expirou. Prepare uma nova prévia para continuar.
+          </p>
+        )}
+        {frozen && (
+          <p role="status">
+            Geração em andamento. A revisão está bloqueada; consulte a versão
+            salva para atualizar o estado.
+          </p>
+        )}
+        {invalidated && (
+          <p role="alert">
+            A revisão anterior foi invalidada. Alterar material, origem ou
+            configuração exige nova prévia e nova aprovação.
+          </p>
+        )}
+        <div className="review-columns">
+          <section aria-label="Material original" className="review-material">
+            <h2>Material original</h2>
+            {preview.source_documents.map((doc) => (
+              <div key={doc.id}>
+                <h3>{doc.title}</h3>
+                <details className="matilda-disclosure">
+                  <summary>Ler material original completo</summary>
+                  <p className="review-literal">{doc.content}</p>
+                </details>
+              </div>
+            ))}
+            <h3>Conceitos e procedência</h3>
+            <ul>
+              {preview.concepts.map((concept) => (
+                <li key={concept.id}>
+                  {concept.name} · {concept.provenance.join(", ")}
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section aria-label="Sugestões de enriquecimento">
+            <h2>Sugestões de enriquecimento</h2>
+            {preview.suggestions.length === 0 && (
+              <p>
+                Sem sugestões científicas nesta prévia. Isso não indica
+                inexistência de contribuições femininas. Você pode continuar sem
+                enriquecimentos após aprovar os objetivos.
+              </p>
+            )}
+            {preview.suggestions.map((suggestion) => (
+              <SuggestionCard
+                key={suggestion.id}
+                suggestion={suggestion}
+                preview={preview}
+                edit={edits[suggestion.id]}
+                disabled={blocked}
+                onExplore={async (event) => {
+                  const trigger = event.currentTarget;
+                  exploreTrigger.current = trigger;
+                  const id = preview.scientific_context.analysis_id;
+                  if (
+                    id &&
+                    onExploreAnalysis &&
+                    (await onExploreAnalysis(
+                      id,
+                      suggestion.contribution_id,
+                      () => trigger.focus(),
+                    ))
+                  )
+                    return;
+                  setExploring(suggestion.contribution_id);
+                }}
+                onChange={(edit) => {
+                  setEdits((value) => ({ ...value, [suggestion.id]: edit }));
+                  setNotice("");
+                }}
+              />
+            ))}
+          </section>
+        </div>
+        <section
+          aria-label="Objetivos da aula"
+          id="review-actions"
+          tabIndex={-1}
+        >
+          <h2>Objetivos da aula</h2>
+          <fieldset disabled={blocked}>
+            <legend>Revisão e aprovação dos objetivos</legend>
+            <label>
+              Objetivos de aprendizagem · um por linha
+              <textarea
+                value={objectives}
+                onChange={(event) => {
+                  setObjectives(event.target.value);
+                  setApproved(false);
+                  setNotice("");
+                }}
+                aria-describedby="review-objective-help"
+              />
+            </label>
+            <p id="review-objective-help">
+              Informe de 1 a 10 objetivos, com até 300 caracteres cada. Quando
+              não há objetivos originais, as sugestões precisam da sua
+              aprovação.
+            </p>
+            <label>
+              <input
+                type="checkbox"
+                checked={approved}
+                onChange={(event) => {
+                  setApproved(event.target.checked);
+                  setNotice("");
+                }}
+              />{" "}
+              Revisei e aprovo estes objetivos
+            </label>
+          </fieldset>
+        </section>
+        <section aria-label="Limitações">
+          <h2>Limitações e cobertura</h2>
           <ul>
-            {preview.concepts.map((concept) => (
-              <li key={concept.id}>
-                {concept.name} · {concept.provenance.join(", ")}
-              </li>
+            {preview.limitations.map((item, index) => (
+              <li key={index}>{item}</li>
             ))}
           </ul>
         </section>
-        <section aria-label="Sugestões de enriquecimento">
-          <h2>Sugestões de enriquecimento</h2>
-          {preview.suggestions.length === 0 && (
-            <p>
-              Sem sugestões científicas nesta prévia. Isso não indica
-              inexistência de contribuições femininas. Você pode continuar sem
-              enriquecimentos após aprovar os objetivos.
+        <footer className="review-actions">
+          <p>
+            {pending} sugestão(ões) pendente(s).{" "}
+            {dirty
+              ? "Há alterações ainda não confirmadas."
+              : "A revisão exibida corresponde à versão salva."}
+          </p>
+          <p>
+            Você pode salvar decisões parciais. Para continuar, decida todas as
+            sugestões, aprove os objetivos e salve. Rejeitar todas é válido.
+          </p>
+          {undecidedEdit && (
+            <p role="status">
+              Aceite ou rejeite a sugestão editada antes de salvar sua proposta
+              pedagógica.
             </p>
           )}
-          {preview.suggestions.map((suggestion) => (
-            <SuggestionCard
-              key={suggestion.id}
-              suggestion={suggestion}
-              preview={preview}
-              edit={edits[suggestion.id]}
-              disabled={blocked}
-              onChange={(edit) => {
-                setEdits((value) => ({ ...value, [suggestion.id]: edit }));
-                setNotice("");
-              }}
-            />
-          ))}
-        </section>
-      </div>
-      <section aria-label="Objetivos da aula">
-        <h2>Objetivos da aula</h2>
-        <fieldset disabled={blocked}>
-          <legend>Revisão e aprovação dos objetivos</legend>
-          <label>
-            Objetivos de aprendizagem · um por linha
-            <textarea
-              value={objectives}
-              onChange={(event) => {
-                setObjectives(event.target.value);
-                setApproved(false);
-                setNotice("");
-              }}
-              aria-describedby="review-objective-help"
-            />
-          </label>
-          <p id="review-objective-help">
-            Informe de 1 a 10 objetivos, com até 300 caracteres cada. Quando não
-            há objetivos originais, as sugestões precisam da sua aprovação.
-          </p>
-          <label>
-            <input
-              type="checkbox"
-              checked={approved}
-              onChange={(event) => {
-                setApproved(event.target.checked);
-                setNotice("");
-              }}
-            />{" "}
-            Revisei e aprovo estes objetivos
-          </label>
-        </fieldset>
-      </section>
-      <section aria-label="Limitações">
-        <h2>Limitações e cobertura</h2>
-        <ul>
-          {preview.limitations.map((item, index) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
-      </section>
-      <footer className="review-actions">
-        <p>
-          {pending} sugestão(ões) pendente(s).{" "}
-          {dirty
-            ? "Há alterações ainda não confirmadas."
-            : "A revisão exibida corresponde à versão salva."}
-        </p>
-        <p>
-          Você pode salvar decisões parciais. Para continuar, decida todas as
-          sugestões, aprove os objetivos e salve. Rejeitar todas é válido.
-        </p>
-        {undecidedEdit && (
-          <p role="status">
-            Aceite ou rejeite a sugestão editada antes de salvar sua proposta
-            pedagógica.
-          </p>
-        )}
-        {!contentValid && (
-          <p role="status">
-            Preencha proposta e justificativa com até 20.000 caracteres cada.
-          </p>
-        )}
-        <div className="review-buttons">
-          <button
-            disabled={
-              blocked ||
-              uncertain ||
-              !dirty ||
-              !objectivesValid ||
-              !contentValid ||
-              undecidedEdit
-            }
-            onClick={() => void perform("save")}
-          >
-            {busy ? "Aguarde…" : "Salvar revisão"}
-          </button>
-          <button
-            disabled={busy || invalidated || confirm !== null}
-            onClick={(event) => {
-              confirmationTrigger.current = event.currentTarget;
-              if (dirty) setConfirm("reload");
-              else void perform("reload");
-            }}
-          >
-            Consultar versão salva
-          </button>
-          <button
-            disabled={!canContinue}
-            onClick={() =>
-              onContinue({
-                preview_id: preview.preview_id,
-                review_revision: preview.review_revision,
-                accepted_suggestion_ids: preview.suggestions
-                  .filter((item) => item.status === "accepted")
-                  .map((item) => item.id),
-              })
-            }
-          >
-            Continuar para geração
-          </button>
-          <button
-            disabled={busy || invalidated || confirm !== null}
-            onClick={(event) => {
-              confirmationTrigger.current = event.currentTarget;
-              setConfirm("new");
-            }}
-          >
-            Alterar material, origem ou configuração
-          </button>
-        </div>
-        {(error || notice) && (
-          <p ref={feedback} tabIndex={-1} role={error ? "alert" : "status"}>
-            {error || notice}
-          </p>
-        )}
-        {confirm && (
-          <div className="review-confirm" role="group" aria-label="Confirmação">
-            <p>
-              {confirm === "reload"
-                ? "Carregar a versão salva substitui as edições desta tela. Deseja continuar?"
-                : "Alterar a entrada invalida esta revisão e exige nova prévia. Deseja continuar?"}
+          {!contentValid && (
+            <p role="status">
+              Preencha proposta e justificativa com até 20.000 caracteres cada.
             </p>
+          )}
+          <div className="review-buttons">
             <button
-              autoFocus
-              onClick={() => {
-                const action = confirm;
-                setConfirm(null);
-                if (action === "reload") void perform("reload");
-                else {
-                  setInvalidated(true);
-                  onRequestNewPreview();
-                }
-              }}
+              className="review-primary"
+              disabled={
+                blocked ||
+                uncertain ||
+                !dirty ||
+                !objectivesValid ||
+                !contentValid ||
+                undecidedEdit
+              }
+              onClick={() => void perform("save")}
             >
-              Confirmar
+              {busy ? "Aguarde…" : "Salvar revisão"}
             </button>
             <button
-              onClick={() => {
-                setConfirm(null);
-                window.requestAnimationFrame(() =>
-                  confirmationTrigger.current?.focus(),
-                );
+              disabled={busy || invalidated || confirm !== null}
+              onClick={(event) => {
+                confirmationTrigger.current = event.currentTarget;
+                if (dirty) setConfirm("reload");
+                else void perform("reload");
               }}
             >
-              Cancelar
+              Consultar versão salva
+            </button>
+            <button
+              className="review-primary"
+              disabled={!canContinue}
+              onClick={() =>
+                onContinue({
+                  preview_id: preview.preview_id,
+                  review_revision: preview.review_revision,
+                  accepted_suggestion_ids: preview.suggestions
+                    .filter((item) => item.status === "accepted")
+                    .map((item) => item.id),
+                })
+              }
+            >
+              Continuar para geração
+            </button>
+            <button
+              disabled={busy || invalidated || confirm !== null}
+              onClick={(event) => {
+                confirmationTrigger.current = event.currentTarget;
+                setConfirm("new");
+              }}
+            >
+              Alterar material, origem ou configuração
             </button>
           </div>
-        )}
-      </footer>
-    </main>
+          {(error || notice) && (
+            <p ref={feedback} tabIndex={-1} role={error ? "alert" : "status"}>
+              {error || notice}
+            </p>
+          )}
+          {confirm && (
+            <div
+              className="review-confirm"
+              role="group"
+              aria-label="Confirmação"
+            >
+              <p>
+                {confirm === "reload"
+                  ? "Carregar a versão salva substitui as edições desta tela. Deseja continuar?"
+                  : "Alterar a entrada invalida esta revisão e exige nova prévia. Deseja continuar?"}
+              </p>
+              <button
+                autoFocus
+                onClick={() => {
+                  const action = confirm;
+                  setConfirm(null);
+                  if (action === "reload") void perform("reload");
+                  else {
+                    setInvalidated(true);
+                    onRequestNewPreview();
+                  }
+                }}
+              >
+                Confirmar
+              </button>
+              <button
+                onClick={() => {
+                  setConfirm(null);
+                  window.requestAnimationFrame(() =>
+                    confirmationTrigger.current?.focus(),
+                  );
+                }}
+              >
+                Cancelar
+              </button>
+            </div>
+          )}
+        </footer>
+      </main>
+      {exploring && (
+        <ScientificDossier
+          preview={preview}
+          contributionId={exploring}
+          onBack={() => {
+            setExploring(null);
+            requestAnimationFrame(() => exploreTrigger.current?.focus());
+          }}
+        />
+      )}
+    </>
   );
 }

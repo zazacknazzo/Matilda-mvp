@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type MouseEvent } from "react";
 import type { EnrichmentPreview, EnrichmentSuggestion } from "../types/studio";
 import { safeSourceUrl } from "../lesson/lesson-view";
 
@@ -12,6 +12,7 @@ interface Props {
   preview: EnrichmentPreview;
   edit: SuggestionEdit;
   disabled: boolean;
+  onExplore?: (event: MouseEvent<HTMLButtonElement>) => void;
   onChange: (edit: SuggestionEdit) => void;
 }
 
@@ -21,6 +22,7 @@ export function SuggestionCard({
   edit,
   disabled,
   onChange,
+  onExplore,
 }: Props) {
   const labelId = useId();
   const document = preview.source_documents.find(
@@ -35,7 +37,11 @@ export function SuggestionCard({
     rejected: "Rejeitada",
   }[edit.status];
   return (
-    <article className="review-suggestion" aria-labelledby={labelId}>
+    <article
+      className="review-suggestion"
+      aria-labelledby={labelId}
+      data-decision={edit.status}
+    >
       <header>
         <h3 id={labelId}>
           {concepts.map((item) => item.name).join(" · ") ||
@@ -43,15 +49,20 @@ export function SuggestionCard({
         </h3>
         <strong>{status}</strong>
       </header>
-      <p>
-        <strong>Onde inserir · {document?.title}</strong>
-      </p>
-      <blockquote>{suggestion.source_anchor.quote}</blockquote>
-      <p>
-        Ocorrência {suggestion.source_anchor.occurrence + 1} no documento
-        original.
-      </p>
+      <details className="matilda-disclosure">
+        <summary>Onde inserir · {document?.title}</summary>
+        <blockquote>{suggestion.source_anchor.quote}</blockquote>
+        <p>
+          Ocorrência {suggestion.source_anchor.occurrence + 1} no documento
+          original.
+        </p>
+      </details>
       <p>{suggestion.scientific_explanation}</p>
+      {onExplore && (
+        <button type="button" onClick={onExplore}>
+          Explorar descoberta
+        </button>
+      )}
       <fieldset disabled={disabled}>
         <legend>Decisão sobre esta sugestão</legend>
         <label>

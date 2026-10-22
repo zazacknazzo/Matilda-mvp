@@ -98,14 +98,17 @@ Use as camadas do grafo, a alternativa em lista ou exporte Markdown/JSON.
 
 ## Studio: texto, revisão e aula persistida (T05/T10)
 
-Selecione **Studio — Criar aula**, informe título, texto e/ou conceitos (por
-exemplo CRISPR-Cas9), confira os defaults e clique em **Criar prévia**.
+Selecione **Studio — Criar aula**, informe título, texto, conceitos ou DOI,
+confira os defaults e clique em **Criar prévia**. No Forensics, **Transformar em
+aula** reutiliza a investigação selecionada; confirme a origem antes de criar.
 O texto é enviado ao Gemini junto da configuração e do conjunto científico
 resolvido pelo mesmo motor do Forensics. A tela separa material original,
 propostas pedagógicas pendentes e evidências canônicas com participantes e fontes.
 Clique em **Revisar fontes e objetivos**, aceite ou rejeite cada sugestão, aprove
 os objetivos e salve. **Continuar para geração** só é liberado após a revisão
-completa. Gere a aula e abra slides e plano, recuperados pelo ID persistido.
+completa. **Explorar descoberta** abre as evidências sem perder a edição docente.
+Gere a aula e abra slides e plano, recuperados pelo ID persistido. Na aula salva,
+confira fontes, baixe Markdown ou imprima o plano/PDF pelo navegador.
 Voltar à revisão conserva as decisões confirmadas; alterar a revisão exige uma
 nova geração e mantém a aula anterior disponível até expirar.
 
@@ -132,7 +135,10 @@ node node_modules/@playwright/test/cli.js test --config playwright.studio.config
 ```
 
 [Contrato e execução T05](docs/studio-preview-t05.md) e
-[integração e validação T10](docs/studio-flow-t10.md). Para publicar, mantenha
+[integração e validação T10](docs/studio-flow-t10.md). O
+[candidato integrado T13](docs/integrated-demo-t13.md) registra a matriz P0,
+medições por etapa e os gates live/presenciais ainda pendentes. Testes com
+provedor controlado não atestam Gemini live. Para publicar, mantenha
 frontend e `/api` na mesma origem HTTPS, proxy com timeout de pelo menos 100 s
 e SQLite persistente. No desenvolvimento, `MATILDA_API_PROXY` altera o destino
 do proxy Vite; o navegador continua usando `/api` e não recebe a chave.
@@ -209,6 +215,7 @@ usa Gemini real por meio do SDK oficial `google-genai`, com validação no servi
 - [Método científico e fontes](docs/research-methodology.md)
 - [Catálogo automático](docs/automatic-catalog.md)
 - [Cenários de demonstração](docs/demo-scenarios.md)
+- [Auditoria UI/UX, comparação visual e validação](docs/ui-ux-audit.md)
 - [Escopo e pendências do PRD](docs/prd-status.md)
 - [PRD da próxima expansão do motor de busca](docs/prd-expansao-motor-busca.md)
 

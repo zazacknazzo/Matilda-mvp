@@ -1,14 +1,14 @@
+@import "../design-system.css";
+
 .forensics-studio-bridge,
 .scientific-dossier {
-  font:
-    1rem/1.6 system-ui,
-    sans-serif;
+  font: 1rem/1.6 var(--matilda-sans);
   max-width: 72rem;
   margin: 1rem auto;
   padding: clamp(1rem, 3vw, 2rem);
-  color: #17352b;
-  background: #fbfcf8;
-  border: 1px solid #cbd7cf;
+  color: var(--matilda-ink);
+  background: var(--matilda-sheet);
+  border: 1px solid var(--matilda-line);
   border-radius: 0.75rem;
   overflow-wrap: anywhere;
 }
@@ -22,7 +22,7 @@
 }
 .forensics-studio-bridge :focus-visible,
 .scientific-dossier :focus-visible {
-  outline: 3px solid #6750b4;
+  outline: 3px solid var(--matilda-copper);
   outline-offset: 3px;
 }
 .scientific-dossier pre {
@@ -30,7 +30,7 @@
   overflow-wrap: anywhere;
 }
 .scientific-dossier-source {
-  border-left: 3px solid #7256a5;
+  border-left: 3px solid var(--matilda-copper);
   padding-left: 1rem;
   margin-block: 1.5rem;
 }
@@ -39,6 +39,6 @@
   margin-inline: 1rem;
 }
 .scientific-dossier h2:focus {
-  outline: 3px solid #6750b4;
+  outline: 3px solid var(--matilda-copper);
   outline-offset: 3px;
 }
