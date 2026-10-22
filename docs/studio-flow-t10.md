@@ -66,9 +66,12 @@ Pop-Location
 
 ## Gate real pendente
 
-O ensaio externo não foi executado: a revisão automática de aprovação bloqueou
-a chamada Gemini por envio de conteúdo e possível cobrança sem autorização
-específica. Nenhum teste local deve ser apresentado como essa prova real.
+O usuário autorizou explicitamente o envio do exemplo CRISPR ao Gemini e o
+consumo da API em 22/10/2026. A tentativa de executar o roteiro com
+`--allow-paid-gemini` encerrou na checagem de configuração: `GEMINI_API_KEY`
+ausente no ambiente do backend e no `.env` do clone. Nenhuma chamada externa
+foi enviada nem houve cobrança. O ensaio real continua pendente da configuração
+da chave; nenhum teste local deve ser apresentado como essa prova real.
 
 `scripts/smoke_studio_t10.py` está preparado e requer a opção explícita
 `--allow-paid-gemini`. Executar somente após autorização para enviar o exemplo
