@@ -43,7 +43,7 @@ export function EvidenceInspector({
             <BookOpen size={23} />
           </div>
           <span className="eyebrow">
-            {node ? typeNames[node.type] : "EVIDENCE CHAIN"}
+            {node ? typeNames[node.type] : "CONSULTE AS FONTES"}
           </span>
           <h2>{node?.label || "Siga uma conexão."}</h2>
           <p>

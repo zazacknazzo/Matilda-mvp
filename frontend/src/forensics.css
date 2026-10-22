@@ -1,0 +1,563 @@
+/* Forensics presentation is scoped so Studio keeps its own workspace styles. */
+.forensics-main {
+  --paper: #fff;
+  --line: #dce5e2;
+  --green: #205c50;
+  background: #f3f7f6;
+  padding-bottom: 40px;
+}
+.journey {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin: 0;
+  padding: 22px 24px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+.journey li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+  color: #586c65;
+}
+.journey li > span {
+  display: grid;
+  place-items: center;
+  border: 1px solid #cad8d2;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 12px;
+}
+.journey li[aria-current] {
+  color: #174f42;
+  font-weight: 700;
+}
+.journey li[aria-current] > span {
+  background: #205c50;
+  color: #fff;
+  border-color: #205c50;
+}
+.forensics-main .landing {
+  max-width: 1400px;
+  margin: auto;
+  padding-top: 55px;
+  padding-bottom: 40px;
+}
+.forensics-main .hero-copy h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(42px, 4.6vw, 68px);
+  letter-spacing: -2px;
+}
+.forensics-main .hero-description {
+  font-size: 17px;
+  max-width: 470px;
+  line-height: 1.75;
+}
+.forensics-main .doi-form label {
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+.forensics-main .search-field {
+  background: #fff;
+  border: 1px solid #a4bcb3;
+  border-radius: 12px;
+  padding: 8px 8px 8px 16px;
+  box-shadow: 0 6px 24px #214f4310;
+}
+.forensics-main .search-field input {
+  font-size: 15px;
+  min-width: 0;
+}
+.forensics-main .search-field button {
+  border-radius: 9px;
+  min-width: 48px;
+  min-height: 48px;
+}
+.forensics-main .doi-form > p {
+  font-size: 13px;
+}
+.forensics-main .examples > button {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  min-height: 64px;
+}
+.forensics-main .examples strong {
+  font-size: 14px;
+}
+.forensics-main .examples small {
+  font-size: 12px;
+}
+.forensics-main .hero-visual {
+  border-radius: 24px;
+  background: #e4eee8;
+  border: 1px solid #cfdfd5;
+}
+.forensics-main .visual-topline,
+.forensics-main .visual-foot {
+  font-size: 10px;
+}
+.forensics-main .orbit-label {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 22px #264f4310;
+}
+.forensics-main .orbit-label small {
+  font-size: 11px;
+}
+.forensics-main .workspace {
+  max-width: 1720px;
+  margin: auto;
+  padding: 28px 32px 0;
+}
+.forensics-main .workspace-heading h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(26px, 2.4vw, 38px);
+  letter-spacing: -0.8px;
+}
+.forensics-main .paper-preview {
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 40px #244b3f08;
+}
+.forensics-main .primary-button {
+  min-height: 48px;
+  border-radius: 10px;
+}
+.investigation-summary {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 20px 24px;
+  background: #e5efea;
+  border-radius: 14px;
+  margin-bottom: 24px;
+}
+.investigation-summary > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.investigation-summary strong {
+  font-size: 30px;
+  font-weight: 500;
+  color: #205c50;
+}
+.investigation-summary span {
+  font-size: 13px;
+  max-width: 130px;
+  line-height: 1.4;
+}
+.investigation-summary p {
+  margin: 0 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  max-width: 380px;
+}
+.forensics-main .investigation-grid {
+  grid-template-columns: minmax(210px, 240px) minmax(0, 1fr) minmax(
+      280px,
+      330px
+    );
+  gap: 20px;
+}
+.forensics-main .investigation-grid > * {
+  min-width: 0;
+}
+.evidence-region {
+  min-width: 0;
+  scroll-margin-top: 76px;
+}
+.forensics-main .explorer,
+.forensics-main .inspector,
+.forensics-main .graph-panel {
+  border-radius: 14px;
+}
+.forensics-main .panel-toolbar {
+  height: 52px;
+  font-size: 12px;
+}
+.forensics-main .panel-toolbar strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.forensics-main .explorer-content > h2 {
+  font-size: 19px;
+  line-height: 1.4;
+}
+.forensics-main .filter-label {
+  font-size: 12px;
+}
+.forensics-main select {
+  min-height: 44px;
+  font-size: 13px;
+  width: 100%;
+  border-radius: 8px;
+}
+.forensics-main .discovery-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  padding: 14px 10px;
+  background: #fff;
+}
+.forensics-main .discovery-card.selected {
+  background: #e8f2ec;
+  border-color: #407563;
+}
+.forensics-main .discovery-card strong {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.forensics-main .discovery-card small {
+  font-size: 12px;
+}
+.forensics-main .mini-status {
+  font-size: 11px;
+}
+.forensics-main .small,
+.forensics-main .coverage,
+.forensics-main .coverage p {
+  font-size: 12px;
+}
+.forensics-main .center-top {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.forensics-main .view-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  background: #e5ece8;
+  padding: 4px;
+  border-radius: 10px;
+}
+.forensics-main .view-toggle button {
+  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 12px;
+  border-radius: 7px;
+}
+.forensics-main .view-toggle button[aria-pressed="true"] {
+  background: #fff;
+  color: #174f42;
+  box-shadow: 0 2px 5px #244b3f12;
+}
+.guided-map {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+}
+.map-intro h2 {
+  font-family: Georgia, serif;
+  font-size: 27px;
+  line-height: 1.2;
+  margin: 10px 0;
+}
+.map-intro p {
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.map-root {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  background: #205c50;
+  color: #fff;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+.map-root span,
+.map-story-heading small,
+.map-topics {
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+.map-root h3 {
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+.map-root small {
+  color: #e0eee7;
+  font-size: 12px;
+}
+.map-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 0;
+  color: #526c61;
+  text-align: center;
+  font-size: 12px;
+}
+.map-stories {
+  display: grid;
+  gap: 16px;
+}
+.map-story {
+  padding: 20px;
+  border: 1px solid #d7e3dc;
+  border-radius: 12px;
+  background: #fcfdfb;
+  transition: border-color 0.15s;
+  min-width: 0;
+}
+.map-story.is-selected {
+  border-color: #205c50;
+  box-shadow: 0 0 0 1px #205c50;
+}
+.map-topics {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #536d60;
+}
+.map-topic-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 20px;
+}
+.map-topic-list span {
+  font-size: 12px;
+  background: #e8efe4;
+  border-radius: 5px;
+  padding: 4px 9px;
+  overflow-wrap: anywhere;
+}
+.map-story-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.story-index {
+  color: #376652;
+  background: #e6eee8;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+.map-story-heading h3 {
+  font-size: 18px;
+  line-height: 1.4;
+  margin: 7px 0 12px;
+}
+.map-people {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 13px;
+  color: #285845;
+}
+.map-description {
+  font-size: 13px;
+  line-height: 1.7;
+}
+.map-citation {
+  display: block;
+  padding: 10px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #53675c;
+}
+.map-evidence-button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 46px;
+  background: #fff;
+  border: 1px solid #b4cbbd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  text-align: left;
+}
+.map-evidence-button svg:last-child {
+  margin-left: auto;
+}
+.map-evidence-button:hover {
+  background: #e6f0e9;
+}
+.map-footnote {
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  margin: 20px 0 0;
+}
+.map-empty {
+  padding: 24px;
+  background: #f3f7f4;
+  border-radius: 12px;
+}
+.map-empty p {
+  font-size: 14px;
+  margin-bottom: 0;
+}
+.forensics-main .interpretation-note {
+  font-size: 12px;
+}
+.forensics-main .dossier {
+  padding: 22px;
+  overflow-wrap: anywhere;
+}
+.forensics-main .dossier p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+.forensics-main .source-card {
+  border-radius: 10px;
+}
+.advanced-discovery {
+  margin-top: 24px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 16px 20px;
+}
+.advanced-discovery > summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 0;
+}
+.forensics-main .mobile-tabs button {
+  min-height: 46px;
+  font-size: 13px;
+}
+@media (min-width: 1600px) {
+  .map-stories {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1150px) and (min-width: 701px) {
+  .forensics-main .investigation-grid {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+  .forensics-main .evidence-region {
+    grid-column: 1 / -1;
+  }
+  .investigation-summary {
+    flex-wrap: wrap;
+    gap: 16px 24px;
+  }
+  .investigation-summary p {
+    max-width: none;
+    margin-left: 0;
+  }
+}
+@media (max-width: 700px) {
+  .journey {
+    gap: 12px;
+    padding: 14px 12px;
+    justify-content: space-between;
+  }
+  .journey li {
+    flex-direction: column;
+    text-align: center;
+    gap: 6px;
+    font-size: 10px;
+    flex: 1;
+  }
+  .forensics-main .landing {
+    padding: 32px 22px 0;
+  }
+  .forensics-main .hero-copy h1 {
+    font-size: 44px;
+  }
+  .forensics-main .hero-description {
+    font-size: 16px;
+  }
+  .forensics-main .hero-visual {
+    display: none;
+  }
+  .forensics-main .workspace {
+    padding: 24px 14px 0;
+  }
+  .forensics-main .investigation-grid {
+    display: block;
+  }
+  .forensics-main .evidence-region {
+    display: none;
+  }
+  .forensics-main .tab-evidence .evidence-region {
+    display: block;
+  }
+  .investigation-summary {
+    padding: 16px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .investigation-summary > div {
+    flex: 1;
+    gap: 8px;
+  }
+  .investigation-summary strong {
+    font-size: 26px;
+  }
+  .investigation-summary span {
+    font-size: 12px;
+  }
+  .investigation-summary p {
+    font-size: 12px;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+  }
+  .forensics-main .mobile-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    border-radius: 10px;
+  }
+  .guided-map {
+    padding: 18px;
+  }
+  .map-intro h2 {
+    font-size: 25px;
+  }
+  .map-root,
+  .map-story {
+    padding: 16px;
+  }
+  .forensics-main .view-toggle {
+    width: 100%;
+  }
+  .forensics-main .view-toggle button {
+    flex: 1;
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+  .forensics-main .dossier {
+    display: block;
+  }
+  .forensics-main .workspace-actions {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .forensics-main *,
+  .forensics-main *::before,
+  .forensics-main *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

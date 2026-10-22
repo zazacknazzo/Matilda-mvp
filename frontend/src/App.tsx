@@ -23,6 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { AutomaticDiscovery } from "./components/AutomaticDiscovery";
+import { GuidedMap } from "./components/GuidedMap";
 import { retrievePaper, investigate } from "./services/api";
 import type { Analysis, Paper, Match, GraphNode } from "./types";
 import {
@@ -54,12 +55,20 @@ function ForensicsApp() {
   const [node, setNode] = useState<GraphNode | null>(null);
   const [busy, setBusy] = useState<"retrieving" | "investigating" | null>(null);
   const [error, setError] = useState("");
-  const [view, setView] = useState<"graph" | "list">("graph");
+  const [view, setView] = useState<"map" | "graph" | "list">("map");
   const [filter, setFilter] = useState("all");
   const [about, setAbout] = useState(false);
   const [mobileTab, setMobileTab] = useState("explore");
   const heading = useRef<HTMLHeadingElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
+  const evidenceRef = useRef<HTMLDivElement>(null);
+  function revealEvidence() {
+    setMobileTab("evidence");
+    requestAnimationFrame(() => {
+      evidenceRef.current?.focus();
+      evidenceRef.current?.scrollIntoView({ block: "start" });
+    });
+  }
   async function load(value: string) {
     setDoi(value);
     setError("");
@@ -87,6 +96,7 @@ function ForensicsApp() {
       const result = await investigate(paper.doi);
       setAnalysis(result);
       setFilter("all");
+      setView("map");
       setMobileTab("explore");
       setTimeout(() => heading.current?.focus(), 0);
     } catch (e) {
@@ -102,7 +112,7 @@ function ForensicsApp() {
   function choose(match: Match) {
     setSelected(match);
     setNode(null);
-    setMobileTab("evidence");
+    revealEvidence();
   }
   function selectNode(n: GraphNode) {
     setNode(n);
@@ -113,7 +123,7 @@ function ForensicsApp() {
           m.researchers.some((r) => r.openalex_id === n.id)),
     );
     setSelected(match || null);
-    setMobileTab("evidence");
+    revealEvidence();
   }
   const results =
     analysis?.contributions.filter(
@@ -144,14 +154,31 @@ function ForensicsApp() {
           </span>
         </button>
         <div className="header-center">
-          <span className="live-dot" /> SCIENTIFIC CONTRIBUTION INTELLIGENCE
+          <span className="live-dot" /> DESCUBRA HISTÓRIAS. CONFIRA AS FONTES.
         </div>
         <button className="quiet-button" onClick={() => setAbout(true)}>
           <CircleHelp size={16} />
           <span>Como investigamos</span>
         </button>
       </header>
-      <main id="main">
+      <main id="main" className="forensics-main">
+        <ol className="journey" aria-label="Etapas da investigação">
+          {[
+            "Encontre um artigo",
+            "Explore as conexões",
+            "Confira as fontes",
+          ].map((label, index) => (
+            <li
+              key={label}
+              aria-current={
+                (selected ? 2 : analysis ? 1 : 0) === index ? "step" : undefined
+              }
+            >
+              <span>{index + 1}</span>
+              {label}
+            </li>
+          ))}
+        </ol>
         {!paper ? (
           <div className="landing">
             <div className="hero-copy">
@@ -169,8 +196,8 @@ function ForensicsApp() {
                 </em>
               </h1>
               <p className="hero-description">
-                Parta de um artigo. Descubra contribuições femininas
-                relacionadas ao conhecimento — e siga as evidências.
+                Descubra as mulheres por trás de contribuições científicas.
+                Comece com um artigo, explore as conexões e confira as fontes.
               </p>
               <form onSubmit={submit} className="doi-form">
                 <label htmlFor="doi">COMECE POR UM ARTIGO CIENTÍFICO</label>
@@ -198,7 +225,10 @@ function ForensicsApp() {
                     )}
                   </button>
                 </div>
-                <p>Metadados reais do OpenAlex. Sem cadastro.</p>
+                <p>
+                  DOI é o identificador de um artigo. Não tem um? Use um exemplo
+                  abaixo.
+                </p>
               </form>
               <div className="examples">
                 <span>Experimente uma investigação</span>
@@ -223,7 +253,7 @@ function ForensicsApp() {
               aria-label="Ilustração do mecanismo de investigação"
             >
               <div className="visual-topline">
-                <span>DUAL GRAPH INTELLIGENCE</span>
+                <span>DA CURIOSIDADE À EVIDÊNCIA</span>
                 <span>FIG. 01</span>
               </div>
               <div className="orbital">
@@ -432,22 +462,35 @@ function ForensicsApp() {
               </section>
             ) : (
               <>
-                <AutomaticDiscovery
-                  key={analysis.id}
-                  analysis={analysis}
-                  onUpdated={(result) =>
-                    setAnalysis((current) =>
-                      current?.id === result.id ? result : current,
-                    )
-                  }
-                />
+                <div className="investigation-summary" role="status">
+                  <div>
+                    <strong>{analysis.contributions.length}</strong>
+                    <span>contribuições no catálogo</span>
+                  </div>
+                  <div>
+                    <strong>
+                      {
+                        new Set(
+                          analysis.contributions.flatMap((m) =>
+                            m.researchers.map((r) => r.id),
+                          ),
+                        ).size
+                      }
+                    </strong>
+                    <span>pesquisadoras relacionadas</span>
+                  </div>
+                  <p>
+                    <ShieldCheck size={19} /> Uma conexão é um convite à
+                    leitura. Confira o que cada fonte sustenta.
+                  </p>
+                </div>
                 <nav
                   className="mobile-tabs"
                   aria-label="Painéis da investigação"
                 >
                   {[
                     ["explore", "Descobertas"],
-                    ["graph", "Grafo e lista"],
+                    ["graph", "Mapa e lista"],
                     ["evidence", "Evidências"],
                   ].map(([value, label]) => (
                     <button
@@ -464,7 +507,7 @@ function ForensicsApp() {
                     <div className="panel-toolbar">
                       <div>
                         <Search size={16} />
-                        <strong>Discovery Explorer</strong>
+                        <strong>Suas descobertas</strong>
                       </div>
                       <span>01</span>
                     </div>
@@ -491,7 +534,7 @@ function ForensicsApp() {
                       </a>
                       <div className="concept-list">
                         <h3>
-                          Conceitos identificados{" "}
+                          Assuntos do artigo{" "}
                           <span>{paper.concepts.length}</span>
                         </h3>
                         {paper.concepts.length ? (
@@ -519,7 +562,7 @@ function ForensicsApp() {
                         </span>
                       </div>
                       <label className="filter-label" htmlFor="citation-filter">
-                        Comparação bibliográfica
+                        Presença nas referências
                       </label>
                       <select
                         id="citation-filter"
@@ -601,14 +644,24 @@ function ForensicsApp() {
                   </aside>
                   <div className="center-panel">
                     <div className="center-top">
-                      <span className="eyebrow">DUAL GRAPH INTELLIGENCE</span>
-                      <div className="view-toggle">
+                      <span className="eyebrow">EXPLORE AS CONEXÕES</span>
+                      <div
+                        className="view-toggle"
+                        aria-label="Visualização dos resultados"
+                      >
+                        <button
+                          aria-pressed={view === "map"}
+                          onClick={() => setView("map")}
+                        >
+                          <GitBranch size={14} />
+                          Mapa simples
+                        </button>
                         <button
                           aria-pressed={view === "graph"}
                           onClick={() => setView("graph")}
                         >
                           <Network size={14} />
-                          Grafo
+                          Rede completa
                         </button>
                         <button
                           aria-pressed={view === "list"}
@@ -619,7 +672,14 @@ function ForensicsApp() {
                         </button>
                       </div>
                     </div>
-                    {view === "graph" ? (
+                    {view === "map" ? (
+                      <GuidedMap
+                        analysis={analysis}
+                        matches={results}
+                        selected={selected}
+                        onSelect={choose}
+                      />
+                    ) : view === "graph" ? (
                       <ScientificGraph
                         analysis={analysis}
                         selected={selected}
@@ -690,12 +750,33 @@ function ForensicsApp() {
                       </p>
                     </div>
                   </div>
-                  <EvidenceInspector
-                    match={selected}
-                    node={node}
-                    paper={paper}
-                  />
+                  <div
+                    className="evidence-region"
+                    ref={evidenceRef}
+                    tabIndex={-1}
+                    aria-label="Fontes da contribuição selecionada"
+                  >
+                    <EvidenceInspector
+                      match={selected}
+                      node={node}
+                      paper={paper}
+                    />
+                  </div>
                 </div>
+                <details className="advanced-discovery">
+                  <summary>
+                    Quer ir além do catálogo? Ampliar a busca em outras fontes
+                  </summary>
+                  <AutomaticDiscovery
+                    key={analysis.id}
+                    analysis={analysis}
+                    onUpdated={(result) =>
+                      setAnalysis((current) =>
+                        current?.id === result.id ? result : current,
+                      )
+                    }
+                  />
+                </details>
               </>
             )}
           </div>
