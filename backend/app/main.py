@@ -122,3 +122,6 @@ def export(identifier: str, format: str = 'markdown'):
 # Studio is composed independently; no provider is initialized at import/startup.
 from app.api.studio_preview import router as studio_preview_router
 app.include_router(studio_preview_router)
+
+from app.api.studio_runtime import router as studio_runtime_router
+app.include_router(studio_runtime_router)

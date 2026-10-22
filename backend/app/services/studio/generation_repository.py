@@ -5,34 +5,16 @@ selected by production and does not import or migrate the T05 repository.
 """
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from hashlib import sha256
 import json
 from pathlib import Path
 import sqlite3
 from uuid import uuid4
 
 from app.schemas.lesson import LessonBundle
-from app.schemas.studio import EnrichmentPreview, GenerateRequest, StudioError, utc, validate_lesson_response
+from app.schemas.studio import EnrichmentPreview, GenerateRequest, StudioError, validate_lesson_response
 from app.studio.ports import POLICY, GenerationClaim
 from .generation import generation_error
-
-
-def timestamp(now):
-    return datetime.fromisoformat(utc(now)).timestamp()
-
-
-def fingerprint(preview, request):
-    value = {
-        'request': request.model_dump(),
-        'configuration': preview.project.model_dump(include={'title', 'subject', 'education_level', 'duration_minutes'}),
-        'objectives': preview.approved_objectives,
-        'suggestions': [item.model_dump() for item in preview.suggestions],
-        'context': preview.scientific_context.model_dump(),
-        'documents': [item.model_dump() for item in preview.source_documents],
-        'evidence': [item.model_dump() for item in preview.evidence_references],
-    }
-    value['request']['accepted_suggestion_ids'].sort()
-    return sha256(json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(',', ':')).encode()).hexdigest()
+from .generation_identity import timestamp, fingerprint
 
 
 class IsolatedGenerationRepository:
