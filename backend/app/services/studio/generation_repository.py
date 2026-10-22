@@ -84,6 +84,7 @@ class IsolatedGenerationRepository:
 
     async def get_preview(self, *, session_id, preview_id, now):
         with self.transaction() as db:
+            self._recover(db, now)
             return self._preview(db, session_id, preview_id, now)
 
     async def get_lesson(self, *, session_id, lesson_bundle_id, now):
@@ -95,6 +96,7 @@ class IsolatedGenerationRepository:
 
     async def claim_generation(self, *, session_id, request, idempotency_key, now):
         with self.transaction() as db:
+            self._recover(db, now)
             preview = self._preview(db, session_id, request.preview_id, now)
             if preview is None:
                 raise generation_error('not_found')
@@ -173,11 +175,14 @@ class IsolatedGenerationRepository:
             if operation:
                 self._fail(db, operation, error, now)
 
+    def _recover(self, db, now):
+        for operation in db.execute("SELECT * FROM t09_operations WHERE state='generating' AND deadline+?<=?", (POLICY.recovery_grace_seconds, timestamp(now))).fetchall():
+            self._fail(db, operation, generation_error('generation_timeout', retryable=True).error, now)
+
     async def cleanup_expired(self, *, now):
         with self.transaction() as db:
             stamp = timestamp(now)
-            for operation in db.execute("SELECT * FROM t09_operations WHERE state='generating' AND deadline+?<=?", (POLICY.recovery_grace_seconds, stamp)).fetchall():
-                self._fail(db, operation, generation_error('generation_timeout', retryable=True).error, now)
+            self._recover(db, now)
             count = db.execute("DELETE FROM t09_previews WHERE expires<=? AND id NOT IN (SELECT preview_id FROM t09_operations WHERE state='generating')", (stamp,)).rowcount
             db.execute('DELETE FROM t09_usage WHERE admitted<=?', (stamp - 3600,))
             return count

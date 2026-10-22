@@ -12,6 +12,8 @@ import uvicorn
 from app.api.studio_generation import create_generation_router
 from app.services.studio.generation import GenerationService
 from app.services.studio.generation_repository import IsolatedGenerationRepository
+from app.services.studio.operations import studio_maintenance_lifespan
+from app.schemas.studio import GenerateRequest
 from app.studio.ports import ProviderFailure
 from generation_fixtures import Clock, Provider, authority, draft, preview
 
@@ -42,6 +44,8 @@ service = GenerationService(repo, provider, lambda value: authority('no-coverage
 
 
 def reset():
+    fresh = Clock()
+    clock.stamp, clock.ticks = fresh.stamp, fresh.ticks
     with repo.transaction() as db:
         for table in ('t09_operations', 't09_bundles', 't09_previews', 't09_usage', 't09_sessions'):
             db.execute(f'DELETE FROM {table}')
@@ -54,7 +58,8 @@ def reset():
 
 
 reset()
-app = FastAPI(title='EXEMPLO T09 — provedor, sessão e revisões simulados')
+app = FastAPI(title='EXEMPLO T09/T12 — provedor, sessão e revisões simulados',
+              lifespan=studio_maintenance_lifespan(repo, now=clock.now, metrics=service.metrics))
 
 
 async def session(request):
@@ -80,6 +85,23 @@ def reset_test():
 @app.get('/test/stats')
 def stats():
     return {'provider_calls': provider.calls}
+
+
+@app.post('/test/interrupt')
+async def interrupt(body: dict):
+    """Controlled process-loss scenario, never imported by the product host."""
+    global repo
+    await repo.claim_generation(session_id='fixture-owner', request=GenerateRequest.model_validate(body['request']),
+                                idempotency_key=body['key'], now=clock.now())
+    repo = IsolatedGenerationRepository(repo.path)
+    service.repository = repo
+    return {'test_only': True}
+
+
+@app.post('/test/advance')
+def advance(body: dict):
+    clock.advance(body['seconds'])
+    return {'test_only': True}
 
 
 if __name__ == '__main__':
