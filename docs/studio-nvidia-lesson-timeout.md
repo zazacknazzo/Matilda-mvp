@@ -173,13 +173,26 @@ execução**. Nenhuma chamada live deste comando foi feita nesta correção.
 
 ## Verificação
 
-Backend: **669 passed**, 9,83 s, incluindo Forensics, limites, retry/recuperação,
+Backend: **670 passed**, 9,56 s, incluindo Forensics, limites, retry/recuperação,
 idempotência, timeout pré-header/durante corpo, truncamento/JSON incompleto,
 LessonDraft inválido, persistência e Markdown. Contratos: **7/40/4**. TypeScript/
-build aprovado (aviso Vite de chunk >500 kB permanece). Playwright e revisões
-independentes serão registrados ao concluir.
+build aprovado (aviso Vite de chunk >500 kB permanece). **87 Playwright aprovados** nas execuções finais: integrado T13/Forensics 20
+(24,5 s), revisão 19 (10,3 s), slides 14 (5,4 s), geração/operações 18 (9,5 s),
+ponte 5 (4,3 s), exportação 11 (4,8 s). As falhas iniciais são registradas abaixo.
+
+Revisões independentes: Standards **0 achados pendentes**, Spec **0**. Spec
+reexecutou 50 testes do commit principal; ambos revisaram o incremento de cache.
+O responsável executou o novo teste e a suíte backend completa final.
+[Relatório por eixo](reviews/nvidia-lesson-timeout-code-review.md).
 
 O primeiro E2E integrado passou 19/20: o mock BrowserProvider do cenário de falha
 única ainda exigia um ID administrativo removido do payload. O identificador de
 teste foi adaptado ao conteúdo recebido (somente harness, sem alterar frontend).
 A reprodução isolada passou após a correção; o rerun completo passou **20/20**.
+
+O primeiro harness de geração/operações passou 17/18; o caso de polling em
+andamento falhou em route.fetch/response.json com `Response has been disposed`,
+antes da leitura pelo mock do navegador. A reprodução isolada passou e o rerun
+completo passou **18/18** sem alteração de produto ou frontend. Esse problema de
+ciclo de vida do transporte do Playwright já estava registrado no diagnóstico
+anterior; permanece uma limitação do harness, não uma prova de erro NVIDIA.
