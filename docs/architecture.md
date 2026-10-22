@@ -77,3 +77,40 @@ criadas automaticamente. Os endpoints `/api/catalog/candidates` e
 O frontend oferece ação de ampliação, filtro de identidade documentada e fontes,
 sem transformar candidatos pendentes em nós verificados. A exportação inclui
 os resultados e todas as limitações. Não há endpoint de aprovação editorial.
+
+
+## Studio — T05
+
+`api/studio_preview.py` compõe somente POST `/api/studio/preview` e GET
+`/api/studio/previews/{id}` em `main.py`. A leitura do corpo é limitada em
+streaming antes do Pydantic; erros usam StudioError. Os schemas M0 permanecem
+inalterados. Revisão, geração e exportação Studio continuam reservadas às
+portas/consumidores dos tickets posteriores.
+
+`services/studio/preview.py` usa `build_scientific_context` e
+`search_context_contributions` de T04. O planner recebe documentos e IDs
+permitidos; o servidor materializa pesquisadores, explicação e afirmação
+histórica canônica. A resposta passa pelo schema interno e por
+`EnrichmentPreview.validate_scientific_authority` antes de publicar.
+
+`integrations/gemini_client.py` implementa StudioProvider com o SDK oficial,
+JSON Schema, contagem de tokens, ferramentas desabilitadas e deadline comum.
+A construção é preguiçosa: importar/iniciar o Forensics não requer chave.
+
+`services/studio/repository.py` implementa a fatia de prévia das portas M0,
+com migração transacional aditiva e foreign keys apenas nas novas entidades.
+Inclui as cinco tabelas Studio e tabelas auxiliares de sessão, admissão e cota;
+não modifica tabelas Forensics. Admissão/publicação são transações curtas,
+sem transação na chamada externa. Ownership é um hash do token opaco HttpOnly.
+Operações abandonadas liberam a admissão após 45 + 15 s. GET não renova o prazo.
+O lifespan limpa expirados ao iniciar e a cada hora, sem depender de um acesso
+Studio. Nova tentativa mantém o último projeto utilizável até publicar, e GET
+materializa o erro corrente separado dos originais/snapshots anteriores.
+O bloqueio persistido impede duas operações ativas da mesma sessão. A chave
+idempotente de geração pertence ao futuro endpoint `/generate`; T05 não cria
+semântica concorrente para POST de prévia.
+
+O frontend mantém os modos montados ao alternar. StudioWorkspace usa o cliente
+HTTP real e navegação por hash para retomar a prévia. ReviewWorkspace e
+LessonWorkspace existentes permanecem módulos independentes, sem mocks em
+produção ou botões que aparentem executar revisão/geração ainda não integradas.

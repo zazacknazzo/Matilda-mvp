@@ -114,7 +114,8 @@ def test_standalone_openapi_describes_six_operations_without_installing_routes()
     generate = contract['paths']['/api/studio/generate']['post']
     assert {'200', '201', '409', '502', '504'} <= set(generate['responses'])
     assert any(p['name'] == 'Idempotency-Key' and p['required'] for p in generate['parameters'])
-    assert not any(path.startswith('/api/studio') for path in app.openapi()['paths'])
+    # T05 mounts live preview routes. Generating the standalone M0 contract must
+    # still leave the application's route table unchanged.
     assert app.openapi()['paths'] == before
 
 

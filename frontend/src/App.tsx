@@ -1,4 +1,5 @@
-import { useState, useRef, type FormEvent } from "react";
+import { StudioWorkspace } from "./studio/StudioWorkspace";
+import { useState, useRef, useEffect, type FormEvent } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -45,7 +46,7 @@ const examples = [
     detail: "BNT162b2 · Polack et al., 2020",
   },
 ];
-export default function App() {
+function ForensicsApp() {
   const [doi, setDoi] = useState("");
   const [paper, setPaper] = useState<Paper | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
@@ -812,6 +813,50 @@ export default function App() {
           </section>
         </div>
       )}
+    </>
+  );
+}
+
+/** Keep both workspaces mounted so mode changes preserve the investigation. */
+export default function App() {
+  const [studio, setStudio] = useState(() =>
+    location.hash.startsWith("#studio"),
+  );
+  const studioLocation = useRef("#studio");
+  useEffect(() => {
+    const update = () => setStudio(location.hash.startsWith("#studio"));
+    window.addEventListener("hashchange", update);
+    return () => window.removeEventListener("hashchange", update);
+  }, []);
+  return (
+    <>
+      <nav className="mode-navigation" aria-label="Modos Matilda">
+        <button
+          aria-pressed={!studio}
+          onClick={() => {
+            if (studio) studioLocation.current = location.hash;
+            setStudio(false);
+            history.replaceState(null, "", "#forensics");
+          }}
+        >
+          Forensics — Investigar ciência
+        </button>
+        <button
+          aria-pressed={studio}
+          onClick={() => {
+            setStudio(true);
+            history.replaceState(null, "", studioLocation.current);
+          }}
+        >
+          Studio — Criar aula
+        </button>
+      </nav>
+      <div hidden={studio}>
+        <ForensicsApp />
+      </div>
+      <div hidden={!studio}>
+        <StudioWorkspace />
+      </div>
     </>
   );
 }
