@@ -135,7 +135,12 @@ Não há aumento de timeouts, nova cota ou extensão de deadline para retry.
 
 Backend: **656 passed**, 9,67 s, incluindo Forensics. Contratos científicos/Studio/
 LessonBundle: **7/40/4**. TypeScript/build aprovado; aviso Vite de chunk >500 kB
-permanece. Playwright e revisões independentes serão registrados ao concluir. Os testes exercitam somente interfaces HTTP,
+permanece. **87 Playwright aprovados**: integrado T13/Forensics 20 (24,4 s), revisão 19
+(7,7 s), slides 14 (4,8 s), geração/operações 18 (9,4 s), ponte 5 (3,2 s),
+exportação 11 (5,3 s). Sem falhas nesta execução.
+
+Revisões independentes: **Standards 0 achados; Spec 0 achados**. Spec reexecutou
+os **37 testes focados**, todos aprovados. [Relatórios por eixo](reviews/nvidia-scientific-candidates-code-review.md). Os testes exercitam somente interfaces HTTP,
 transporte controlado e validadores públicos; não substituem qualidade pedagógica
 e aceitação do schema no endpoint real.
 
