@@ -23,8 +23,20 @@ def controlled_nvidia(external):
             if error.reason == 'timeout':
                 raise httpx.ReadTimeout('controlled')
             return httpx.Response(200, json={'choices': [{'finish_reason': 'length' if error.reason == 'truncated' else 'content_filter'}]})
+        content = compact_payload(json.loads(result.content)) if stage == 'lesson' else json.loads(result.content)
         return httpx.Response(200, json={
-            'model': 'controlled', 'choices': [{'finish_reason': 'stop', 'message': {'role': 'assistant', 'content': result.content.decode()}}],
+            'model': 'controlled', 'choices': [{'finish_reason': 'stop', 'message': {'role': 'assistant', 'content': json.dumps(content)}}],
             'usage': {'prompt_tokens': 900, 'completion_tokens': 1200},
         })
     return NVIDIAProvider(transport=httpx.MockTransport(upstream))
+
+
+def compact_payload(full):
+    """Test provider speaks NVIDIA authoring format; never used in production."""
+    return {**{k: full[k] for k in ('prior_knowledge', 'materials', 'limitations')}, 'sections': [
+        {**{k: section[k] for k in ('title', 'duration_minutes', 'objective_indexes')},
+         'slides': [{k: value for k, value in slide.items() if k not in ('key', 'section_key', 'duration_minutes')}
+                    for slide in full['slides'] if slide['key'] in section['slide_keys']],
+         'activities': [{k: value for k, value in activity.items() if k not in ('key', 'section_key')}
+                        for activity in full['activities'] if activity['key'] in section['activity_keys']]}
+        for section in full['sections']]}

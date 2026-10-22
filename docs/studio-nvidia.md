@@ -1,6 +1,8 @@
 # Studio com NVIDIA NIM — Issue #31
 
-Atualização atual: [candidatos científicos e compactação](studio-scientific-candidates.md).
+Atualização lesson: [timeout, contrato compacto e smoke isolado](studio-nvidia-lesson-timeout.md).
+
+Histórico da prévia: [candidatos científicos e compactação](studio-scientific-candidates.md).
 
 Histórico estrutural de âncoras: [seleção canônica pelo servidor](studio-canonical-anchors.md).
 
@@ -48,7 +50,7 @@ explícita; o estado docente local é preservado para consulta/tentativa explíc
 | Estágio | reasoning_effort | stream | temperature | top_p | Saída |
 |---|---|---|---|---|---|
 | Prévia | none | false | 1 | 0.95 | PreviewPlan completo |
-| Aula | low | false | 1 | 0.95 | LessonDraft completo → LessonBundle validado |
+| Aula | none | false | 1 | 0.95 | CompactLessonDraft → LessonDraft completo → LessonBundle validado |
 
 ## JSON e autoridade científica
 
@@ -60,7 +62,9 @@ incluindo `$defs`, `$ref`, limites, campos obrigatórios, uniões e
 `additionalProperties=false`. Não há adaptação que retire validações. O schema da prévia agora exige sugestões com cobertura e proíbe sugestões sem cobertura, mantendo a validação científica independente.
 
 A API do modelo não recebe LessonBundle diretamente: a fronteira T09 existente
-é LessonDraft. IDs finais, metadados, evidências, participantes e referências
+é LessonDraft, preservada para Gemini e para a validação central. O adapter
+NVIDIA usa elaboração compacta aninhada, expandida deterministicamente para esse
+LessonDraft integral antes da materialização. IDs finais, metadados, evidências, participantes e referências
 canônicas são acrescentados e conferidos pelo servidor. Exigir LessonBundle do
 modelo permitiria que ele escrevesse campos que pertencem ao servidor. A prévia
 usa PreviewPlan privado com candidate_id; o servidor resolve toda a associação
@@ -68,7 +72,7 @@ usa PreviewPlan privado com candidate_id; o servidor resolve toda a associação
 o SourceAnchor público original antes de validar EnrichmentPreview. Não aceita
 source_anchor escrito pelo modelo. A aula continua recebendo a prévia pública completa.
 
-O contrato completo ainda precisa ser aceito pelo endpoint live: testes de
+O contrato compacto da aula ainda precisa ser aceito pelo endpoint live: testes de
 transporte validam o payload, mas não executam o compilador de schema da NVIDIA.
 Se o schema for recusado, 400/422 falha sem repetição automática. Não há downgrade
 para JSON livre. Uma adaptação futura exige reproduzir o erro sanitizado, manter

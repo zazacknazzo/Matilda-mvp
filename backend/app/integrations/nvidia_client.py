@@ -31,19 +31,23 @@ class NVIDIAProvider:
         return os.getenv('NVIDIA_MODEL', DEFAULT_MODEL)
 
     def _payload(self, request):
+        instruction, material, schema = request.system_instruction, request.material, request.response_schema
+        if request.stage == 'lesson':
+            from .nvidia_lesson import contract
+            instruction, material, schema = contract(request)
         return {
             'model': self.model,
             'messages': [
-                {'role': 'system', 'content': request.system_instruction},
-                {'role': 'user', 'content': serialize(request.material)},
+                {'role': 'system', 'content': instruction},
+                {'role': 'user', 'content': serialize(material)},
             ],
             'temperature': 1, 'top_p': 0.95, 'stream': False,
-            'reasoning_effort': 'none' if request.stage == 'preview' else 'low',
+            'reasoning_effort': 'none',
             'max_tokens': min(request.max_output_tokens, POLICY.max_output_tokens),
             'tool_choice': 'none',
             'response_format': {'type': 'json_schema', 'json_schema': {
                 'name': 'PreviewPlan' if request.stage == 'preview' else 'LessonDraft',
-                'schema': dict(request.response_schema),
+                'schema': dict(schema),
             }},
         }
 
@@ -56,13 +60,19 @@ class NVIDIAProvider:
 
     async def complete(self, request):
         started = monotonic()
-        event = {'stage': request.stage, 'http_status': None, 'outcome': 'unavailable'}
+        event = {'stage': request.stage, 'http_status': None, 'outcome': 'unavailable',
+                 'phase': 'preflight', 'headers_ms': None, 'first_body_ms': None, 'response_bytes': 0,
+                 'deadline_budget_ms': max(0, round((request.deadline - started) * 1000)),
+                 'max_input_tokens': min(request.max_input_tokens, POLICY.max_input_tokens),
+                 'max_output_tokens': min(request.max_output_tokens, POLICY.max_output_tokens)}
         try:
             # Includes queue/network/body parsing; a second attempt never resets this.
             if monotonic() >= request.deadline:
                 raise ProviderFailure('timeout')
             estimate = await self.count_input_tokens(request)
-            event['estimated_input_tokens'] = estimate
+            event.update(estimated_input_tokens=estimate, reasoning_effort='none', stream=False)
+            if request.stage == 'lesson':
+                event['lesson_contract'] = 'compact-v1'
             if estimate > min(request.max_input_tokens, POLICY.max_input_tokens):
                 event['outcome'] = 'input_too_large'
                 raise conflict('input_too_large', 'Entrada excede o limite seguro de tokens.')
@@ -82,23 +92,34 @@ class NVIDIAProvider:
                 async with httpx.AsyncClient(transport=self.transport, timeout=max(.001, request.deadline - monotonic()),
                                             follow_redirects=False, trust_env=False,
                                             limits=httpx.Limits(max_connections=POLICY.global_concurrency)) as client:
+                    event['phase'] = 'waiting_headers'
                     async with client.stream('POST', str(base).rstrip('/') + '/chat/completions',
                             json=self._payload(request), headers={'Authorization': 'Bearer ' + key, 'Accept': 'application/json'}) as response:
-                        event['http_status'] = response.status_code
+                        event.update(http_status=response.status_code, headers_ms=round((monotonic() - started) * 1000, 3), phase='reading_body')
                         self._check_status(response.status_code, event)
                         body = bytearray()
-                        async for chunk in response.aiter_bytes(chunk_size=4096):
+                        async for chunk in response.aiter_bytes():
+                            if chunk and event['first_body_ms'] is None:
+                                event['first_body_ms'] = round((monotonic() - started) * 1000, 3)
+                            event['response_bytes'] += len(chunk)
                             if len(body) + len(chunk) > POLICY.max_body_bytes:
                                 self._invalid('response_too_large', event)
                             body.extend(chunk)
+                    event['phase'] = 'validation'
                     result = self._parse(bytes(body), request, started, event)
-            event['outcome'] = 'completed'
+            event.update(outcome='completed', phase='completed')
             return result
+        except asyncio.CancelledError:
+            expired = monotonic() >= request.deadline
+            event.update(outcome='timeout' if expired else 'cancelled', failure_phase=event['phase'],
+                         failure_reason='deadline_exceeded' if expired else 'caller_cancelled')
+            raise
         except (httpx.TimeoutException, TimeoutError):
-            event['outcome'] = 'timeout'
+            event.update(outcome='timeout', failure_phase=event['phase'],
+                         failure_reason='deadline_exceeded' if monotonic() >= request.deadline else 'http_timeout')
             raise ProviderFailure('timeout') from None
         except httpx.HTTPError:
-            event['outcome'] = 'unavailable'
+            event.update(outcome='unavailable', failure_phase=event['phase'], failure_reason='transport_error')
             raise ProviderFailure('unavailable') from None
         except ProviderFailure as failure:
             # Empty content has the existing truncated port reason, distinct telemetry.
@@ -188,6 +209,20 @@ class NVIDIAProvider:
             encoded = content.encode('utf-8')
         except (ValueError, TypeError, RecursionError):
             self._invalid('invalid_json', event)
+        if request.stage == 'lesson':
+            from pydantic import ValidationError
+            from .nvidia_lesson import expand
+            try:
+                encoded = expand(encoded, duration_minutes=request.material['configuration']['duration_minutes'])
+                if len(encoded) > POLICY.max_body_bytes:
+                    self._invalid('response_too_large', event)
+            except ValidationError:
+                event['outcome'] = 'pydantic_validation'
+                raise
+            except (ValueError, KeyError):
+                if event['outcome'] == 'unavailable':
+                    event['outcome'] = 'invalid_lesson_draft'
+                raise
         return ProviderResult(encoded, LessonGenerationMetadata(
             provider='nvidia', model=model, prompt_version=request.prompt_version, schema_version=1,
             generated_at=datetime.now(timezone.utc).isoformat(), duration_ms=int((monotonic()-started)*1000),

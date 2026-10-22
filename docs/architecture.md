@@ -175,6 +175,14 @@ integral: PreviewPlan na prévia e LessonDraft na geração. O serviço material
 valida LessonBundle contra a revisão e o snapshot científico existentes. O provedor
 não recebe autoridade para inventar referências ou identidades.
 
+No adapter NVIDIA, `integrations/nvidia_lesson.py` usa uma elaboração aninhada:
+slides e atividades pertencem à seção por estrutura; chaves, vínculos e distribuição
+de minutos dos slides são construídos no servidor. O plano reutiliza blocos e
+notas pedagógicas produzidos uma vez. A expansão passa pelo LessonDraft integral
+e pelos mesmos validadores T09/Bundle; Gemini mantém o contrato original. Tempo
+total e objetivos semânticos continuam escolhas validadas da elaboração. Ver
+[timeout e smoke lesson](studio-nvidia-lesson-timeout.md).
+
 Na prévia, `services/studio/preview_anchors.py` constrói escolhas literais ligadas
 à proveniência, aos conceitos e às contribuições resolvidas. PreviewPlan recebe
 somente `candidate_id`; cada candidato liga contribuição, conceito, evidências

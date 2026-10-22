@@ -18,7 +18,8 @@ class BrowserProvider(FlowProvider):
             if any('T13-reconnect' in doc['content'] for doc in documents):
                 await asyncio.sleep(1)
             if any('falha única' in doc['content'] for doc in documents):
-                key = documents[0]['id']
+                # Administrative IDs are deliberately absent from the hosted payload.
+                key = tuple(document['content'] for document in documents)
                 if key not in self.failed_once:
                     self.failed_once.add(key)
                     raise ProviderFailure('unauthorized')

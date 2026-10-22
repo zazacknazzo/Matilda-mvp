@@ -14,7 +14,7 @@ def request_for(stage='preview', **changes):
     from app.services.studio.lesson_validator import LessonDraft
     return ProviderRequest(**{
         'stage': stage, 'system_instruction': 'Retorne somente JSON em português brasileiro.',
-        'material': {'text': 'RNA mensageiro'},
+        'material': {'text': 'RNA mensageiro', **({'configuration': {'duration_minutes': 50}} if stage == 'lesson' else {})},
         'response_schema': (PreviewPlan if stage == 'preview' else LessonDraft).model_json_schema(),
         'deadline': monotonic() + 2, 'prompt_version': 'test-v1', **changes,
     })
@@ -26,7 +26,7 @@ def completion(content='{}', **changes):
             'usage': {'prompt_tokens': 900, 'completion_tokens': 1100}, **changes}
 
 
-@pytest.mark.parametrize('stage,effort', [('preview', 'none'), ('lesson', 'low')])
+@pytest.mark.parametrize('stage,effort', [('preview', 'none'), ('lesson', 'none')])
 def test_structured_completion_uses_full_schema_and_actual_usage(monkeypatch, stage, effort):
     from app.integrations.nvidia_client import NVIDIAProvider
     monkeypatch.setenv('NVIDIA_API_KEY', 'test-private-key')
@@ -42,19 +42,29 @@ def test_structured_completion_uses_full_schema_and_actual_usage(monkeypatch, st
         assert body['stream'] is False
         assert body['temperature'] == 1 and body['top_p'] == 0.95
         assert body['max_tokens'] == 8000
-        assert body['response_format'] == {'type': 'json_schema', 'json_schema': {
-            'name': 'PreviewPlan' if stage == 'preview' else 'LessonDraft', 'schema': req.response_schema}}
+        assert body['response_format']['type'] == 'json_schema'
+        schema = body['response_format']['json_schema']['schema']
+        if stage == 'lesson':
+            assert 'CompactSection' in schema['$defs']
+        else:
+            assert schema == req.response_schema
         assert not body.get('tools') and body['tool_choice'] == 'none'
         assert body['messages'][0]['role'] == 'system'
-        assert json.loads(body['messages'][1]['content']) == req.material
-        return httpx.Response(200, json=completion())
+        material = json.loads(body['messages'][1]['content'])
+        assert all(material[k] == v for k, v in req.material.items())
+        from test_nvidia_compact_lesson import compact_lesson
+        return httpx.Response(200, json=completion(content=json.dumps(compact_lesson()) if stage == 'lesson' else '{}'))
 
     async def run():
         provider = NVIDIAProvider(transport=httpx.MockTransport(upstream))
         estimate = await provider.count_input_tokens(req)
         assert 1000 < estimate < 12000 and seen == []
         result = await provider.complete(req)
-        assert result.content == b'{}'
+        if stage == 'lesson':
+            from app.services.studio.lesson_validator import LessonDraft
+            assert len(LessonDraft.model_validate_json(result.content).slides) == 4
+        else:
+            assert result.content == b'{}'
         assert result.metadata.provider == 'nvidia'
         assert result.metadata.input_tokens == 900 and result.metadata.output_tokens == 1100
         assert result.metadata.prompt_version == 'test-v1'

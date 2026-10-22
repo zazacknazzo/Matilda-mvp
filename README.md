@@ -162,7 +162,19 @@ autorização, o comando NVIDIA tem teto de **3 chamadas / 180 segundos**:
 .venv/bin/python scripts/smoke_studio_nvidia.py --allow-paid-nvidia
 ```
 
-O relatório exige as prévias CRISPR/RNA e uma aula de 50 minutos com leitura e
+Para diagnosticar somente a geração sem pagar pelas prévias novamente, há um
+[smoke lesson isolado](docs/studio-nvidia-lesson-timeout.md): preparação pedagógica
+explicitamente simulada por API, ciência canônica real em cache, uma inferência
+lesson real, leitura/idempotência e Markdown. Exige autorização separada:
+
+```sh
+.venv/bin/python scripts/smoke_studio_nvidia_lesson.py --env-file .env --allow-paid-nvidia
+```
+
+Teto de uma chamada/100 s totais, preservando os 75 s do backend e a reserva de
+5 s. Esse ensaio isolado não comprova o fluxo completo real.
+
+O relatório do smoke completo exige as prévias CRISPR/RNA e uma aula de 50 minutos com leitura e
 Markdown. O smoke usa fontes bibliográficas reais em cache datado e SQLite separado.
 O resultado controlado da suíte não comprova inferência NVIDIA em produção.
 
