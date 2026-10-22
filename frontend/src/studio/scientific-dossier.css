@@ -1,0 +1,44 @@
+.forensics-studio-bridge,
+.scientific-dossier {
+  font:
+    1rem/1.6 system-ui,
+    sans-serif;
+  max-width: 72rem;
+  margin: 1rem auto;
+  padding: clamp(1rem, 3vw, 2rem);
+  color: #17352b;
+  background: #fbfcf8;
+  border: 1px solid #cbd7cf;
+  border-radius: 0.75rem;
+  overflow-wrap: anywhere;
+}
+.forensics-studio-bridge button,
+.scientific-dossier button {
+  padding: 0.6rem 1rem;
+  min-height: 44px;
+  white-space: normal;
+  font: inherit;
+  cursor: pointer;
+}
+.forensics-studio-bridge :focus-visible,
+.scientific-dossier :focus-visible {
+  outline: 3px solid #6750b4;
+  outline-offset: 3px;
+}
+.scientific-dossier pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.scientific-dossier-source {
+  border-left: 3px solid #7256a5;
+  padding-left: 1rem;
+  margin-block: 1.5rem;
+}
+.scientific-dossier blockquote {
+  white-space: pre-wrap;
+  margin-inline: 1rem;
+}
+.scientific-dossier h2:focus {
+  outline: 3px solid #6750b4;
+  outline-offset: 3px;
+}
