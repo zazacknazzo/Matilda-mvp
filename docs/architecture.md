@@ -84,8 +84,8 @@ os resultados e todas as limitações. Não há endpoint de aprovação editoria
 `api/studio_preview.py` compõe somente POST `/api/studio/preview` e GET
 `/api/studio/previews/{id}` em `main.py`. A leitura do corpo é limitada em
 streaming antes do Pydantic; erros usam StudioError. Os schemas M0 permanecem
-inalterados. Revisão, geração e exportação Studio continuam reservadas às
-portas/consumidores dos tickets posteriores.
+inalterados. A composição T10 abaixo conecta revisão, geração, consulta e exportação às
+portas existentes, sem substituir os contratos ou renderizadores.
 
 `services/studio/preview.py` usa `build_scientific_context` e
 `search_context_contributions` de T04. O planner recebe documentos e IDs
@@ -114,3 +114,28 @@ O frontend mantém os modos montados ao alternar. StudioWorkspace usa o cliente
 HTTP real e navegação por hash para retomar a prévia. ReviewWorkspace e
 LessonWorkspace existentes permanecem módulos independentes, sem mocks em
 produção ou botões que aparentem executar revisão/geração ainda não integradas.
+
+
+## Studio — integração T10
+
+`api/studio_runtime.py` compõe POST de revisão, o router de geração T09, GET
+lesson e o router Markdown T11. `get_repository` fornece `StudioRepository`,
+que estende a persistência T05 no mesmo banco; `get_provider` continua criando
+apenas o adaptador Gemini real e permite substituição explícita nos testes.
+
+`services/studio/runtime_repository.py` grava revisão e operações de geração em
+transações curtas, com comparação da revisão, ownership, expiração e idempotência.
+Prévia e geração compartilham admissão/capacidade. Nenhuma transação atravessa
+uma chamada de rede. O fingerprint comum mora em `generation_identity.py`;
+o adaptador isolado T09 permanece exclusivo dos testes/harnesses.
+
+A publicação da prévia grava um snapshot científico separado e validado no
+servidor. A geração reutiliza esse snapshot, incluindo Papers e evidências,
+sem consultar novamente uma investigação que pode ter expirado. A migração é
+aditiva. Prévias anteriores sem snapshot permanecem consultáveis; precisam de
+nova prévia para gerar com autoridade verificável.
+
+`StudioWorkspace` conecta os componentes T05/T07/T09/T08 a APIs reais. As rotas
+hash de revisão, geração e aula retomam o estado persistido da sessão; a entrega
+consulta o bundle imutável retornado pela geração. Campos científicos e contratos
+M0 permanecem inalterados. Detalhes de verificação em `studio-flow-t10.md`.

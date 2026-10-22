@@ -132,7 +132,10 @@ async def create_preview(*, request, project, documents, session_id, provider, r
                 generation_status='idle', project=project, source_documents=documents,
             )
             preview.validate_scientific_authority(matches, references, concepts=editorial, papers=papers)
-            await repository.publish_preview(session_id=session_id, preview=preview, now=now())
+            await repository.publish_preview(session_id=session_id, preview=preview, now=now(), scientific_snapshot={
+                'matches': [m.model_dump() for m in matches], 'references': {k: v.model_dump() for k, v in references.items()},
+                'concepts': [c.model_dump() for c in editorial], 'papers': [p.model_dump() for p in papers],
+            })
             return preview
         except ProviderFailure as exc:
             if exc.reason not in ('rate_limited', 'unavailable') or attempt + 1 == POLICY.max_provider_attempts:

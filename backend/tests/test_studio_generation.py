@@ -412,6 +412,10 @@ def test_wall_deadline_cancels_uncooperative_async_transport_and_preserves_revie
     run(scenario())
 
 
-def test_app_does_not_select_a_test_provider_or_mount_generation_implicitly():
+def test_production_mounts_generation_with_real_provider_only():
     from app.main import app
-    assert '/api/studio/generate' not in app.openapi()['paths']
+    assert '/api/studio/generate' in app.openapi()['paths']
+    from app.api.studio_preview import get_provider
+    from app.integrations.gemini_client import GeminiProvider
+    assert isinstance(get_provider(), GeminiProvider)
+    assert get_provider not in app.dependency_overrides

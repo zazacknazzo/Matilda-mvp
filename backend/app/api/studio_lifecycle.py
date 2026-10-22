@@ -5,14 +5,14 @@ from datetime import datetime, timezone
 import logging
 import sqlite3
 
-from app.services.studio.repository import PreviewRepository
+from app.services.studio.runtime_repository import StudioRepository
 
 log = logging.getLogger('matilda.studio')
 
 
 async def cleanup():
     try:
-        await PreviewRepository().cleanup_expired(now=datetime.now(timezone.utc).isoformat())
+        await StudioRepository().cleanup_expired(now=datetime.now(timezone.utc).isoformat())
     except sqlite3.Error:
         # A cleanup failure must not prevent the independent Forensics from starting.
         log.warning('studio_cleanup_failed code=storage_unavailable')

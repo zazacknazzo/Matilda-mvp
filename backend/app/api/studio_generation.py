@@ -1,7 +1,7 @@
 """T09 composable POST handler. Registration with production belongs to T10."""
 from collections.abc import Awaitable, Callable
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse, Response
 from pydantic import ValidationError
 
@@ -12,15 +12,15 @@ from app.studio.ports import POLICY, RepositoryConflict
 
 
 def create_generation_router(
-    service: GenerationService,
+    service: GenerationService | None,
     resolve_session: Callable[[Request], Awaitable[str | None]],
     renew_session_cookie: Callable[[Request, Response, str], None],
-    *, trusted_origins: frozenset[str],
+    *, trusted_origins: frozenset[str], service_dependency=None,
 ) -> APIRouter:
     router = APIRouter()
 
     @router.post('/api/studio/generate')
-    async def generate(http: Request):
+    async def generate(http: Request, active_service=Depends(service_dependency or (lambda: service))):
         admitted_expiry = []
         try:
             headers = GenerationHeaders.model_validate({'Origin': http.headers.get('origin'), 'Idempotency-Key': http.headers.get('idempotency-key')})
@@ -35,7 +35,7 @@ def create_generation_router(
             session_id = await resolve_session(http)
             if not session_id:
                 raise generation_error('not_found')
-            result = await service.generate(session_id=session_id, request=request, idempotency_key=headers.idempotency_key,
+            result = await active_service.generate(session_id=session_id, request=request, idempotency_key=headers.idempotency_key,
                                             on_admitted=admitted_expiry.append)
             response = JSONResponse(result.bundle.model_dump(), status_code=200 if result.replayed else 201, headers={'Cache-Control': 'no-store'})
             if not result.replayed:

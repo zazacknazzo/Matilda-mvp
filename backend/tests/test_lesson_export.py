@@ -163,9 +163,9 @@ def test_invalid_formats_or_parameters_fail_before_repository(query):
     assert not repo.calls
 
 
-def test_export_route_is_not_registered_in_production_and_bad_content_does_not_leak():
+def test_export_route_is_registered_in_production_and_bad_content_does_not_leak():
     from app.main import app
-    assert not any(getattr(route, 'path', '').endswith('/export') and '/studio/' in route.path for route in app.routes)
+    assert '/api/studio/lessons/{lesson_bundle_id}/export' in app.openapi()['paths']
     bundle = fixture()
     bundle.references[0].source_url = 'javascript:SECRET'
     with client_for(ReadOnlyRepository(bundle)) as client:
