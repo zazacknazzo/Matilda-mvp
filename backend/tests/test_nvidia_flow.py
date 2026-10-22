@@ -58,6 +58,7 @@ def test_both_scientific_paths_produce_50_minute_lesson_resume_and_markdown(clie
 @pytest.mark.parametrize('failure,attempts,code,retryable', [
     (401, 1, 'provider_unavailable', False), (403, 1, 'provider_unavailable', False),
     (400, 1, 'invalid_generation', False), (422, 1, 'invalid_generation', False),
+    (202, 1, 'invalid_generation', False),
     (429, 2, 'provider_unavailable', True), (503, 2, 'provider_unavailable', True),
     ('invalid_json', 2, 'invalid_generation', True), ('invalid_schema', 2, 'invalid_generation', True),
     ('truncated', 1, 'invalid_generation', True),

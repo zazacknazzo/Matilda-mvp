@@ -117,7 +117,11 @@ class NVIDIAProvider:
             raise ProviderFailure('unauthorized')
         if status == 429:
             raise ProviderFailure('rate_limited')
-        if status == 202 or status >= 500:
+        if status == 202:
+            # Already accepted upstream. Retrying POST could create paid duplicate work.
+            event['outcome'] = 'pending_response'
+            raise conflict('invalid_generation', 'A NVIDIA aceitou a operação, mas o resultado está pendente. Não foi iniciada outra inferência.', retryable=False)
+        if status >= 500:
             raise ProviderFailure('unavailable')
         event['outcome'] = 'invalid_request'
         raise conflict('invalid_generation', 'A requisição ou o JSON Schema não foi aceito pela NVIDIA.', retryable=False)

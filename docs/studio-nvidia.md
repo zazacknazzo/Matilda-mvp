@@ -29,7 +29,12 @@ corpo. Respostas são lidas em blocos com teto de 128 KiB **antes** do parsing.
 O deadline é o mesmo nas duas tentativas controladas pelos serviços: 45 s na
 prévia, 75 s na aula, com os 5 s de reserva de persistência existentes na geração.
 A admissão SQLite mantém uma operação por sessão e duas globais, entre os estágios.
-O adaptador não tem retries próprios nem faz polling de respostas HTTP 202.
+O adaptador não tem retries próprios. HTTP 202 já é trabalho aceito: falha como
+resposta pendente, sem iniciar outro POST. A página do endpoint menciona polling
+por requestId, mas não especifica nela a rota/protocolo de consulta; não se
+inventa uma URL, não se segue Location arbitrário e não se aumenta o deadline.
+Polling/reconciliação de uma operação NVIDIA pendente continua uma limitação
+explícita; o estado docente local é preservado para consulta/tentativa explícita.
 
 | Estágio | reasoning_effort | stream | temperature | top_p | Saída |
 |---|---|---|---|---|---|
@@ -107,7 +112,8 @@ envelope HTTP M0, sem alterar contratos públicos. Telemetria mantém a distinç
 | 400/422, redirects/outro HTTP incompatível | invalid_request | invalid_generation, sem retry |
 | 401/403 | unauthorized | provider_unavailable, sem retry |
 | 429 | rate_limited | provider_unavailable, até 2 tentativas |
-| 5xx, rede, 202 não concluído | unavailable | provider_unavailable, até 2 tentativas |
+| 5xx, rede | unavailable | provider_unavailable, até 2 tentativas |
+| 202 aceito/pendente | pending_response | invalid_generation, sem novo POST automático |
 | Timeout/deadline | timeout | generation_timeout, sem prazo novo |
 | JSON inválido/duplicado/não objeto | invalid_json | invalid_generation após até 2 tentativas |
 | Envelope/metadados incompatíveis | invalid_response | invalid_generation após até 2 tentativas |
@@ -168,7 +174,7 @@ npm run build
 node node_modules/@playwright/test/cli.js test --config playwright.studio.config.ts
 ```
 
-Resultado desta versão: **617 backend**, **7 fixtures científicas**, **40 payloads
+Resultado desta versão: **619 backend**, **7 fixtures científicas**, **40 payloads
 Studio**, **4 fixtures LessonBundle**, TypeScript/build e **20 E2E integrados**
 aprovados. MockTransport exercita ambos os estágios, erros HTTP, limite de
 entrada/saída/corpo, deadline, credenciais ausentes, URL insegura, ausência de

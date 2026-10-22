@@ -67,7 +67,7 @@ def test_structured_completion_uses_full_schema_and_actual_usage(monkeypatch, st
     (400, None, 'invalid_generation'), (422, None, 'invalid_generation'),
     (401, 'unauthorized', None), (403, 'unauthorized', None),
     (429, 'rate_limited', None), (500, 'unavailable', None), (503, 'unavailable', None),
-    (302, None, 'invalid_generation'), (202, 'unavailable', None),
+    (302, None, 'invalid_generation'), (202, None, 'invalid_generation'),
 ])
 def test_http_failures_are_classified_and_never_expose_upstream(monkeypatch, caplog, status, reason, code):
     from app.integrations.nvidia_client import NVIDIAProvider
