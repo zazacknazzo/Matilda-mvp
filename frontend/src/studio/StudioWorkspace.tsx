@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { EnrichmentPreview, PreviewRequest } from "../types/studio";
-import { studioApi, StudioApiError } from "./api";
+import { studioApi, StudioApiError, studioErrorMessage } from "./api";
 import { StudioSetup, initialSetup } from "./StudioSetup";
 import { PreviewPanel } from "./PreviewPanel";
 import "./studio.css";
@@ -23,6 +23,9 @@ export function StudioWorkspace() {
         const result = await studioApi.getPreview(decodeURIComponent(match[1]));
         if (!active) return;
         setPreview(result);
+        setError(
+          result.last_error ? studioErrorMessage(result.last_error.code) : "",
+        );
         setEditing(false);
         setSetup({
           title: result.project.title,

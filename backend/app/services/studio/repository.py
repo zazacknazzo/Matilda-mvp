@@ -76,10 +76,16 @@ class PreviewRepository:
                 raise conflict('session_limit', 'Limite de cinco prévias por hora. Aguarde antes de tentar novamente.', retryable=True)
             if db.execute('SELECT COUNT(*) FROM studio_preview_operations').fetchone()[0] >= POLICY.global_concurrency:
                 raise conflict('provider_unavailable', 'Studio ocupado. Tente novamente em instantes.', retryable=True)
+            retained_project = project
             if existing:
-                project.created_at = LessonProject.model_validate_json(existing[1]).created_at
+                # A failed new preview must not replace the last usable state.
+                retained_project = LessonProject.model_validate_json(existing[1])
+                project.created_at = retained_project.created_at
+                retained_project.updated_at = project.updated_at
+                retained_project.last_teacher_activity_at = project.last_teacher_activity_at
+                retained_project.expires_at = project.expires_at
             db.execute('INSERT INTO studio_sessions VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET expires_at=excluded.expires_at', (session_id, project.expires_at))
-            db.execute('INSERT INTO lesson_projects VALUES (?, ?, ?, ?, ?, NULL) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload, request=excluded.request, expires_at=excluded.expires_at, last_error=NULL', (project.id, session_id, project.model_dump_json(), request.model_dump_json(), project.expires_at))
+            db.execute('INSERT INTO lesson_projects VALUES (?, ?, ?, ?, ?, NULL) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload, request=excluded.request, expires_at=excluded.expires_at, last_error=NULL', (project.id, session_id, retained_project.model_dump_json(), request.model_dump_json(), project.expires_at))
             for document in documents:
                 db.execute('INSERT INTO source_documents VALUES (?, ?, ?)', (document.id, project.id, document.model_dump_json()))
             db.execute('INSERT INTO studio_preview_operations VALUES (?, ?, ?)', (project.id, session_id, timestamp + POLICY.preview_backend_seconds + POLICY.recovery_grace_seconds))
@@ -107,7 +113,7 @@ class PreviewRepository:
     async def get_preview(self, *, session_id, preview_id, now):
         with self.transaction() as db:
             self._cleanup(db, now)
-            row = db.execute('SELECT e.payload, p.payload FROM enrichment_previews e JOIN lesson_projects p ON p.id=e.project_id JOIN studio_sessions s ON s.id=p.session_id WHERE e.id=? AND p.session_id=? AND p.expires_at>? AND s.expires_at>?', (preview_id, session_id, now, now)).fetchone()
+            row = db.execute('SELECT e.payload, p.payload, p.last_error FROM enrichment_previews e JOIN lesson_projects p ON p.id=e.project_id JOIN studio_sessions s ON s.id=p.session_id WHERE e.id=? AND p.session_id=? AND p.expires_at>? AND s.expires_at>?', (preview_id, session_id, now, now)).fetchone()
             if not row:
                 return None
             payload = json.loads(row[0])
@@ -116,6 +122,7 @@ class PreviewRepository:
             for key in ('updated_at', 'last_teacher_activity_at', 'expires_at'):
                 payload['project'][key] = project[key]
             payload['expires_at'] = project['expires_at']
+            payload['last_error'] = json.loads(row[2]) if row[2] else None
             return EnrichmentPreview.model_validate(payload)
 
     async def append_documents(self, *, session_id, project_id, documents, now):

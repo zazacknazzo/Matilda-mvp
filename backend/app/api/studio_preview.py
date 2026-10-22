@@ -70,30 +70,30 @@ async def post_preview(http: Request, provider=Depends(get_provider), repository
     token = http.cookies.get(SESSION_COOKIE) or secrets.token_urlsafe(32)
     session_id = owner(token)
     try:
-        allowed = os.getenv('MATILDA_CORS_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173').split(',')
-        if http.headers.get('origin') not in [origin.strip() for origin in allowed]:
-            raise conflict('invalid_input', 'Origem de escrita não autorizada.')
-        body = bytearray()
-        async for chunk in http.stream():
-            if len(body) + len(chunk) > POLICY.max_body_bytes:
-                raise conflict('input_too_large', 'Corpo excede 128 KiB.')
-            body.extend(chunk)
-        request = PreviewRequest.model_validate_json(bytes(body))
-        timestamp = now()
-        project = LessonProject(id=request.project_id or str(uuid4()), title=request.title, subject=request.subject,
-                                education_level=request.education_level, duration_minutes=request.duration_minutes,
-                                learning_objectives=request.objectives, status='draft', created_at=timestamp, updated_at=timestamp,
-                                last_teacher_activity_at=timestamp, expires_at=(datetime.fromisoformat(timestamp) + timedelta(days=7)).isoformat())
-        documents = original_documents(request, project.id)
-        await repository.save_material(session_id=session_id, project=project, request=request, documents=documents, now=timestamp)
-        admitted = True
         async with asyncio.timeout(max(0, started + POLICY.preview_backend_seconds - monotonic())):
+            allowed = os.getenv('MATILDA_CORS_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173').split(',')
+            if http.headers.get('origin') not in [origin.strip() for origin in allowed]:
+                raise conflict('invalid_input', 'Origem de escrita não autorizada.')
+            body = bytearray()
+            async for chunk in http.stream():
+                if len(body) + len(chunk) > POLICY.max_body_bytes:
+                    raise conflict('input_too_large', 'Corpo excede 128 KiB.')
+                body.extend(chunk)
+            request = PreviewRequest.model_validate_json(bytes(body))
+            timestamp = now()
+            project = LessonProject(id=request.project_id or str(uuid4()), title=request.title, subject=request.subject,
+                                    education_level=request.education_level, duration_minutes=request.duration_minutes,
+                                    learning_objectives=request.objectives, status='draft', created_at=timestamp, updated_at=timestamp,
+                                    last_teacher_activity_at=timestamp, expires_at=(datetime.fromisoformat(timestamp) + timedelta(days=7)).isoformat())
+            documents = original_documents(request, project.id)
+            await repository.save_material(session_id=session_id, project=project, request=request, documents=documents, now=timestamp)
+            admitted = True
             preview = await create_preview(request=request, project=project, documents=documents, session_id=session_id,
-                                           provider=provider, repository=repository, deadline=started + POLICY.preview_backend_seconds, now=now)
-        response = JSONResponse(preview.model_dump(), status_code=201, headers={'Cache-Control': 'no-store'})
-        set_session(response, token, http.url.scheme == 'https', project.expires_at)
-        log.info('preview_complete id=%s model=%s seconds=%.3f', preview.preview_id, preview.generation_metadata.model, monotonic()-started)
-        return response
+                                               provider=provider, repository=repository, deadline=started + POLICY.preview_backend_seconds, now=now)
+            response = JSONResponse(preview.model_dump(), status_code=201, headers={'Cache-Control': 'no-store'})
+            set_session(response, token, http.url.scheme == 'https', project.expires_at)
+            log.info('preview_complete id=%s model=%s seconds=%.3f', preview.preview_id, preview.generation_metadata.model, monotonic()-started)
+            return response
     except ValidationError:
         error = StudioError(code='invalid_input', detail='Entrada inválida: confira campos, tipos e limites.', retryable=False)
     except RepositoryConflict as exc:

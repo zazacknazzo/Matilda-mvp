@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test("texto CRISPR chega à prévia persistida com fontes e sessão isolada", async ({
   page,
   browser,
-}) => {
+}, testInfo) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Studio — Criar aula" }).click();
   await page.getByLabel("Título da aula").fill("Edição genética");
@@ -24,6 +24,10 @@ test("texto CRISPR chega à prévia persistida com fontes e sessão isolada", as
   await expect(
     page.getByRole("link", { name: "Abrir fonte original" }).first(),
   ).toHaveAttribute("href", /^https:\/\//);
+  await page.screenshot({
+    path: testInfo.outputPath("studio-preview-desktop.png"),
+    fullPage: true,
+  });
   const hash = new URL(page.url()).hash;
   await page.reload();
   await expect(
@@ -75,7 +79,7 @@ test("sem cobertura e falha do provedor preservam uma experiência honesta", asy
 
 test("formulário e prévia funcionam no celular com teclado e HTML como texto", async ({
   page,
-}) => {
+}, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/#studio");
   await page.getByLabel("Título da aula").fill("CRISPR");
@@ -87,6 +91,10 @@ test("formulário e prévia funcionam no celular com teclado e HTML como texto",
   await expect(
     page.getByRole("heading", { name: "Prévia de enriquecimento" }),
   ).toBeVisible();
+  await page.screenshot({
+    path: testInfo.outputPath("studio-preview-mobile.png"),
+    fullPage: true,
+  });
   expect(await page.evaluate(() => "pwned" in window)).toBe(false);
   expect(
     await page.evaluate(

@@ -24,6 +24,13 @@ const messages: Record<StudioErrorCode, string> = {
     "A prévia excedeu o prazo. O material foi preservado. Tente novamente explicitamente.",
 };
 
+export function studioErrorMessage(code: StudioErrorCode): string {
+  return (
+    messages[code] ||
+    "Não foi possível consultar o Studio. O material foi preservado."
+  );
+}
+
 export class StudioApiError extends Error {
   constructor(
     message: string,

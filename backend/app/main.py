@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
+from app.api.studio_lifecycle import studio_lifespan
 from app.integrations.openalex import retrieve_paper
 from app.schemas import Analysis, AnalysisRequest, Paper, Graph, Evidence
 from app.services.contribution_search import search_contributions
@@ -19,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger('httpx').setLevel(logging.WARNING)
 logging.getLogger('httpcore').setLevel(logging.WARNING)
 log = logging.getLogger('matilda')
-app = FastAPI(title='Matilda Forensics', version='0.1.0', description='Investigação documental de contribuições científicas. Relação temática não comprova influência histórica.')
+app = FastAPI(lifespan=studio_lifespan, title='Matilda Forensics', version='0.1.0', description='Investigação documental de contribuições científicas. Relação temática não comprova influência histórica.')
 app.add_middleware(CORSMiddleware, allow_origins=os.getenv('MATILDA_CORS_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173').split(','), allow_methods=['GET', 'POST'], allow_headers=['Content-Type'])
 
 @app.get('/api/health')

@@ -433,3 +433,49 @@ def test_cookie_expiry_matches_admitted_project_even_after_provider_delay(client
     assert 'Max-Age=604780' in cookie
     expiry = next(part.strip()[8:] for part in cookie.split(';') if part.strip().startswith('expires='))
     assert parsedate_to_datetime(expiry).timestamp() == int(datetime.fromisoformat(response.json()['expires_at']).timestamp())
+
+
+def test_failed_new_preview_exposes_error_without_losing_previous_preview(client, provider, monkeypatch):
+    from datetime import timedelta
+    from app.studio.ports import ProviderFailure
+    import app.api.studio_preview as api
+    current = datetime.now(timezone.utc)
+    monkeypatch.setattr(api, 'now', lambda: current.isoformat())
+    first = client.post('/api/studio/preview', json=REQUEST, headers=ORIGIN).json()
+    current += timedelta(days=1)
+    original = provider.complete
+    async def fail(request):
+        raise ProviderFailure('unauthorized')
+    provider.complete = fail
+    failed = client.post('/api/studio/preview', json={**REQUEST, 'title': 'Nova configuração', 'project_id': first['project_id']}, headers=ORIGIN)
+    assert failed.status_code == 503
+    resumed = client.get('/api/studio/previews/' + first['preview_id']).json()
+    assert resumed['last_error'] == failed.json()
+    assert resumed['project']['title'] == REQUEST['title']
+    assert resumed['project']['status'] == 'preview_ready'
+    assert resumed['source_documents'] == first['source_documents']
+    assert resumed['scientific_context'] == first['scientific_context']
+    assert resumed['expires_at'] != first['expires_at']
+    provider.complete = original
+    successful = client.post('/api/studio/preview', json={**REQUEST, 'project_id': first['project_id']}, headers=ORIGIN)
+    assert successful.status_code == 201
+    assert client.get('/api/studio/previews/' + first['preview_id']).json()['last_error'] is None
+
+
+def test_total_deadline_includes_slow_request_body(client, provider, monkeypatch):
+    import asyncio
+    import httpx
+    from dataclasses import replace
+    import app.api.studio_preview as api
+    monkeypatch.setattr(api, 'POLICY', replace(api.POLICY, preview_backend_seconds=0.02))
+    async def body():
+        yield b'{'
+        await asyncio.sleep(0.1)
+        yield b'}'
+    async def journey():
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://testserver') as api_client:
+            response = await api_client.post('/api/studio/preview', content=body(), headers=ORIGIN)
+            assert response.status_code == 504
+            assert response.json()['project_id'] is None
+    asyncio.run(journey())
+    assert provider.requests == []

@@ -103,6 +103,9 @@ Inclui as cinco tabelas Studio e tabelas auxiliares de sessão, admissão e cota
 não modifica tabelas Forensics. Admissão/publicação são transações curtas,
 sem transação na chamada externa. Ownership é um hash do token opaco HttpOnly.
 Operações abandonadas liberam a admissão após 45 + 15 s. GET não renova o prazo.
+O lifespan limpa expirados ao iniciar e a cada hora, sem depender de um acesso
+Studio. Nova tentativa mantém o último projeto utilizável até publicar, e GET
+materializa o erro corrente separado dos originais/snapshots anteriores.
 O bloqueio persistido impede duas operações ativas da mesma sessão. A chave
 idempotente de geração pertence ao futuro endpoint `/generate`; T05 não cria
 semântica concorrente para POST de prévia.

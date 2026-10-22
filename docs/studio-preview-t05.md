@@ -52,6 +52,8 @@ final permanecem nos próximos tickets; os módulos T07/T08 não foram modificad
   sob HTTPS. Só o hash do token é armazenado; ownership não chega à resposta.
   Sessão e projeto recebem sete dias na admissão; cookie usa o prazo admitido,
   descontando a execução. GET não renova. Limpar cookie impede retomada.
+- Limpeza de expirados no início e a cada hora, além dos acessos Studio;
+  operações admitidas continuam protegidas até deadline + tolerância.
 - Admissão/cota persistidas e atômicas: uma operação por sessão, duas globais,
   cinco prévias por hora. Operação interrompida libera após 45 + 15 s. Transação
   SQLite não permanece aberta na rede. Conflito ativo é 409; cota é 429 com
@@ -70,8 +72,8 @@ Ambiente: macOS arm64, Python 3.14, Node 26.10, SDK Google 2.32.0,
 SQLite local temporário. Os requisitos mínimos do README permanecem Python 3.12+
 e Node 22+. Testes não declaram ensaio em todas essas versões.
 
-- `.venv/bin/python -m pytest backend/tests -q`: 427 testes aprovados, incluindo
-  41 novos testes T05 na fronteira HTTP com SQLite real e provedor controlado.
+- `.venv/bin/python -m pytest backend/tests -q`: 429 testes aprovados, incluindo
+  43 novos testes T05 na fronteira HTTP com SQLite real e provedor controlado.
 - `npm run build` em frontend: TypeScript e Vite aprovados.
 - `scripts/check_studio_contract.py`: 40 payloads; `check_scientific_contract.py`:
   7 fixtures; `node scripts/check_lesson_types.mjs`: 4 fixtures, aprovados.
@@ -113,3 +115,15 @@ Referências oficiais consultadas para o adaptador:
 Produção mantém a implementação real como único provedor. A composição que
 substitui Gemini está exclusivamente em `backend/tests/studio_e2e_app.py` e é
 iniciada pelo Playwright em porta/banco temporários; não há flag de mock no app.
+
+
+## Revisão da implementação
+
+Primeira passagem de code-review contra `main` `de5abcb`, em agentes separados:
+Standards: um P2 (último erro/estado na retomada); Spec: dois P2 (limpeza sem
+lifecycle e leitura do corpo fora do prazo total). Todos corrigidos sem mudar
+schemas compartilhados. Regressões HTTP falharam antes e passaram após os ajustes.
+A conferência operacional de retenção, com relógio controlado e reinício real do
+lifespan, removeu 2 documentos expirados antes de qualquer acesso Studio e
+preservou a investigação Forensics. Essa verificação de armazenamento é registrada
+separadamente dos testes de comportamento HTTP.
