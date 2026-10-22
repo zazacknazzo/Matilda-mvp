@@ -1,12 +1,14 @@
+@import "./design-system.css";
+
 :root {
   font-family: Arial, Helvetica, sans-serif;
-  color: #233e33;
-  background: #f6f5ef;
+  color: var(--matilda-ink);
+  background: var(--matilda-canvas);
   font-synthesis: none;
   line-height: 1.6;
-  --green: #264f43;
+  --green: var(--matilda-action);
   --line: #dce0d5;
-  --paper: #fdfcf7;
+  --paper: var(--matilda-sheet);
 }
 * {
   box-sizing: border-box;
@@ -50,7 +52,7 @@ h3 {
   margin-bottom: 12px;
 }
 p {
-  color: #566b60;
+  color: var(--matilda-text);
 }
 svg {
   flex-shrink: 0;
@@ -95,19 +97,19 @@ select:focus-visible,
 .brand-sub {
   display: block;
   font-family: Arial, sans-serif;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 3.5px;
   margin-top: 7px;
   padding-left: 2px;
   font-weight: 600;
 }
 .header-center {
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 2px;
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #657569;
+  color: var(--matilda-caption);
 }
 .live-dot {
   display: inline-block;
@@ -135,7 +137,7 @@ select:focus-visible,
   gap: 55px;
 }
 .eyebrow {
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 1.8px;
   font-weight: 700;
   color: #657160;
@@ -177,7 +179,7 @@ select:focus-visible,
   max-width: 465px;
 }
 .doi-form > label {
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 1.2px;
   font-weight: 700;
   display: block;
@@ -221,7 +223,7 @@ select:focus-visible,
   flex-shrink: 0;
 }
 .doi-form > p {
-  font-size: 10px;
+  font-size: 12px;
   margin: 9px 0 23px;
   color: #64745f;
 }
@@ -232,9 +234,9 @@ select:focus-visible,
   gap: 10px;
 }
 .examples > span {
-  font-size: 10px;
+  font-size: 12px;
   flex: 0 0 100%;
-  color: #69786b;
+  color: var(--matilda-caption);
 }
 .examples > button {
   flex: 1;
@@ -261,7 +263,7 @@ select:focus-visible,
 }
 .examples small {
   display: block;
-  font-size: 9px;
+  font-size: 11px;
   color: #62735b;
   margin-top: 1px;
 }
@@ -278,7 +280,7 @@ select:focus-visible,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 1.8px;
   border-top: 1px solid #cfd6c8;
   padding: 14px 0;
@@ -359,7 +361,7 @@ select:focus-visible,
 .orbit-label small {
   display: block;
   color: #617357;
-  font-size: 8px;
+  font-size: 10px;
   margin-top: 3px;
 }
 .orbit-paper {
@@ -386,7 +388,7 @@ select:focus-visible,
   width: 9px;
   height: 9px;
   background: #6d8260;
-  border: 3px solid #f6f5ef;
+  border: 3px solid var(--matilda-canvas);
   outline: 1px solid #8f9d84;
   border-radius: 50%;
 }
@@ -406,7 +408,7 @@ select:focus-visible,
 .visual-foot {
   display: flex;
   justify-content: space-between;
-  font-size: 9px;
+  font-size: 11px;
   color: #627357;
   border-bottom: 1px solid #d0d8c8;
   padding: 13px 0;
@@ -419,7 +421,7 @@ select:focus-visible,
   color: #617653;
 }
 .scientific-note p {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.9;
   margin: 0;
 }
@@ -447,7 +449,7 @@ select:focus-visible,
   color: #637556;
 }
 .method-number {
-  font-size: 9px;
+  font-size: 11px;
   color: #637556;
   align-self: flex-start;
   margin-top: 2px;
@@ -458,7 +460,7 @@ select:focus-visible,
   margin: 0 0 7px;
 }
 .method-strip p {
-  font-size: 10px;
+  font-size: 12px;
   color: #627257;
   margin: 0;
 }
@@ -467,7 +469,7 @@ select:focus-visible,
   display: flex;
   justify-content: space-between;
   border-top: 1px solid var(--line);
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 0.7px;
   color: #61705b;
   gap: 20px;
@@ -500,7 +502,7 @@ select:focus-visible,
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 10px;
+  font-size: 12px;
   color: #607157;
   background: none;
 }
@@ -511,7 +513,7 @@ select:focus-visible,
   flex-wrap: wrap;
 }
 .badge {
-  font-size: 10px;
+  font-size: 12px;
   border: 1px solid #d8ddce;
   background: #f0f2e9;
   display: inline-flex;
@@ -534,7 +536,7 @@ select:focus-visible,
 .paper-preview {
   max-width: 900px;
   margin: 30px auto 70px;
-  background: #fdfcf7;
+  background: var(--matilda-sheet);
   border: 1px solid var(--line);
   padding: 42px;
   border-radius: 12px;
@@ -613,7 +615,7 @@ details p {
   margin-top: 14px;
 }
 .primary-button:hover {
-  background: #163f31;
+  background: var(--matilda-action-hover);
 }
 .investigation-grid {
   display: grid;
@@ -636,7 +638,7 @@ details p {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--line);
-  font-size: 9px;
+  font-size: 11px;
   color: #607157;
   gap: 8px;
 }
@@ -646,12 +648,12 @@ details p {
   align-items: center;
 }
 .panel-toolbar strong {
-  font-size: 10px;
+  font-size: 12px;
   color: #3f5747;
   font-weight: 500;
 }
 .panel-toolbar > span {
-  font-size: 8px;
+  font-size: 10px;
   white-space: nowrap;
 }
 .explorer-content {
@@ -676,12 +678,12 @@ details p {
   flex: 0 0 100%;
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 12px;
   color: #5d6c5c;
   margin-bottom: 8px;
 }
 .concept-list .badge {
-  font-size: 9px;
+  font-size: 11px;
   background: #eef0e9;
   border: 0;
 }
@@ -697,7 +699,7 @@ details p {
   font-weight: 500;
 }
 .count {
-  font-size: 9px;
+  font-size: 11px;
   background: #e5ebdd;
   border-radius: 50%;
   width: 20px;
@@ -706,13 +708,13 @@ details p {
   place-items: center;
 }
 .filter-label {
-  font-size: 9px;
+  font-size: 11px;
   display: block;
   margin-bottom: 5px;
   color: #5f735e;
 }
 .explorer select {
-  font-size: 10px;
+  font-size: 12px;
   background: #f8f8f1;
   border: 1px solid #d1d9c7;
   border-radius: 4px;
@@ -738,7 +740,7 @@ details p {
   border-left: 2px solid #47684d;
 }
 .discovery-number {
-  font-size: 8px;
+  font-size: 10px;
   color: #667653;
   padding-top: 3px;
 }
@@ -753,7 +755,7 @@ details p {
   display: block;
 }
 .discovery-card small {
-  font-size: 9px;
+  font-size: 11px;
   color: #67765e;
   display: block;
   margin: 5px 0 7px;
@@ -763,7 +765,7 @@ details p {
   color: #637653;
 }
 .mini-status {
-  font-size: 8px;
+  font-size: 10px;
   color: #546e4b;
   display: flex;
   align-items: center;
@@ -775,7 +777,7 @@ details p {
   padding-top: 16px;
 }
 .coverage summary {
-  font-size: 10px;
+  font-size: 12px;
 }
 .coverage summary svg {
   vertical-align: middle;
@@ -783,7 +785,7 @@ details p {
 }
 .coverage ul,
 .coverage p {
-  font-size: 10px;
+  font-size: 12px;
   color: #65755d;
 }
 .coverage ul {
@@ -803,7 +805,7 @@ details p {
   gap: 10px;
 }
 .center-top > .eyebrow {
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 1px;
 }
 .view-toggle {
@@ -817,7 +819,7 @@ details p {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 9px;
+  font-size: 11px;
   padding: 5px 8px;
   border-radius: 3px;
   background: none;
@@ -846,7 +848,7 @@ details p {
   color: #637653;
 }
 .graph-layers button {
-  font-size: 8px;
+  font-size: 10px;
   padding: 5px 8px;
   border-radius: 3px;
   border: 1px solid #d9dfce;
@@ -868,7 +870,7 @@ details p {
 }
 .graph-node-content > span {
   display: block;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 1.3px;
   opacity: 0.8;
   margin-bottom: 9px;
@@ -900,7 +902,7 @@ details p {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 8px;
+  font-size: 10px;
   color: #63735b;
 }
 .graph-legend i {
@@ -909,7 +911,7 @@ details p {
   border-radius: 50%;
 }
 .graph-help {
-  font-size: 9px;
+  font-size: 11px;
   margin: 0;
   padding: 0 12px 14px;
   color: #607252;
@@ -922,13 +924,13 @@ details p {
   color: #617653;
 }
 .interpretation-note p {
-  font-size: 9px;
+  font-size: 11px;
   margin: 0;
-  color: #65765b;
+  color: var(--matilda-caption);
 }
 .interpretation-note strong {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   margin-bottom: 5px;
 }
@@ -969,13 +971,13 @@ details p {
   background: #f0f2e9;
   border: 1px solid #d9dfd0;
   border-radius: 4px;
-  font-size: 9px;
+  font-size: 11px;
   padding: 7px 12px;
   min-width: 130px;
 }
 .chain-preview i {
   font-style: normal;
-  font-size: 8px;
+  font-size: 10px;
   color: #637653;
 }
 .dossier {
@@ -993,7 +995,7 @@ details p {
   align-items: center;
   gap: 6px;
   color: #486c40;
-  font-size: 9px;
+  font-size: 11px;
   margin-top: 12px;
 }
 .contribution-description {
@@ -1006,7 +1008,7 @@ details p {
   padding-top: 20px;
 }
 .dossier h3 {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -1044,7 +1046,7 @@ details p {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 8px;
+  font-size: 10px;
   color: #5b704e;
   text-decoration: none;
   margin-top: 4px;
@@ -1053,10 +1055,10 @@ details p {
   margin-top: 10px;
 }
 .dossier details p {
-  font-size: 10px;
+  font-size: 12px;
 }
 .dossier summary {
-  font-size: 9px;
+  font-size: 11px;
 }
 .thematic {
   background: #edf0f4 !important;
@@ -1064,7 +1066,7 @@ details p {
   color: #4b637e !important;
 }
 .dossier .badge {
-  font-size: 8px;
+  font-size: 10px;
 }
 .citation-status {
   display: flex;
@@ -1075,7 +1077,7 @@ details p {
   border-radius: 4px;
   padding: 10px;
   margin-top: 12px;
-  font-size: 10px;
+  font-size: 12px;
   color: #786143;
 }
 .citation-status.cited {
@@ -1107,14 +1109,14 @@ details p {
   text-decoration: underline;
 }
 .source-card p {
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.9;
   margin-top: 12px;
   margin-bottom: 0;
 }
 .limitations ul {
   padding-left: 15px;
-  font-size: 10px;
+  font-size: 12px;
   color: #606d53;
   line-height: 1.8;
 }
@@ -1165,11 +1167,11 @@ details p {
   font-weight: 500;
 }
 .text-results li p {
-  font-size: 10px;
+  font-size: 12px;
   margin: 3px 0;
 }
 .relation-text {
-  font-size: 9px;
+  font-size: 11px;
   background: #e7eddf;
   padding: 3px 9px;
   border-radius: 4px;
@@ -1185,7 +1187,7 @@ details p {
   margin: 6px 0;
   border: 1px solid #d5dec9;
   padding: 9px;
-  font-size: 10px;
+  font-size: 12px;
   border-radius: 4px;
 }
 .processing {
@@ -1346,7 +1348,7 @@ details p {
   }
   .orbit-label {
     padding: 10px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .orbit-label small {
     font-size: 7px;
@@ -1402,7 +1404,7 @@ details p {
     height: 30px;
   }
   .orbit-label {
-    font-size: 9px;
+    font-size: 11px;
     padding: 10px;
     gap: 7px;
   }
@@ -1435,7 +1437,7 @@ details p {
     font-size: 11px;
   }
   .method-strip p {
-    font-size: 9px;
+    font-size: 11px;
   }
   .method-strip > div > svg {
     width: 19px;
@@ -1463,10 +1465,10 @@ details p {
     width: 23px;
   }
   .brand-sub {
-    font-size: 8px;
+    font-size: 10px;
   }
   .site-header .quiet-button {
-    font-size: 10px;
+    font-size: 12px;
     gap: 5px;
   }
   .landing {
@@ -1476,7 +1478,7 @@ details p {
     gap: 35px;
   }
   .hero-eyebrow {
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 1.5px;
     margin-bottom: 25px;
   }
@@ -1503,10 +1505,10 @@ details p {
     min-width: 150px;
   }
   .examples strong {
-    font-size: 10px;
+    font-size: 12px;
   }
   .examples small {
-    font-size: 8px;
+    font-size: 10px;
   }
   .hero-visual {
     max-width: 500px;
@@ -1519,7 +1521,7 @@ details p {
     aspect-ratio: 1.1;
   }
   .orbit-label {
-    font-size: 10px;
+    font-size: 12px;
     padding: 12px;
   }
   .orbit-label small {
@@ -1551,13 +1553,13 @@ details p {
     font-size: 12px;
   }
   .method-strip p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .site-footer {
     padding: 22px;
     flex-direction: column;
     gap: 12px;
-    font-size: 8px;
+    font-size: 10px;
     margin-top: 15px;
   }
   .workspace {
@@ -1576,7 +1578,7 @@ details p {
     justify-content: flex-start;
   }
   .workspace-actions .badge {
-    font-size: 8px;
+    font-size: 10px;
   }
   .mobile-tabs {
     display: flex;
@@ -1590,7 +1592,7 @@ details p {
     flex: 1;
     background: none;
     padding: 10px 5px;
-    font-size: 10px;
+    font-size: 12px;
     border-radius: 3px;
   }
   .mobile-tabs button[aria-current="page"] {
@@ -1629,10 +1631,10 @@ details p {
     font-size: 12px;
   }
   .discovery-card small {
-    font-size: 10px;
+    font-size: 12px;
   }
   .mini-status {
-    font-size: 9px;
+    font-size: 11px;
   }
   .dossier {
     display: block;
@@ -1660,23 +1662,23 @@ details p {
   .paper-preview .primary-button {
     width: 100%;
     justify-content: center;
-    font-size: 10px;
+    font-size: 12px;
     padding: 14px 10px;
     gap: 7px;
   }
   .author-list {
-    font-size: 10px;
+    font-size: 12px;
   }
   .paper-preview .text-link {
-    font-size: 10px;
+    font-size: 12px;
     overflow-wrap: anywhere;
   }
   .notice {
     padding: 12px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .processing {
-    font-size: 10px;
+    font-size: 12px;
     width: max-content;
     bottom: 15px;
     padding: 13px 15px;
@@ -1702,7 +1704,7 @@ details p {
 }
 
 .automatic-discovery {
-  background: #fdfcf7;
+  background: var(--matilda-sheet);
   border: 1px solid #d4ddcd;
   border-radius: 7px;
   padding: 20px 24px;
@@ -1761,7 +1763,7 @@ details p {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 12px;
   margin-bottom: 14px;
 }
 .candidate-card h3 {
@@ -1780,7 +1782,7 @@ details p {
 }
 .candidate-card .eyebrow {
   margin-top: 18px;
-  font-size: 8px;
+  font-size: 10px;
 }
 .candidate-card details {
   margin-top: 15px;
@@ -1795,17 +1797,17 @@ details p {
   border-top: 1px solid #dce1d3;
   padding-top: 10px;
   margin-top: 10px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .candidate-identity strong,
 .candidate-identity span {
   display: block;
 }
 .candidate-identity p {
-  font-size: 10px;
+  font-size: 12px;
 }
 .candidate-identity a {
-  font-size: 10px;
+  font-size: 12px;
   margin-right: 10px;
 }
 .automatic-coverage {
@@ -1832,7 +1834,7 @@ details p {
   .automatic-heading .primary-button {
     width: 100%;
     justify-content: center;
-    font-size: 10px;
+    font-size: 12px;
   }
   .candidate-grid {
     grid-template-columns: 1fr;

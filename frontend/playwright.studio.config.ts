@@ -13,6 +13,7 @@ export default defineConfig({
     "studio.spec.ts",
     "studio-flow.spec.ts",
     "studio-integrated.spec.ts",
+    "ui-ux.spec.ts",
     "investigation.spec.ts",
   ],
   timeout: 30000,

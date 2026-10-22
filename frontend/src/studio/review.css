@@ -1,10 +1,10 @@
+@import "../design-system.css";
+
 .review-workspace {
-  color: #24352d;
-  background: #f6f5ef;
-  padding: clamp(16px, 3vw, 40px);
-  font:
-    16px/1.6 system-ui,
-    sans-serif;
+  color: var(--matilda-ink);
+  background: var(--matilda-canvas);
+  padding: 0;
+  font: 16px/1.6 var(--matilda-sans);
   max-width: 1600px;
   margin: auto;
 }
@@ -17,6 +17,9 @@
   font-size: clamp(1.6rem, 3vw, 2.4rem);
   line-height: 1.2;
   margin: 0;
+  font-family: var(--matilda-editorial);
+  font-weight: 400;
+  letter-spacing: -0.025em;
 }
 .review-workspace h2 {
   font-size: 1.35rem;
@@ -43,8 +46,8 @@
 .review-suggestion,
 .review-workspace > section,
 .review-actions {
-  background: #fff;
-  border: 1px solid #ccd4ca;
+  background: var(--matilda-sheet);
+  border: 1px solid var(--matilda-line);
   border-radius: 12px;
   padding: 20px;
   margin-block: 16px;
@@ -69,7 +72,7 @@
   white-space: pre-wrap;
 }
 .review-workspace fieldset {
-  border: 1px solid #c4cec0;
+  border: 1px solid var(--matilda-line);
   padding: 16px;
   border-radius: 8px;
   min-width: 0;
@@ -86,13 +89,13 @@
   resize: vertical;
   font: inherit;
   padding: 10px;
-  border: 1px solid #65755e;
+  border: 1px solid var(--matilda-input-line);
   border-radius: 6px;
-  color: #24352d;
-  background: white;
+  color: var(--matilda-ink);
+  background: var(--matilda-field);
 }
 .review-workspace input {
-  accent-color: #345c3f;
+  accent-color: var(--matilda-action);
 }
 .review-workspace input[type="radio"],
 .review-workspace input[type="checkbox"] {
@@ -119,29 +122,87 @@
   padding: 10px 16px;
   font: inherit;
   font-weight: 600;
-  background: #345c3f;
-  color: white;
-  border: 1px solid #345c3f;
+  background: var(--matilda-sheet);
+  color: var(--matilda-action);
+  border: 1px solid var(--matilda-line);
   border-radius: 6px;
   cursor: pointer;
 }
-.review-workspace button:disabled {
+.review-workspace button.review-primary {
+  background: var(--matilda-action);
+  color: var(--matilda-on-action);
+}
+.review-workspace button:hover:not(:disabled) {
+  background: var(--matilda-wash);
+}
+.review-workspace button.review-primary:hover:not(:disabled) {
+  background: var(--matilda-action-hover);
+}
+.review-checkpoint {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 0;
+  margin-bottom: 24px;
+  border-block: 1px solid var(--matilda-line);
+  font-size: 14px;
+}
+.review-checkpoint p {
+  margin: 0;
+}
+.review-checkpoint a {
+  padding-block: 12px;
+  font-weight: 600;
+}
+.review-suggestion > header > strong {
+  padding: 4px 8px;
+  border-radius: var(--matilda-radius-control);
+  font-size: 12px;
+  background: var(--matilda-field);
+  white-space: nowrap;
+}
+.review-suggestion[data-decision="accepted"] > header > strong {
+  background: var(--matilda-wash);
+  color: var(--matilda-action);
+}
+.review-evidence {
+  border-left: 3px solid var(--matilda-copper);
+  padding: 16px;
+  background: var(--matilda-field);
+  font-size: 14px;
+}
+.review-workspace :is(input[type="radio"], input[type="checkbox"]) {
+  flex-shrink: 0;
+}
+.review-workspace label:has(> input) {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+}
+.review-workspace #review-actions {
+  scroll-margin-block: 24px;
+}
+.review-workspace button:disabled,
+.review-workspace button.review-primary:disabled {
   background: #e1e5dd;
   border-color: #b1bbae;
   color: #586253;
   cursor: default;
 }
 .review-workspace :focus-visible {
-  outline: 3px solid #b5571c;
+  outline: 3px solid var(--matilda-copper);
   outline-offset: 4px;
 }
 .review-workspace [role="alert"] {
-  color: #8b2316;
+  color: var(--matilda-error);
 }
 .review-confirm {
   padding: 16px;
   margin-top: 16px;
-  border: 2px solid #65755e;
+  border: 2px solid var(--matilda-input-line);
 }
 .review-confirm button + button {
   margin-left: 12px;
@@ -149,6 +210,9 @@
 @media (max-width: 800px) {
   .review-columns {
     grid-template-columns: 1fr;
+  }
+  .review-material {
+    order: 2;
   }
   .review-heading {
     flex-direction: column;

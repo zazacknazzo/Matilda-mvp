@@ -226,8 +226,28 @@ export function StudioWorkspace({
     lesson: "Aula salva",
   };
   return (
-    <div className="studio-workspace" id="studio-main">
-      <h2 ref={heading} tabIndex={-1}>
+    <div className="studio-workspace" id="studio-main" tabIndex={-1}>
+      <ol className="studio-steps" aria-label="Etapas da aula">
+        {(["setup", "preview", "review", "generation", "lesson"] as const).map(
+          (step, index) => (
+            <li key={step} aria-current={view === step ? "step" : undefined}>
+              <span aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              {
+                {
+                  setup: "Preparar",
+                  preview: "Conferir",
+                  review: "Revisar",
+                  generation: "Gerar",
+                  lesson: "Aula",
+                }[step]
+              }
+            </li>
+          ),
+        )}
+      </ol>
+      <h2 ref={heading} tabIndex={-1} className="studio-view-label">
         {labels[view]}
       </h2>
       <div hidden={exploring !== null}>
@@ -241,17 +261,16 @@ export function StudioWorkspace({
         )}
         {view === "preview" && preview && (
           <>
-            <PreviewPanel preview={preview} onEdit={edit} />
-            <button
-              disabled={busy}
-              onClick={() =>
+            <PreviewPanel
+              preview={preview}
+              onEdit={edit}
+              busy={busy}
+              onReview={() =>
                 navigate(
                   `studio/previews/${encodeURIComponent(preview.preview_id)}/review`,
                 )
               }
-            >
-              Revisar fontes e objetivos
-            </button>
+            />
           </>
         )}
         {view === "review" && preview && !busy && (

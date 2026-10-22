@@ -1,8 +1,10 @@
+@import "../design-system.css";
+
 .lesson-ui {
-  --lesson-ink: #203f36;
-  --lesson-muted: #586d63;
-  --lesson-paper: #fffdf7;
-  --lesson-line: #d8dfd2;
+  --lesson-ink: var(--matilda-ink);
+  --lesson-muted: var(--matilda-text);
+  --lesson-paper: var(--matilda-sheet);
+  --lesson-line: var(--matilda-line);
   font:
     16px/1.55 Arial,
     Helvetica,
@@ -54,7 +56,7 @@
   opacity: 0.45;
 }
 .lesson-ui :focus-visible {
-  outline: 3px solid #ab5c2b;
+  outline: 3px solid var(--matilda-copper);
   outline-offset: 4px;
 }
 .lesson-ui a {
@@ -63,7 +65,7 @@
 .lesson-workspace {
   max-width: 1480px;
   margin: auto;
-  padding: 40px clamp(16px, 4vw, 64px);
+  padding: 32px 0;
 }
 .lesson-workspace-header {
   display: flex;
@@ -76,6 +78,8 @@
   font-size: clamp(30px, 3vw, 48px);
   max-width: 850px;
   margin-bottom: 12px;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 .lesson-workspace-header p:last-child {
   color: var(--lesson-muted);
@@ -89,13 +93,13 @@
   text-transform: uppercase;
 }
 .lesson-ui .lesson-primary {
-  background: #264f43;
-  color: #fffdf7;
-  border-color: #264f43;
+  background: var(--matilda-action);
+  color: var(--matilda-sheet);
+  border-color: var(--matilda-action);
   white-space: nowrap;
 }
 .lesson-ui .lesson-primary:hover {
-  background: #163c30;
+  background: var(--matilda-action-hover);
 }
 .lesson-view-switch {
   display: flex;
@@ -153,7 +157,7 @@
   font:
     20px Georgia,
     serif;
-  color: #617a68;
+  color: var(--matilda-text);
   min-width: 26px;
   flex-shrink: 0;
 }
@@ -172,6 +176,7 @@
   min-width: 0;
 }
 .lesson-slide {
+  container-type: inline-size;
   background: var(--lesson-paper);
   border: 1px solid var(--lesson-line);
   aspect-ratio: 16/9;
@@ -179,7 +184,7 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 12px 35px #203f3609;
+  box-shadow: 0 12px 35px var(--matilda-ink) 09;
 }
 .lesson-slide-top {
   display: flex;
@@ -216,8 +221,8 @@
 }
 .lesson-layout-title {
   --lesson-muted: #dce6df;
-  background: #264f43;
-  color: #fffdf7;
+  background: var(--matilda-action);
+  color: var(--matilda-sheet);
 }
 .lesson-layout-title .lesson-slide-top {
   border-color: #ffffff30;
@@ -238,7 +243,7 @@
   color: #dce6df;
 }
 .lesson-layout-concept h2 {
-  border-left: 4px solid #a86239;
+  border-left: 4px solid var(--matilda-copper);
   padding-left: 18px;
 }
 .lesson-bullets {
@@ -248,7 +253,7 @@
   padding: 5px 0 5px 8px;
 }
 .lesson-bullets li::marker {
-  color: #a86239;
+  color: var(--matilda-copper);
 }
 .lesson-steps {
   list-style: none;
@@ -276,7 +281,7 @@
   font-size: clamp(22px, 2.6vw, 40px);
 }
 .lesson-evidence {
-  border-left: 3px solid #a86239;
+  border-left: 3px solid var(--matilda-copper);
   padding: 0 0 0 18px;
 }
 .lesson-evidence blockquote {
@@ -314,7 +319,7 @@
   justify-content: center;
 }
 .lesson-layout-summary {
-  border-top: 6px solid #a86239;
+  border-top: 6px solid var(--matilda-copper);
 }
 .lesson-controls {
   display: flex;
@@ -333,7 +338,7 @@
   height: 4px;
   width: 100%;
   margin-top: 8px;
-  accent-color: #264f43;
+  accent-color: var(--matilda-action);
 }
 .lesson-ui .lesson-keyboard-help {
   font-size: 12px;
@@ -448,6 +453,7 @@
   flex-direction: column;
   padding: 12px 28px;
   overflow: auto;
+  overscroll-behavior: contain;
 }
 .lesson-presentation-toolbar {
   display: flex;
@@ -483,7 +489,18 @@
 .lesson-presentation .lesson-evidence .lesson-source-link,
 .lesson-presentation .lesson-evidence .lesson-source-location,
 .lesson-presentation .lesson-evidence .lesson-source-limits {
-  font-size: 14px;
+  font-size: clamp(14px, 1.5cqw, 24px);
+}
+.lesson-presentation .lesson-slide .lesson-blocks {
+  font-size: clamp(16px, 2cqw, 32px);
+}
+.lesson-presentation .lesson-slide h2 {
+  font-size: clamp(28px, 4cqw, 64px);
+}
+.lesson-presentation .lesson-slide-top,
+.lesson-presentation .lesson-slide-footer,
+.lesson-presentation .lesson-eyebrow {
+  font-size: clamp(11px, 1.1cqw, 18px);
 }
 .lesson-fullscreen-notice {
   font-size: 12px;
@@ -497,7 +514,7 @@
 }
 @media (max-width: 760px) {
   .lesson-workspace {
-    padding: 24px 16px;
+    padding: 24px 0;
   }
   .lesson-workspace-header {
     flex-direction: column;
