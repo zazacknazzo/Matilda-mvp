@@ -175,6 +175,13 @@ integral: PreviewPlan na prévia e LessonDraft na geração. O serviço material
 valida LessonBundle contra a revisão e o snapshot científico existentes. O provedor
 não recebe autoridade para inventar referências ou identidades.
 
+Na prévia, `services/studio/preview_anchors.py` constrói escolhas literais ligadas
+à proveniência, aos conceitos e às contribuições resolvidas. PreviewPlan recebe
+somente `source_anchor_id`; o serviço resolve o ID autorizado para o SourceAnchor
+público, revalida seus vínculos e publica EnrichmentPreview. A ausência de trecho
+conceitual literal falha antes da inferência, preservando o material. Ver
+[âncoras canônicas](studio-canonical-anchors.md).
+
 NVIDIA_API_KEY vem exclusivamente do ambiente do backend. AI_PROVIDER seleciona
 nvidia (padrão) ou gemini (explícito); valor desconhecido falha dentro da operação,
 preservando material/revisão. Nenhum SDK realiza retries ocultos no adaptador NVIDIA.

@@ -102,7 +102,11 @@ bloqueio preserva o primeiro diagnóstico e não consome outra chamada.
 - Backend completo: **650 passed**, 9,15 s, incluindo regressão Forensics.
 - Contratos: **7** científicos, **40** Studio HTTP e **4** LessonBundle TypeScript.
 - TypeScript/build aprovado; permanece o aviso Vite de bundle acima de 500 kB.
-- Playwright e revisões independentes: resultados serão registrados ao concluir.
+- Playwright: **87 aprovados** — integrado T13/Forensics 20 (26,0 s), revisão
+  docente 19 (7,6 s), slides 14 (5,2 s), geração/operações 18 (8,4 s), ponte
+  Forensics–Studio 5 (3,1 s), exportação 11 (4,5 s).
+- Revisões independentes: **Standards 0 achados; Spec 0 achados**. Spec reexecutou
+  os **31 testes focados**, todos aprovados. Ver [relatório separado por eixo](reviews/nvidia-canonical-anchors-code-review.md).
 - HTTPX MockTransport cobre RNA, CRISPR, texto sem DOI, documentos múltiplos,
   Unicode composto/decomposto, termos repetidos, ausência de cobertura,
   vínculos inválidos, IDs de outra operação, retry e recuperação da prévia anterior.
