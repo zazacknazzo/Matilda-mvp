@@ -64,11 +64,13 @@ function GenerationSession({ request, api, onOpenLesson }: Props) {
   const [waiting, setWaiting] = useState(false);
   const [polling, setPolling] = useState(false);
   const [readyId, setReadyId] = useState<string | null>(null);
+  const [online, setOnline] = useState(() => navigator.onLine);
   const post = useRef<AbortController | null>(null);
   const read = useRef<AbortController | null>(null);
   const feedback = useRef<HTMLParagraphElement>(null);
   const polls = useRef(0);
   const previewId = request.preview_id;
+  const generating = posting || preview?.generation_status === "generating";
   useEffect(
     () => () => {
       post.current?.abort();
@@ -140,13 +142,39 @@ function GenerationSession({ request, api, onOpenLesson }: Props) {
     void refresh();
   }, [refresh]);
   useEffect(() => {
-    if (!posting) {
+    const reconnect = () => {
+      setOnline(true);
+      void refresh();
+    };
+    const disconnect = () => {
+      read.current?.abort();
+      read.current = null;
+      setChecking(false);
+      setOnline(false);
+      setUncertain(true);
+      setPolling(false);
+    };
+    const resume = () => {
+      if (document.visibilityState === "visible" && navigator.onLine)
+        reconnect();
+    };
+    window.addEventListener("online", reconnect);
+    window.addEventListener("offline", disconnect);
+    document.addEventListener("visibilitychange", resume);
+    return () => {
+      window.removeEventListener("online", reconnect);
+      window.removeEventListener("offline", disconnect);
+      document.removeEventListener("visibilitychange", resume);
+    };
+  }, [refresh]);
+  useEffect(() => {
+    if (!generating) {
       setWaiting(false);
       return;
     }
     const timer = window.setTimeout(() => setWaiting(true), 45000);
     return () => window.clearTimeout(timer);
-  }, [posting]);
+  }, [generating]);
   useEffect(() => {
     if (!polling || posting) return;
     const timer = window.setInterval(() => {
@@ -166,6 +194,7 @@ function GenerationSession({ request, api, onOpenLesson }: Props) {
       post.current ||
       !preview ||
       !reviewed(preview, request) ||
+      !online ||
       uncertain ||
       preview.generation_status === "generating"
     )
@@ -215,8 +244,15 @@ function GenerationSession({ request, api, onOpenLesson }: Props) {
 
   const validReview = preview ? reviewed(preview, request) : false;
   const serverGenerating = preview?.generation_status === "generating";
+  const previousId =
+    !readyId &&
+    typeof preview?.last_lesson_bundle_id === "string" &&
+    preview.last_lesson_bundle_id.trim()
+      ? preview.last_lesson_bundle_id
+      : null;
   const canGenerate =
     validReview &&
+    online &&
     !uncertain &&
     !posting &&
     !checking &&
@@ -228,6 +264,12 @@ function GenerationSession({ request, api, onOpenLesson }: Props) {
     <section className="generation-panel" aria-label="Geração da aula">
       <p className="generation-eyebrow">MATILDA STUDIO · GERAÇÃO</p>
       <h2>Gerar a aula revisada</h2>
+      {!online && (
+        <p role="status">
+          Sem conexão. Sua revisão permanece salva. Ao reconectar, consultaremos
+          o estado antes de uma nova tentativa.
+        </p>
+      )}
       <p>
         A geração usa somente suas decisões e objetivos aprovados. Revise
         integralmente o material antes de usá-lo em aula.
@@ -267,7 +309,7 @@ function GenerationSession({ request, api, onOpenLesson }: Props) {
         <button disabled={!canGenerate} onClick={() => void generate()}>
           Gerar minha aula
         </button>
-        <button disabled={checking} onClick={() => void refresh()}>
+        <button disabled={checking || !online} onClick={() => void refresh()}>
           {checking ? "Consultando…" : "Consultar estado salvo"}
         </button>
         <button
@@ -278,7 +320,20 @@ function GenerationSession({ request, api, onOpenLesson }: Props) {
         >
           Abrir aula existente
         </button>
+        {previousId && (
+          <button
+            disabled={posting || !online}
+            onClick={() => onOpenLesson(previousId)}
+          >
+            Abrir aula anterior
+          </button>
+        )}
       </div>
+      {previousId && (
+        <p>
+          A aula anterior conserva as decisões da revisão com que foi gerada.
+        </p>
+      )}
       {uncertain && !posting && (
         <p>
           Consulte o estado salvo antes de tentar novamente. Uma nova tentativa

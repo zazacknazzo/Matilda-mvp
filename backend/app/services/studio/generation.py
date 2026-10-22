@@ -9,6 +9,7 @@ from app.schemas.lesson import LessonBundle, LessonGenerationMetadata
 from app.schemas.studio import EnrichmentPreview, GenerateRequest, StudioError
 from app.studio.ports import POLICY, ProviderFailure, ProviderRequest, RepositoryConflict, StudioProvider, StudioRepository
 from .lesson_validator import LessonDraft, ScientificAuthority, materialize_lesson
+from .metrics import StudioMetrics
 
 PROMPT_VERSION = 'studio-lesson-v1'
 SYSTEM = '''Você organiza uma aula pedagógica no schema JSON fornecido, em português.
@@ -51,12 +52,29 @@ class GenerationService:
     def __init__(self, repository: StudioRepository, provider: StudioProvider,
                  authority: Callable[[EnrichmentPreview], ScientificAuthority], *,
                  now: Callable[[], str] = lambda: datetime.now(timezone.utc).isoformat(),
-                 monotonic_clock: Callable[[], float] = monotonic):
+                 monotonic_clock: Callable[[], float] = monotonic,
+                 metrics: StudioMetrics | None = None):
         self.repository, self.provider, self.authority = repository, provider, authority
         self.now, self.monotonic = now, monotonic_clock
+        self.metrics = metrics if metrics is not None else StudioMetrics()
 
     async def generate(self, *, session_id: str, request: GenerateRequest, idempotency_key: str,
                        on_admitted: Callable[[str], None] | None = None) -> GenerationResult:
+        started = self.monotonic()
+        try:
+            result = await self._generate(session_id=session_id, request=request,
+                idempotency_key=idempotency_key, on_admitted=on_admitted)
+        except asyncio.CancelledError:
+            self.metrics.generation('cancelled', self.monotonic() - started, 'generation_timeout')
+            raise
+        except RepositoryConflict as failure:
+            self.metrics.generation('failed', self.monotonic() - started, failure.error.code)
+            raise
+        else:
+            self.metrics.generation('replayed' if result.replayed else 'completed', self.monotonic() - started)
+            return result
+
+    async def _generate(self, *, session_id, request, idempotency_key, on_admitted):
         started = self.monotonic()
         deadline = started + POLICY.generation_backend_seconds
         claim_id = None
@@ -130,12 +148,14 @@ class GenerationService:
                         raise generation_error('input_too_large', project_id=preview.project_id)
                     if self.monotonic() >= provider_deadline:
                         raise ProviderFailure('timeout')
+                    self.metrics.attempt(tokens)
                     result = await self.provider.complete(provider_request)
                 if self.monotonic() > provider_deadline:
                     raise ProviderFailure('timeout')
                 metadata = LessonGenerationMetadata.model_validate(result.metadata.model_dump())
                 if metadata.prompt_version != PROMPT_VERSION or (metadata.output_tokens is not None and metadata.output_tokens > POLICY.max_output_tokens) or (metadata.input_tokens is not None and metadata.input_tokens > POLICY.max_input_tokens):
                     raise ValueError('Invalid generation metadata or token budget.')
+                self.metrics.output(metadata.output_tokens)
                 return materialize_lesson(result.content, preview=preview, request=request, metadata=metadata)
             except (TimeoutError, ProviderFailure) as failure:
                 reason = failure.reason if isinstance(failure, ProviderFailure) else 'timeout'
