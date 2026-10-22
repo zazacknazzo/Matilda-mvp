@@ -63,8 +63,8 @@ export function PreviewPanel({
         <section className="studio-panel" aria-label="Propostas pedagógicas">
           <h2>Sugestões de enriquecimento</h2>
           <p>
-            Propostas geradas por IA. A revisão docente e a geração da aula
-            serão conectadas em uma próxima etapa.
+            Propostas geradas por IA. Confira as fontes e revise as sugestões e
+            os objetivos antes de gerar a aula.
           </p>
           {preview.suggestions.length === 0 && (
             <div className="studio-notice">

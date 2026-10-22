@@ -1,7 +1,9 @@
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { citationLabels } from "../components/EvidenceInspector";
 import { safeSourceUrl } from "../lesson/lesson-view";
 import type { ScientificSourceSnapshot } from "./scientific-source";
+import type { EnrichmentPreview } from "../types/studio";
+import type { Evidence } from "../types";
 import "./scientific-dossier.css";
 
 function SourceLink({ url, title }: { url: string; title: string }) {
@@ -15,24 +17,20 @@ function SourceLink({ url, title }: { url: string; title: string }) {
   );
 }
 
-/** Read-only canonical science. Material needs neither a Paper nor a graph root. */
-export function ScientificDossier({
-  source,
-  contributionId,
+function DossierFrame({
   onBack,
+  identity,
+  children,
 }: {
-  source: ScientificSourceSnapshot;
-  contributionId: string;
   onBack(): void;
+  identity: string;
+  children: ReactNode;
 }) {
   const heading = useRef<HTMLHeadingElement>(null);
   const headingId = useId();
-  const match = source.matches.find(
-    (item) => item.contribution.id === contributionId,
-  );
   useEffect(() => {
     heading.current?.focus();
-  }, [contributionId]);
+  }, [identity]);
   return (
     <section className="scientific-dossier" aria-labelledby={headingId}>
       <h2 id={headingId} ref={heading} tabIndex={-1}>
@@ -41,6 +39,150 @@ export function ScientificDossier({
       <button type="button" onClick={onBack}>
         Voltar ao Studio
       </button>
+      {children}
+    </section>
+  );
+}
+
+function EvidenceDocument({ evidence }: { evidence: Evidence }) {
+  return (
+    <article className="scientific-dossier-source">
+      <h5>
+        <SourceLink url={evidence.source_url} title={evidence.source_title} />
+      </h5>
+      <p>
+        ID: {evidence.id} · contribuição {evidence.contribution_id}
+      </p>
+      <p>
+        Tipo: {evidence.source_type} · Verificação:{" "}
+        {evidence.verification_status}
+      </p>
+      <p>Localização: {evidence.excerpt_or_location}</p>
+      <h5>Afirmação sustentada</h5>
+      <blockquote>{evidence.claim_supported}</blockquote>
+    </article>
+  );
+}
+
+type Props = { contributionId: string; onBack(): void } & (
+  | { source: ScientificSourceSnapshot; preview?: never }
+  | { preview: EnrichmentPreview; source?: never }
+);
+
+/** M0 previews expose canonical references, without fabricating a Paper/Match. */
+export function ScientificDossier(props: Props) {
+  return props.preview ? (
+    <PreviewDossier
+      preview={props.preview}
+      contributionId={props.contributionId}
+      onBack={props.onBack}
+    />
+  ) : (
+    <SourceScientificDossier
+      source={props.source!}
+      contributionId={props.contributionId}
+      onBack={props.onBack}
+    />
+  );
+}
+
+function PreviewDossier({
+  preview,
+  contributionId,
+  onBack,
+}: {
+  preview: EnrichmentPreview;
+  contributionId: string;
+  onBack(): void;
+}) {
+  const suggestions = preview.suggestions.filter(
+    (item) => item.contribution_id === contributionId,
+  );
+  const references = preview.evidence_references.filter(
+    (item) => item.contribution_id === contributionId,
+  );
+  return (
+    <DossierFrame onBack={onBack} identity={contributionId}>
+      <h3>Origem científica</h3>
+      <p>
+        {preview.scientific_context.origin_type === "material"
+          ? "Sem artigo comparável: material do professor."
+          : "Artigo científico vinculado à preparação."}
+      </p>
+      {preview.source_documents
+        .filter((doc) => doc.type === "paper_metadata")
+        .map((doc) => (
+          <article key={doc.id}>
+            <h4>{doc.title}</h4>
+            <SourceLink
+              url={`https://doi.org/${doc.doi}`}
+              title={`DOI: ${doc.doi}`}
+            />
+          </article>
+        ))}
+      <h3>Conceitos e procedência</h3>
+      <p>{preview.scientific_context.concept_labels.join("; ")}</p>
+      <ul>
+        {preview.scientific_context.provenance.map((entry, index) => (
+          <li key={index}>
+            {entry.method}
+            {entry.quote && <blockquote>{entry.quote}</blockquote>}
+            {entry.retrieved_at && (
+              <p>
+                {entry.from_cache ? "Cache" : "Consulta na fonte"} ·{" "}
+                {entry.retrieved_at}
+              </p>
+            )}
+            {entry.source_url && (
+              <SourceLink url={entry.source_url} title="Fonte da procedência" />
+            )}
+          </li>
+        ))}
+      </ul>
+      <h3>Contribuição documentada · {contributionId}</h3>
+      {suggestions.map((item) => (
+        <p key={item.id}>{item.scientific_explanation}</p>
+      ))}
+      {!references.length && (
+        <p role="alert">Evidência indisponível nesta prévia.</p>
+      )}
+      {references.map((reference) => (
+        <section key={reference.id}>
+          <h4>Todos os participantes documentados da publicação</h4>
+          <p>{reference.participants.join("; ")}</p>
+          <EvidenceDocument evidence={reference} />
+          <ul>
+            {reference.limitations.map((limit, index) => (
+              <li key={index}>{limit}</li>
+            ))}
+          </ul>
+        </section>
+      ))}
+      <h3>Limitações do contexto</h3>
+      <ul>
+        {preview.scientific_context.limitations.map((limit, index) => (
+          <li key={index}>{limit}</li>
+        ))}
+      </ul>
+    </DossierFrame>
+  );
+}
+
+/** Read-only canonical science. Material needs neither a Paper nor a graph root. */
+function SourceScientificDossier({
+  source,
+  contributionId,
+  onBack,
+}: {
+  source: ScientificSourceSnapshot;
+  contributionId: string;
+  onBack(): void;
+}) {
+  const match = source.matches.find(
+    (item) => item.contribution.id === contributionId,
+  );
+  return (
+    <DossierFrame onBack={onBack} identity={contributionId}>
       <section aria-label="Origem científica">
         <h3>Origem científica</h3>
         <p>
@@ -163,24 +305,7 @@ export function ScientificDossier({
           </p>
           <h4>Fontes documentais</h4>
           {match.evidence.map((evidence) => (
-            <article className="scientific-dossier-source" key={evidence.id}>
-              <h5>
-                <SourceLink
-                  url={evidence.source_url}
-                  title={evidence.source_title}
-                />
-              </h5>
-              <p>
-                ID: {evidence.id} · contribuição {evidence.contribution_id}
-              </p>
-              <p>
-                Tipo: {evidence.source_type} · Verificação:{" "}
-                {evidence.verification_status}
-              </p>
-              <p>Localização: {evidence.excerpt_or_location}</p>
-              <h5>Afirmação sustentada</h5>
-              <blockquote>{evidence.claim_supported}</blockquote>
-            </article>
+            <EvidenceDocument key={evidence.id} evidence={evidence} />
           ))}
           <h4>Limitações da contribuição</h4>
           <ul>
@@ -215,6 +340,6 @@ export function ScientificDossier({
           </article>
         ))}
       </details>
-    </section>
+    </DossierFrame>
   );
 }

@@ -37,6 +37,23 @@ export function StudioSetup({
       </p>
       <fieldset disabled={busy}>
         <legend>Configuração da aula</legend>
+        {value.analysis_id && (
+          <div className="studio-notice">
+            <p>
+              A investigação selecionada será reutilizada com suas fontes e
+              participantes. Confirme a configuração antes de criar a prévia.
+            </p>
+            <output aria-label="Investigação de origem">
+              {value.analysis_id}
+            </output>
+            <button
+              type="button"
+              onClick={() => update({ analysis_id: null, project_id: null })}
+            >
+              Remover investigação de origem
+            </button>
+          </div>
+        )}
         <label>
           Título da aula
           <input
@@ -80,6 +97,20 @@ export function StudioSetup({
             />
           </label>
         </div>
+        <label>
+          DOI do artigo (opcional)
+          <input
+            maxLength={300}
+            value={value.doi || ""}
+            onChange={(event) =>
+              update({
+                doi: event.target.value || null,
+                analysis_id: null,
+                project_id: null,
+              })
+            }
+          />
+        </label>
         <label>
           Texto original
           <textarea

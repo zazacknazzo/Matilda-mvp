@@ -9,7 +9,12 @@ const python =
 const runtime = mkdtempSync(join(tmpdir(), "matilda-t05-"));
 export default defineConfig({
   testDir: "./tests",
-  testMatch: ["studio.spec.ts", "studio-flow.spec.ts", "investigation.spec.ts"],
+  testMatch: [
+    "studio.spec.ts",
+    "studio-flow.spec.ts",
+    "studio-integrated.spec.ts",
+    "investigation.spec.ts",
+  ],
   timeout: 30000,
   workers: 1,
   use: {

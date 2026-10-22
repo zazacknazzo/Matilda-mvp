@@ -3,6 +3,28 @@ import type { PreviewRequest } from "../types/studio";
 import type { ScientificSourceSnapshot } from "./scientific-source";
 import { ScientificDossier } from "./ScientificDossier";
 import "./scientific-dossier.css";
+import type { Analysis } from "../types";
+
+/** The existing Forensics host already owns its state and recorded investigation.
+ * Only its ID crosses the write boundary; T06 resolves the context on the server.
+ */
+export function ForensicsLessonAction({
+  analysis,
+  onPrepare,
+}: {
+  analysis: Analysis;
+  onPrepare(analysis: Analysis): void;
+}) {
+  return (
+    <button
+      type="button"
+      className="primary-button"
+      onClick={() => onPrepare(analysis)}
+    >
+      Transformar em aula
+    </button>
+  );
+}
 
 export interface ForensicsStudioBridgeProps<State> {
   source: ScientificSourceSnapshot;

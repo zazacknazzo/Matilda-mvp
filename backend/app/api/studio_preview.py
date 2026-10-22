@@ -14,6 +14,7 @@ from pydantic import ValidationError
 
 from app.schemas.studio import EnrichmentPreview, LessonProject, PreviewRequest, StudioError
 from app.services.studio.preview import create_preview, original_documents
+from app.services.studio.timings import measure
 from app.services.studio.repository import conflict, not_found
 from app.studio.ports import POLICY, SESSION_COOKIE, ProviderFailure, RepositoryConflict
 
@@ -87,7 +88,8 @@ async def post_preview(http: Request, provider=Depends(get_provider), repository
                                     learning_objectives=request.objectives, status='draft', created_at=timestamp, updated_at=timestamp,
                                     last_teacher_activity_at=timestamp, expires_at=(datetime.fromisoformat(timestamp) + timedelta(days=7)).isoformat())
             documents = original_documents(request, project.id)
-            await repository.save_material(session_id=session_id, project=project, request=request, documents=documents, now=timestamp)
+            with measure('persistence'):
+                await repository.save_material(session_id=session_id, project=project, request=request, documents=documents, now=timestamp)
             admitted = True
             preview = await create_preview(request=request, project=project, documents=documents, session_id=session_id,
                                                provider=provider, repository=repository, deadline=started + POLICY.preview_backend_seconds, now=now)

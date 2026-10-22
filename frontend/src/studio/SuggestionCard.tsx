@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type MouseEvent } from "react";
 import type { EnrichmentPreview, EnrichmentSuggestion } from "../types/studio";
 import { safeSourceUrl } from "../lesson/lesson-view";
 
@@ -12,6 +12,7 @@ interface Props {
   preview: EnrichmentPreview;
   edit: SuggestionEdit;
   disabled: boolean;
+  onExplore?: (event: MouseEvent<HTMLButtonElement>) => void;
   onChange: (edit: SuggestionEdit) => void;
 }
 
@@ -21,6 +22,7 @@ export function SuggestionCard({
   edit,
   disabled,
   onChange,
+  onExplore,
 }: Props) {
   const labelId = useId();
   const document = preview.source_documents.find(
@@ -52,6 +54,11 @@ export function SuggestionCard({
         original.
       </p>
       <p>{suggestion.scientific_explanation}</p>
+      {onExplore && (
+        <button type="button" onClick={onExplore}>
+          Explorar descoberta
+        </button>
+      )}
       <fieldset disabled={disabled}>
         <legend>Decisão sobre esta sugestão</legend>
         <label>

@@ -103,8 +103,8 @@ Inclui as cinco tabelas Studio e tabelas auxiliares de sessão, admissão e cota
 não modifica tabelas Forensics. Admissão/publicação são transações curtas,
 sem transação na chamada externa. Ownership é um hash do token opaco HttpOnly.
 Operações abandonadas liberam a admissão após 45 + 15 s. GET não renova o prazo.
-O lifespan limpa expirados ao iniciar e a cada hora, sem depender de um acesso
-Studio. Nova tentativa mantém o último projeto utilizável até publicar, e GET
+A composição inicial T05 usava limpeza horária; a T13 conecta o lifespan T12
+descrito abaixo, sem depender de um acesso Studio. Nova tentativa mantém o último projeto utilizável até publicar, e GET
 materializa o erro corrente separado dos originais/snapshots anteriores.
 O bloqueio persistido impede duas operações ativas da mesma sessão. A chave
 idempotente de geração pertence ao futuro endpoint `/generate`; T05 não cria
@@ -139,3 +139,25 @@ nova prévia para gerar com autoridade verificável.
 hash de revisão, geração e aula retomam o estado persistido da sessão; a entrega
 consulta o bundle imutável retornado pela geração. Campos científicos e contratos
 M0 permanecem inalterados. Detalhes de verificação em `studio-flow-t10.md`.
+
+
+## Studio — composição T13
+
+A prévia delega a resolução DOI/analysis_id ao resolvedor T06, reutilizando T04
+e preservando o snapshot da investigação. A configuração recebe o ID do
+Forensics; o servidor resolve e persiste a autoridade, sem confiar em ciência
+enviada pelo cliente. O dossiê integrado renderiza a prévia canônica M0, sem
+criar Paper/grafo/classificação para material textual. Editor e visualizador
+continuam montados ao explorar evidências. Respostas de uma operação anterior
+não substituem uma nova origem selecionada.
+
+`api/studio_lifecycle.py` compõe `studio_maintenance_lifespan` T12: varredura
+inicial e a cada 15 s, reconciliação de operações abandonadas, falhas de storage
+sanitizadas e encerramento da tarefa. `StudioMetrics` vive no estado do app e é
+compartilhado com o serviço de geração; nenhuma rota pública de métricas é criada.
+
+`services/studio/timings.py` mede as seis etapas de prévia com relógio monotônico
+e eventos sem material/chave. Não altera deadlines, schemas, validação ou retries.
+Os routers de exportação T11 e persistência/autorização T10 são reutilizados
+integralmente; os testes T13 verificam sua composição no host real.
+Ver `integrated-demo-t13.md` para evidências e limitações.

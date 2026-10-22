@@ -50,8 +50,9 @@ class LoggedGenerationService(GenerationService):
         return result
 
 
-def get_generation_service(repository=Depends(get_repository), provider=Depends(get_provider)):
-    return LoggedGenerationService(repository, provider, repository.scientific_authority)
+def get_generation_service(http: Request, repository=Depends(get_repository), provider=Depends(get_provider)):
+    return LoggedGenerationService(repository, provider, repository.scientific_authority,
+                                   metrics=getattr(http.app.state, 'studio_metrics', None))
 
 
 @router.post('/previews/{preview_id}/review')

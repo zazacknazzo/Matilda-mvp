@@ -1,4 +1,5 @@
 import { StudioWorkspace } from "./studio/StudioWorkspace";
+import { ForensicsLessonAction } from "./studio/ForensicsStudioBridge";
 import { useState, useRef, useEffect, type FormEvent } from "react";
 import {
   ArrowRight,
@@ -46,7 +47,7 @@ const examples = [
     detail: "BNT162b2 · Polack et al., 2020",
   },
 ];
-function ForensicsApp() {
+function ForensicsApp({ onPrepare }: { onPrepare(analysis: Analysis): void }) {
   const [doi, setDoi] = useState("");
   const [paper, setPaper] = useState<Paper | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
@@ -432,6 +433,10 @@ function ForensicsApp() {
               </section>
             ) : (
               <>
+                <ForensicsLessonAction
+                  analysis={analysis}
+                  onPrepare={onPrepare}
+                />
                 <AutomaticDiscovery
                   key={analysis.id}
                   analysis={analysis}
@@ -819,6 +824,10 @@ function ForensicsApp() {
 
 /** Keep both workspaces mounted so mode changes preserve the investigation. */
 export default function App() {
+  const [origin, setOrigin] = useState<{
+    analysis_id: string;
+    title: string;
+  } | null>(null);
   const [studio, setStudio] = useState(() =>
     location.hash.startsWith("#studio"),
   );
@@ -852,10 +861,20 @@ export default function App() {
         </button>
       </nav>
       <div hidden={studio}>
-        <ForensicsApp />
+        <ForensicsApp
+          onPrepare={(analysis) => {
+            setOrigin({
+              analysis_id: analysis.id,
+              title: analysis.paper.title.slice(0, 160),
+            });
+            setStudio(true);
+            studioLocation.current = "#studio";
+            history.replaceState(null, "", "#studio");
+          }}
+        />
       </div>
       <div hidden={!studio}>
-        <StudioWorkspace />
+        <StudioWorkspace origin={origin} />
       </div>
     </>
   );
