@@ -42,14 +42,12 @@ def test_rna_model_selects_authorized_anchor_and_server_materializes_original(cl
         material = json.loads(body['messages'][1]['content'])
         schema = body['response_format']['json_schema']['schema']
         properties = schema['$defs']['PlannedSuggestion']['properties']
-        assert 'source_anchor' not in properties and 'source_anchor_id' in properties
-        match = material['authorized_contributions'][0]
-        candidate = next(a for a in material['authorized_source_anchors'] if a['id'] in match['source_anchor_ids'])
-        assert candidate['source_anchor']['quote'] == 'RNA mensageiro'
-        selected.append(candidate['source_anchor'])
+        assert set(properties) == {'candidate_id', 'pedagogical_rationale', 'suggested_content'}
+        candidate = material['scientific_candidates'][0]
+        assert candidate['quote'] == 'RNA mensageiro'
+        selected.append(candidate)
         plan = {'suggested_objectives': ['Explicar o mecanismo molecular.'], 'suggestions': [{
-            'contribution_id': match['contribution_id'], 'concept_ids': candidate['concept_ids'],
-            'evidence_ids': match['evidence_ids'][:1], 'source_anchor_id': candidate['id'],
+            'candidate_id': candidate['id'],
             'pedagogical_rationale': 'Relacionar o mecanismo ao documento.',
             'suggested_content': 'Leia a fonte e discuta o mecanismo molecular.',
         }]}
@@ -59,7 +57,7 @@ def test_rna_model_selects_authorized_anchor_and_server_materializes_original(cl
     try:
         response = client.post('/api/studio/preview', json=RNA, headers=ORIGIN)
         assert response.status_code == 201
-        assert response.json()['suggestions'][0]['source_anchor'] == selected[0]
+        assert response.json()['suggestions'][0]['source_anchor']['quote'] == selected[0]['quote']
         assert '"scientific_authority_valid":true' in caplog.text
     finally:
         app.dependency_overrides.clear()
@@ -70,14 +68,13 @@ def test_repeated_unicode_terms_use_exact_server_occurrence_not_first_substring(
     chosen = []
     def upstream(http):
         material = json.loads(json.loads(http.content)['messages'][1]['content'])
-        match = material['authorized_contributions'][0]
-        choices = [a for a in material['authorized_source_anchors'] if a['id'] in match['source_anchor_ids']]
-        assert [a['source_anchor']['occurrence'] for a in choices] == [1, 2]
+        contribution = material['scientific_candidates'][0]['contribution']
+        choices = [a for a in material['scientific_candidates'] if a['contribution'] == contribution]
+        assert [a['occurrence'] for a in choices] == [1, 2]
         candidate = choices[1]
         chosen.append(candidate)
         plan = {'suggested_objectives': ['Explicar o RNA mensageiro.'], 'suggestions': [{
-            'contribution_id': match['contribution_id'], 'concept_ids': candidate['concept_ids'],
-            'evidence_ids': match['evidence_ids'][:1], 'source_anchor_id': candidate['id'],
+            'candidate_id': candidate['id'],
             'pedagogical_rationale': 'Relacionar o conceito à documentação.', 'suggested_content': 'Compare o mecanismo e a fonte.'}]}
         return httpx.Response(200, json={'model': 'controlled', 'usage': {'prompt_tokens': 1000, 'completion_tokens': 200},
             'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(plan)}}]})
@@ -86,8 +83,8 @@ def test_repeated_unicode_terms_use_exact_server_occurrence_not_first_substring(
         response = client.post('/api/studio/preview', headers=ORIGIN, json={
             'title': 'RNA', 'material_text': '🧬 µ · xmRNA; mRNA e mRNA.'})
         assert response.status_code == 201
-        assert response.json()['suggestions'][0]['source_anchor'] == chosen[0]['source_anchor']
-        assert chosen[0]['source_anchor']['quote'] == 'mRNA'
+        assert response.json()['suggestions'][0]['source_anchor']['occurrence'] == chosen[0]['occurrence'] == 2
+        assert chosen[0]['quote'] == 'mRNA'
     finally:
         app.dependency_overrides.clear()
 
@@ -108,14 +105,13 @@ def test_canonical_selection_covers_only_grounded_science(client, monkeypatch, p
     external, seen = FlowProvider(), []
     async def upstream(http):
         material = json.loads(json.loads(http.content)['messages'][1]['content'])
-        matches = material['authorized_contributions']
+        matches = material['scientific_contributions']
         assert len(matches) == coverage
-        choices = material['authorized_source_anchors']
+        choices = material['scientific_candidates']
         assert len(choices) <= 8
         if coverage:
-            candidate = next(a for a in choices if a['id'] in matches[0]['source_anchor_ids'])
-            anchor = candidate['source_anchor']
-            document = next(d for d in material['source_documents'] if d['id'] == anchor['source_document_id'])
+            anchor = choices[0]
+            document = next(d for d in material['source_documents'] if d['key'] == anchor['document'])
             assert document['type'] == expected_document
             assert anchor['quote'] in document['content']
             if expected_quote is not None:
@@ -162,17 +158,15 @@ def test_anchor_ids_stable_on_retry_and_rejected_in_another_operation(client, mo
     def upstream(http):
         body = json.loads(http.content)
         material = json.loads(body['messages'][1]['content'])
-        payloads.append((material['authorized_source_anchors'], body['response_format']))
-        match = material['authorized_contributions'][0]
-        candidate = next(a for a in material['authorized_source_anchors'] if a['id'] in match['source_anchor_ids'])
+        payloads.append((material['scientific_candidates'], body['response_format']))
+        candidate = material['scientific_candidates'][0]
         # First operation: controlled retry after an invalid ID, then a valid selection.
         # Second operation: an old (once valid) identifier must be rejected twice.
         if len(payloads) == 1:
             stale.append(candidate['id'])
         anchor_id = 'unknown' if len(payloads) == 1 else candidate['id'] if len(payloads) == 2 else stale[0]
         plan = {'suggested_objectives': ['Explicar o conceito.'], 'suggestions': [{
-            'contribution_id': match['contribution_id'], 'concept_ids': candidate['concept_ids'],
-            'evidence_ids': match['evidence_ids'][:1], 'source_anchor_id': anchor_id,
+            'candidate_id': anchor_id,
             'pedagogical_rationale': 'Relacionar à documentação.', 'suggested_content': 'Discuta o mecanismo.'}]}
         return httpx.Response(200, json={'model': 'controlled', 'usage': {'prompt_tokens': 1000, 'completion_tokens': 200},
             'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(plan)}}]})
@@ -184,7 +178,7 @@ def test_anchor_ids_stable_on_retry_and_rejected_in_another_operation(client, mo
         second = client.post('/api/studio/preview', json=RNA, headers=ORIGIN)
         assert second.status_code == 502 and len(payloads) == 4
         assert stale[0] not in {a['id'] for a in payloads[2][0]}
-        assert '"anchor_error":"unknown_anchor_id"' in caplog.text
+        assert '"code":"invalid_scientific_candidate"' in caplog.text
         assert client.get('/api/studio/previews/' + first.json()['preview_id']).status_code == 200
     finally:
         app.dependency_overrides.clear()

@@ -46,12 +46,9 @@ def rejected_plan(client, monkeypatch, caplog, mutate):
     caplog.set_level('INFO', logger='matilda.studio.validation')
     def upstream(http):
         material = json.loads(json.loads(http.content)['messages'][1]['content'])
-        match = material['authorized_contributions'][0]
-        anchor = next(a for a in material['authorized_source_anchors'] if a['id'] in match['source_anchor_ids'])
+        candidate = material['scientific_candidates'][0]
         plan = {'suggested_objectives': ['Conferir as fontes documentais.'], 'suggestions': [{
-            'contribution_id': match['contribution_id'], 'concept_ids': anchor['concept_ids'],
-            'evidence_ids': match['evidence_ids'][:1],
-            'source_anchor_id': anchor['id'],
+            'candidate_id': candidate['id'],
             'pedagogical_rationale': 'Comparar o mecanismo e sua documentação.',
             'suggested_content': 'Leia a evidência e discuta o mecanismo.',
         }]}
@@ -70,30 +67,29 @@ def rejected_plan(client, monkeypatch, caplog, mutate):
         app.dependency_overrides.clear()
 
 
-def test_unknown_contribution_is_distinguished_from_evidence_failure(client, monkeypatch, caplog):
+def test_model_cannot_override_candidate_contribution(client, monkeypatch, caplog):
     def mutate(plan, _):
         plan['suggestions'][0]['contribution_id'] = 'PRIVATE_INVALID_ID'
     response, diagnostics = rejected_plan(client, monkeypatch, caplog, mutate)
     assert response.status_code == 502
-    assert all(e['code'] == 'unknown_contribution' and e['plan_pydantic_valid'] is True
-               and e['returned_suggestions'] == 1 for e in diagnostics)
+    assert all(e['code'] == 'pydantic_validation' and e['plan_pydantic_valid'] is False
+               and e['returned_suggestions'] is None for e in diagnostics)
 
 
-def test_unknown_anchor_selection_is_reported_without_logging_identifier(client, monkeypatch, caplog):
+def test_unknown_scientific_candidate_is_reported_without_logging_identifier(client, monkeypatch, caplog):
     def mutate(plan, _):
-        plan['suggestions'][0]['source_anchor_id'] = 'PRIVATE_INVALID_ID'
+        plan['suggestions'][0]['candidate_id'] = 'PRIVATE_INVALID_ID'
     response, diagnostics = rejected_plan(client, monkeypatch, caplog, mutate)
     assert response.status_code == 502
-    assert diagnostics and all(e['code'] == 'invalid_source_anchor' and e['plan_pydantic_valid'] is True
-                               and e['anchor_error'] == 'unknown_anchor_id' for e in diagnostics)
+    assert diagnostics and all(e['code'] == 'invalid_scientific_candidate' and e['plan_pydantic_valid'] is True for e in diagnostics)
 
 
-def test_invalid_concept_is_distinguished_from_structural_pydantic_failure(client, monkeypatch, caplog):
+def test_model_cannot_override_candidate_concept(client, monkeypatch, caplog):
     def mutate(plan, _):
         plan['suggestions'][0]['concept_ids'] = ['PRIVATE_INVALID_ID']
     response, diagnostics = rejected_plan(client, monkeypatch, caplog, mutate)
     assert response.status_code == 502
-    assert diagnostics and all(e['code'] == 'invalid_concept' and e['plan_pydantic_valid'] is True for e in diagnostics)
+    assert diagnostics and all(e['code'] == 'pydantic_validation' and e['plan_pydantic_valid'] is False for e in diagnostics)
 
 
 def test_ineligible_identity_keeps_rejection_with_specific_code():
@@ -116,7 +112,7 @@ def test_provider_schema_requires_suggestion_only_when_scientific_coverage_exist
         body = json.loads(http.content)
         material = json.loads(body['messages'][1]['content'])
         schema = body['response_format']['json_schema']['schema']
-        covered = bool(material['authorized_contributions'])
+        covered = bool(material['scientific_candidates'])
         seen.append(covered)
         assert schema['properties']['suggestions']['minItems'] == (1 if covered else 0)
         assert schema['properties']['suggestions']['maxItems'] == (20 if covered else 0)
@@ -133,33 +129,28 @@ def test_provider_schema_requires_suggestion_only_when_scientific_coverage_exist
         app.dependency_overrides.clear()
 
 
-def test_model_receives_bound_ids_and_canonical_literal_anchor_choices(client, monkeypatch):
+def test_model_receives_indivisible_candidates_and_documents_without_administrative_duplicates(client, monkeypatch):
     from types import SimpleNamespace
     from studio_flow_provider import FlowProvider
     monkeypatch.setenv('NVIDIA_API_KEY', 'test-private-key')
-    external = FlowProvider()
-    inspected = []
+    external, inspected = FlowProvider(), []
     async def upstream(http):
         body = json.loads(http.content)
         material = json.loads(body['messages'][1]['content'])
         schema = body['response_format']['json_schema']['schema']
         suggestion = schema['$defs']['PlannedSuggestion']['properties']
-        authorized = material['authorized_contributions']
-        assert len(authorized) == 4
-        assert set(suggestion['contribution_id']['enum']) == {a['contribution_id'] for a in authorized}
-        assert set(suggestion['concept_ids']['items']['enum']) == {cid for a in authorized for cid in a['concept_ids']}
-        assert set(suggestion['evidence_ids']['items']['enum']) == {eid for a in authorized for eid in a['evidence_ids']}
-        documents = {doc['id']: doc['content'] for doc in material['source_documents']}
-        assert 'SourceAnchor' not in schema['$defs'] and 'source_anchor' not in suggestion
-        choices = material['authorized_source_anchors']
-        assert 1 <= len(choices) <= 8
-        assert set(suggestion['source_anchor_id']['enum']) == {a['id'] for a in choices}
-        assert all(entry['source_anchor_ids'] for entry in authorized)
+        contributions = material['scientific_contributions']
+        choices = material['scientific_candidates']
+        assert len(contributions) == 4 and 4 <= len(choices) <= 8
+        assert set(suggestion) == {'candidate_id', 'pedagogical_rationale', 'suggested_content'}
+        assert set(suggestion['candidate_id']['enum']) == {a['id'] for a in choices}
+        assert set(contributions) == {a['contribution'] for a in choices}
+        for document in material['source_documents']:
+            assert set(document) == {'key', 'type', 'content'}
         for choice in choices:
-            anchor = choice['source_anchor']
-            assert anchor['quote'].strip() and anchor['quote'] in documents[anchor['source_document_id']]
-            assert any(choice['id'] in entry['source_anchor_ids'] and set(choice['concept_ids']) <= set(entry['concept_ids'])
-                       for entry in authorized)
+            document = next(d for d in material['source_documents'] if d['key'] == choice['document'])
+            assert choice['quote'] in document['content']
+            assert contributions[choice['contribution']]['evidence_claims']
         inspected.append(True)
         result = await external.complete(SimpleNamespace(stage='preview', material=material, prompt_version='controlled'))
         return httpx.Response(200, json={'model': 'controlled', 'usage': {'prompt_tokens': 1000, 'completion_tokens': 200},
@@ -214,12 +205,12 @@ def test_smoke_reports_coverage_failure_and_prevents_corrective_paid_call(client
     assert 'Explicar o mecanismo molecular.' not in json.dumps(report)
 
 
-def test_evidence_from_another_authorized_contribution_is_still_rejected(client, monkeypatch, caplog):
+def test_model_cannot_override_candidate_evidence(client, monkeypatch, caplog):
     def mutate(plan, material):
-        plan['suggestions'][0]['evidence_ids'] = material['authorized_contributions'][1]['evidence_ids'][:1]
+        plan['suggestions'][0]['evidence_ids'] = ['evidence-crispr-2011']
     response, diagnostics = rejected_plan(client, monkeypatch, caplog, mutate)
     assert response.status_code == 502
-    assert diagnostics and all(e['code'] == 'unauthorized_evidence' and e['plan_pydantic_valid'] is True for e in diagnostics)
+    assert diagnostics and all(e['code'] == 'pydantic_validation' and e['plan_pydantic_valid'] is False for e in diagnostics)
 
 
 def test_invalid_plan_shape_is_distinguished_from_scientific_failure(client, monkeypatch, caplog):
@@ -233,7 +224,7 @@ def test_invalid_plan_shape_is_distinguished_from_scientific_failure(client, mon
 
 def test_model_authored_source_anchor_is_forbidden_even_if_it_is_literal(client, monkeypatch, caplog):
     def mutate(plan, material):
-        plan['suggestions'][0]['source_anchor'] = material['authorized_source_anchors'][0]['source_anchor']
+        plan['suggestions'][0]['source_anchor'] = {'source_document_id': 'd1', 'quote': 'CRISPR', 'occurrence': 0}
     response, diagnostics = rejected_plan(client, monkeypatch, caplog, mutate)
     assert response.status_code == 502
     assert diagnostics and all(e['code'] == 'pydantic_validation' and e['plan_pydantic_valid'] is False for e in diagnostics)
@@ -260,13 +251,10 @@ def test_smoke_does_not_spend_a_second_inference_after_upstream_failure(client, 
     assert 'test-private-key' not in json.dumps(report)
 
 
-def test_known_anchor_with_different_authorized_concept_still_fails_binding(client, monkeypatch, caplog):
+def test_crossed_legacy_ids_are_rejected_instead_of_repaired(client, monkeypatch, caplog):
     def mutate(plan, material):
-        item = plan['suggestions'][0]
-        match = material['authorized_contributions'][0]
-        other = next(cid for cid in match['concept_ids'] if cid not in item['concept_ids'])
-        item['concept_ids'] = [other]
+        plan['suggestions'][0].update(contribution_id='crispr-2012', concept_ids=['crispr'],
+                                      evidence_ids=['evidence-crispr-2011'], source_anchor_id='old-anchor')
     response, diagnostics = rejected_plan(client, monkeypatch, caplog, mutate)
     assert response.status_code == 502
-    assert diagnostics and all(e['code'] == 'invalid_source_anchor' and e['plan_pydantic_valid'] is True
-                               and e['anchor_error'] == 'anchor_binding_mismatch' for e in diagnostics)
+    assert diagnostics and all(e['code'] == 'pydantic_validation' and e['plan_pydantic_valid'] is False for e in diagnostics)

@@ -1,5 +1,8 @@
 # Âncoras canônicas na prévia — Issue #31 / PR #32
 
+Documento histórico. A seleção separada de IDs foi substituída por
+[candidatos científicos indivisíveis](studio-scientific-candidates.md).
+
 Base desta correção: `6816c30`, cabeça anterior de `feat/nvidia-studio`.
 Não foram realizadas chamadas reais NVIDIA/Gemini nesta investigação.
 

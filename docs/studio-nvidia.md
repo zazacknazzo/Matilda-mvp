@@ -1,6 +1,8 @@
 # Studio com NVIDIA NIM — Issue #31
 
-Atualização estrutural de âncoras: [seleção canônica pelo servidor](studio-canonical-anchors.md).
+Atualização atual: [candidatos científicos e compactação](studio-scientific-candidates.md).
+
+Histórico estrutural de âncoras: [seleção canônica pelo servidor](studio-canonical-anchors.md).
 
 Histórico após o primeiro smoke relatado pelo usuário: ver
 [diagnóstico da prévia e limites da evidência](nvidia-preview-diagnosis.md).
@@ -61,7 +63,8 @@ A API do modelo não recebe LessonBundle diretamente: a fronteira T09 existente
 é LessonDraft. IDs finais, metadados, evidências, participantes e referências
 canônicas são acrescentados e conferidos pelo servidor. Exigir LessonBundle do
 modelo permitiria que ele escrevesse campos que pertencem ao servidor. A prévia
-usa PreviewPlan privado com source_anchor_id; o servidor resolve a seleção para
+usa PreviewPlan privado com candidate_id; o servidor resolve toda a associação
+(contribuição, conceitos, evidências e âncora) para
 o SourceAnchor público original antes de validar EnrichmentPreview. Não aceita
 source_anchor escrito pelo modelo. A aula continua recebendo a prévia pública completa.
 

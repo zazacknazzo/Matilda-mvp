@@ -204,7 +204,7 @@ def test_official_gemini_sdk_both_stages_only_google_transport_is_simulated(clie
         if request.url.path.endswith(':countTokens'):
             return httpx.Response(200, json={'totalTokens': 600})
         material = json.loads(body['contents'][0]['parts'][0]['text'])
-        stage = 'preview' if 'authorized_contributions' in material else 'lesson'
+        stage = 'preview' if 'scientific_candidates' in material else 'lesson'
         result = await flow.complete(SimpleNamespace(stage=stage, material=material, prompt_version=f'studio-{stage}-v1'))
         return httpx.Response(200, json={'candidates': [{'content': {'role': 'model', 'parts': [{'text': result.content.decode()}]}, 'finishReason': 'STOP'}],
             'modelVersion': 'gemini-controlled-sdk', 'usageMetadata': {'promptTokenCount': 600, 'candidatesTokenCount': 800, 'thoughtsTokenCount': 20}})

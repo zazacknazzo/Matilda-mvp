@@ -1,4 +1,4 @@
-"""Private model selections backed by server-owned, literal scientific anchors."""
+"""Private, indivisible scientific candidates backed by canonical literal anchors."""
 from dataclasses import dataclass
 from hashlib import sha256
 import json
@@ -14,10 +14,7 @@ from app.services.concept_analysis import editorial_alias_spans
 
 
 class PlannedSuggestion(LessonModel):
-    contribution_id: Id
-    concept_ids: list[Id] = Field(min_length=1, max_length=20)
-    evidence_ids: list[Id] = Field(min_length=1, max_length=20)
-    source_anchor_id: Id
+    candidate_id: Id
     pedagogical_rationale: Text
     suggested_content: Text
 
@@ -28,26 +25,31 @@ class PreviewPlan(LessonModel):
 
 
 @dataclass(frozen=True)
-class CanonicalAnchor:
+class ScientificCandidate:
     id: str
-    source_anchor: SourceAnchor
+    contribution_id: str
     concept_id: str
+    evidence_ids: tuple[str, ...]
+    source_anchor: SourceAnchor
 
-    def for_model(self):
-        return {'id': self.id, 'source_anchor': self.source_anchor.model_dump(), 'concept_ids': [self.concept_id]}
+    def preview_fields(self):
+        return {'contribution_id': self.contribution_id, 'concept_ids': [self.concept_id],
+                'evidence_ids': list(self.evidence_ids), 'source_anchor': self.source_anchor.model_copy(deep=True)}
 
 
-class CanonicalAnchors:
-    """Build once per operation; callers never trust a model-authored quote or offset."""
+class ScientificCandidates:
+    """Build once; one selection resolves all scientific fields without alternatives."""
     MAX_CHOICES = 8
 
     def __init__(self, *, context, documents, matches, concepts):
         self._matches = {match.contribution.id: match for match in matches}
         self._documents = {document.id: document for document in documents}
+        self._document_keys = {document.id: f'd{index + 1}' for index, document in enumerate(documents)}
+        self._contribution_keys = {identifier: f's{index + 1}' for index, identifier in enumerate(self._matches)}
         editorial = {concept.id: concept for concept in concepts}
         resolved = {(p.source_document_id, p.concept_id) for p in context.provenance if p.concept_id is not None}
         needed = {c.id for match in matches for c in match.matched_concepts if c.id in match.contribution.concept_ids}
-        options = []
+        anchors = []
         for document in documents:
             for identifier in sorted(needed):
                 concept = editorial.get(identifier)
@@ -64,61 +66,62 @@ class CanonicalAnchors:
                     anchor = SourceAnchor(source_document_id=document.id, quote=quote, occurrence=occurrence)
                     if anchor.locate(document) != (start, end):
                         raise PydanticCustomError('missing_grounded_anchor', 'Ocorrência conceitual não corresponde ao documento.')
-                    token = sha256(json.dumps([context.id, document.id, identifier, start, end]).encode()).hexdigest()[:24]
-                    options.append(CanonicalAnchor('anchor-' + token, anchor, identifier))
-        self._allowed = {}
-        chosen = {}
-        # Guarantee every contribution has a grounded choice before adding alternatives.
+                    anchors.append((identifier, anchor))
+        chosen, alternatives = {}, []
+        # Guarantee one indivisible candidate per authorized contribution before alternatives.
         for identifier, match in self._matches.items():
+            if match.contribution.verification_status != 'verified':
+                raise PydanticCustomError('ineligible_contribution', 'Contribuição não verificada.')
+            if not match.evidence or any(e.contribution_id != identifier or e.verification_status != 'verified'
+                                        or e.source_type not in ('documental', 'historical') for e in match.evidence):
+                raise PydanticCustomError('unauthorized_evidence', 'Evidência não elegível para a contribuição.')
             supported = {c.id for c in match.matched_concepts} & set(match.contribution.concept_ids)
-            eligible = [option for option in options if option.concept_id in supported]
+            eligible = []
+            for concept_id, anchor in anchors:
+                if concept_id not in supported:
+                    continue
+                evidence_ids = tuple(e.id for e in match.evidence)
+                token = sha256(json.dumps([context.id, identifier, concept_id, evidence_ids, anchor.model_dump()],
+                                          sort_keys=True).encode()).hexdigest()[:24]
+                eligible.append(ScientificCandidate('candidate-' + token, identifier, concept_id, evidence_ids, anchor))
             if not eligible:
                 raise PydanticCustomError('missing_grounded_anchor', 'Contribuição sem trecho conceitual literal nos documentos autorizados.')
-            self._allowed[identifier] = {option.id for option in eligible}
-            chosen.setdefault(eligible[0].id, eligible[0])
+            chosen[eligible[0].id] = eligible[0]
+            alternatives.extend(eligible[1:])
         if len(chosen) > self.MAX_CHOICES:
-            raise PydanticCustomError('missing_grounded_anchor', 'Limite de âncoras não comporta todas as contribuições autorizadas.')
-        for option in options:
+            raise PydanticCustomError('missing_grounded_anchor', 'Limite de candidatos não comporta todas as contribuições autorizadas.')
+        for candidate in alternatives:
             if len(chosen) >= self.MAX_CHOICES:
                 break
-            chosen.setdefault(option.id, option)
+            chosen.setdefault(candidate.id, candidate)
         self._choices = chosen
 
     def for_model(self):
         return {
-            'authorized_contributions': [{
-                'contribution_id': match.contribution.id,
-                'concept_ids': [c.id for c in match.matched_concepts],
-                'evidence_ids': [e.id for e in match.evidence],
-                'source_anchor_ids': [identifier for identifier in self._choices if identifier in self._allowed[match.contribution.id]],
-                'scientific_explanation': match.explanation,
-            } for match in self._matches.values()],
-            'authorized_source_anchors': [option.for_model() for option in self._choices.values()],
+            'source_documents': [{'key': self._document_keys[d.id], 'type': d.type, 'content': d.content}
+                                 for d in self._documents.values()],
+            'scientific_contributions': {self._contribution_keys[identifier]: {
+                'title': match.contribution.title,
+                'evidence_claims': [e.claim_supported for e in match.evidence],
+            } for identifier, match in self._matches.items()},
+            'scientific_candidates': [{
+                'id': candidate.id, 'contribution': self._contribution_keys[candidate.contribution_id],
+                'concept': next(c.name for c in self._matches[candidate.contribution_id].matched_concepts if c.id == candidate.concept_id),
+                'document': self._document_keys[candidate.source_anchor.source_document_id],
+                'quote': candidate.source_anchor.quote, 'occurrence': candidate.source_anchor.occurrence,
+            } for candidate in self._choices.values()],
         }
 
     def response_schema(self):
         schema = PreviewPlan.model_json_schema()
         schema['properties']['suggestions'].update(minItems=1 if self._matches else 0, maxItems=20 if self._matches else 0)
-        if self._matches:
-            properties = schema['$defs']['PlannedSuggestion']['properties']
-            properties['contribution_id']['enum'] = list(self._matches)
-            properties['concept_ids']['items']['enum'] = sorted({c.id for m in self._matches.values() for c in m.matched_concepts})
-            properties['evidence_ids']['items']['enum'] = sorted({e.id for m in self._matches.values() for e in m.evidence})
-            properties['source_anchor_id']['enum'] = list(self._choices)
+        if self._choices:
+            schema['$defs']['PlannedSuggestion']['properties']['candidate_id']['enum'] = list(self._choices)
         return schema
 
-    def resolve(self, selection: PlannedSuggestion) -> SourceAnchor:
-        match = self._matches.get(selection.contribution_id)
-        if match is None:
-            raise PydanticCustomError('unknown_contribution', 'Contribuição não autorizada.')
-        if not set(selection.evidence_ids) <= {e.id for e in match.evidence}:
-            raise PydanticCustomError('unauthorized_evidence', 'Evidência não autorizada para a contribuição.')
-        if not set(selection.concept_ids) <= ({c.id for c in match.matched_concepts} & set(match.contribution.concept_ids)):
-            raise PydanticCustomError('invalid_concept', 'Conceito não autorizado para a contribuição.')
-        option = self._choices.get(selection.source_anchor_id)
-        if option is None:
-            raise PydanticCustomError('invalid_source_anchor', 'Identificador de âncora não autorizado.', {'anchor_error': 'unknown_anchor_id'})
-        if option.id not in self._allowed[selection.contribution_id] or set(selection.concept_ids) != {option.concept_id}:
-            raise PydanticCustomError('invalid_source_anchor', 'Âncora sem vínculo com a contribuição e os conceitos selecionados.', {'anchor_error': 'anchor_binding_mismatch'})
-        option.source_anchor.locate(self._documents[option.source_anchor.source_document_id])
-        return option.source_anchor.model_copy(deep=True)
+    def resolve(self, identifier: str) -> ScientificCandidate:
+        candidate = self._choices.get(identifier)
+        if candidate is None:
+            raise PydanticCustomError('invalid_scientific_candidate', 'Candidato científico não autorizado nesta operação.')
+        candidate.source_anchor.locate(self._documents[candidate.source_anchor.source_document_id])
+        return candidate

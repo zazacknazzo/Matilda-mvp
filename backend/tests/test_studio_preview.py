@@ -25,16 +25,12 @@ class PreviewProvider:
 
     async def complete(self, request):
         self.requests.append(request)
-        matches = request.material['authorized_contributions']
+        candidates = request.material['scientific_candidates']
         suggestions = []
-        if matches:
-            match = matches[0]
-            anchor = next(a for a in request.material['authorized_source_anchors'] if a['id'] in match['source_anchor_ids'])
+        if candidates:
+            candidate = candidates[0]
             suggestions.append({
-                'contribution_id': match['contribution_id'],
-                'concept_ids': anchor['concept_ids'],
-                'evidence_ids': match['evidence_ids'][:1],
-                'source_anchor_id': anchor['id'],
+                'candidate_id': candidate['id'],
                 'pedagogical_rationale': 'Relacionar mecanismo molecular e análise documental.',
                 'suggested_content': 'Compare a afirmação documental com o mecanismo apresentado no material.',
             })
@@ -111,12 +107,9 @@ def test_sdk_transport_is_real_and_disables_tools(client, monkeypatch):
         if request.url.path.endswith(':countTokens'):
             return httpx.Response(200, json={'totalTokens': 600})
         material = json.loads(body['contents'][0]['parts'][0]['text'])
-        match = material['authorized_contributions'][0]
-        anchor = next(a for a in material['authorized_source_anchors'] if a['id'] in match['source_anchor_ids'])
+        candidate = material['scientific_candidates'][0]
         plan = {'suggested_objectives': ['Explicar o mecanismo.'], 'suggestions': [{
-            'contribution_id': match['contribution_id'], 'concept_ids': anchor['concept_ids'],
-            'evidence_ids': match['evidence_ids'][:1],
-            'source_anchor_id': anchor['id'],
+            'candidate_id': candidate['id'],
             'pedagogical_rationale': 'Conferir a documentação.', 'suggested_content': 'Leia a evidência e compare os mecanismos.'}]}
         return httpx.Response(200, json={'candidates': [{'content': {'role': 'model', 'parts': [{'text': json.dumps(plan)}]}, 'finishReason': 'STOP'}],
             'modelVersion': 'gemini-3.8-flash', 'usageMetadata': {'promptTokenCount': 600, 'candidatesTokenCount': 100, 'thoughtsTokenCount': 20}})
@@ -153,8 +146,6 @@ def test_rejects_unauthorized_provider_references(client, provider, field, value
     async def poison(request):
         result = await original(request)
         payload = json.loads(result.content)
-        if field == 'source_anchor' and value['source_document_id'] == 'keep':
-            value['source_document_id'] = request.material['source_documents'][0]['id']
         payload['suggestions'][0][field] = value
         return ProviderResult(json.dumps(payload).encode(), result.metadata)
 
