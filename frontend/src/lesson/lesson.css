@@ -184,7 +184,7 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 12px 35px var(--matilda-ink) 09;
+  box-shadow: var(--matilda-slide-shadow);
 }
 .lesson-slide-top {
   display: flex;
