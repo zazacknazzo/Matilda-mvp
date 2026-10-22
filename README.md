@@ -96,14 +96,18 @@ Confirme a ficha bibliográfica e clique em **Investigar contribuições feminin
 Selecione uma contribuição, leia a classificação bibliográfica e abra a evidência.
 Use as camadas do grafo, a alternativa em lista ou exporte Markdown/JSON.
 
-## Studio: texto até prévia verificável (T05)
+## Studio: texto, revisão e aula persistida (T05/T10)
 
 Selecione **Studio — Criar aula**, informe título, texto e/ou conceitos (por
 exemplo CRISPR-Cas9), confira os defaults e clique em **Criar prévia**.
 O texto é enviado ao Gemini junto da configuração e do conjunto científico
 resolvido pelo mesmo motor do Forensics. A tela separa material original,
 propostas pedagógicas pendentes e evidências canônicas com participantes e fontes.
-A revisão docente e a geração final ainda não estão conectadas neste fluxo.
+Clique em **Revisar fontes e objetivos**, aceite ou rejeite cada sugestão, aprove
+os objetivos e salve. **Continuar para geração** só é liberado após a revisão
+completa. Gere a aula e abra slides e plano, recuperados pelo ID persistido.
+Voltar à revisão conserva as decisões confirmadas; alterar a revisão exige uma
+nova geração e mantém a aula anterior disponível até expirar.
 
 Configure `GEMINI_API_KEY` no `.env` da raiz, exclusivamente no backend, e
 reinicie a API. O modelo configurável é `GEMINI_MODEL=gemini-3.8-flash`.
@@ -127,7 +131,8 @@ cd frontend
 node node_modules/@playwright/test/cli.js test --config playwright.studio.config.ts
 ```
 
-[Contrato e execução T05](docs/studio-preview-t05.md). Para publicar, mantenha
+[Contrato e execução T05](docs/studio-preview-t05.md) e
+[integração e validação T10](docs/studio-flow-t10.md). Para publicar, mantenha
 frontend e `/api` na mesma origem HTTPS, proxy com timeout de pelo menos 100 s
 e SQLite persistente. No desenvolvimento, `MATILDA_API_PROXY` altera o destino
 do proxy Vite; o navegador continua usando `/api` e não recebe a chave.

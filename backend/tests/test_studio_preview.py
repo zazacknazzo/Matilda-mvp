@@ -403,7 +403,7 @@ def test_two_global_slots_do_not_block_forensics(client, provider):
     asyncio.run(journey())
 
 
-@pytest.mark.parametrize('content', [b'{invalid', b'[]', b'{}', b' ' * (128 * 1024 + 1)])
+@pytest.mark.parametrize('content', [b'{invalid', b'[]', b'{}', b' ' * (128 * 1024 + 1)], ids=['invalid-json', 'array', 'empty', 'oversized'])
 def test_bad_json_or_oversized_output_cannot_publish_preview(client, provider, content):
     original = provider.complete
     async def invalid(request):

@@ -2,10 +2,10 @@
 from app.main import app
 from app.api.studio_preview import get_provider
 from app.studio.ports import ProviderFailure
-from test_studio_preview import PreviewProvider
+from studio_flow_provider import FlowProvider
 
 
-class BrowserProvider(PreviewProvider):
+class BrowserProvider(FlowProvider):
     async def complete(self, request):
         import asyncio
         await asyncio.sleep(0.15)

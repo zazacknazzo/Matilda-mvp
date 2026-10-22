@@ -20,7 +20,7 @@ test("texto CRISPR chega à prévia persistida com fontes e sessão isolada", as
   await expect(page.getByTestId("original-document").first()).toHaveText(
     original,
   );
-  await expect(page.getByText("Pendente", { exact: true })).toBeVisible();
+  await expect(page.getByText("Pendente", { exact: true }).first()).toBeVisible();
   await expect(
     page.getByRole("link", { name: "Abrir fonte original" }).first(),
   ).toHaveAttribute("href", /^https:\/\//);

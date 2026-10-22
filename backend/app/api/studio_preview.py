@@ -14,7 +14,7 @@ from pydantic import ValidationError
 
 from app.schemas.studio import EnrichmentPreview, LessonProject, PreviewRequest, StudioError
 from app.services.studio.preview import create_preview, original_documents
-from app.services.studio.repository import PreviewRepository, conflict, not_found
+from app.services.studio.repository import conflict, not_found
 from app.studio.ports import POLICY, SESSION_COOKIE, ProviderFailure, RepositoryConflict
 
 router = APIRouter(prefix='/api/studio', tags=['Studio'])
@@ -31,7 +31,8 @@ def get_provider():
 
 
 def get_repository():
-    return PreviewRepository()
+    from app.services.studio.runtime_repository import StudioRepository
+    return StudioRepository()
 
 
 def owner(token):
@@ -116,6 +117,10 @@ async def post_preview(http: Request, provider=Depends(get_provider), repository
 
 @router.get('/previews/{preview_id}', response_model=EnrichmentPreview, responses={404: {'model': StudioError}})
 async def get_preview(preview_id: str, http: Request, repository=Depends(get_repository)):
+    origin = http.headers.get('origin')
+    allowed = {item.strip() for item in os.getenv('MATILDA_CORS_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173').split(',')}
+    if origin is not None and origin not in allowed:
+        return error_response(conflict('invalid_input', 'Origem não autorizada.').error)
     token = http.cookies.get(SESSION_COOKIE)
     preview = await repository.get_preview(session_id=owner(token), preview_id=preview_id, now=now()) if token else None
     if preview is None:

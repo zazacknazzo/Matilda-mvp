@@ -2,9 +2,14 @@ import { defineConfig } from "@playwright/test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+const python =
+  process.platform === "win32"
+    ? "..\\.venv\\Scripts\\python.exe"
+    : "../.venv/bin/python";
 const runtime = mkdtempSync(join(tmpdir(), "matilda-t05-"));
 export default defineConfig({
   testDir: "./tests",
+  testMatch: ["studio.spec.ts", "studio-flow.spec.ts", "investigation.spec.ts"],
   timeout: 30000,
   workers: 1,
   use: {
@@ -16,8 +21,7 @@ export default defineConfig({
   reporter: "list",
   webServer: [
     {
-      command:
-        "../.venv/bin/python -m uvicorn studio_e2e_app:app --app-dir ../backend/tests --host 127.0.0.1 --port 8016",
+      command: `"${python}" -X utf8 -m uvicorn studio_e2e_app:app --app-dir ../backend/tests --host 127.0.0.1 --port 8016`,
       url: "http://127.0.0.1:8016/api/health",
       reuseExistingServer: false,
       env: {

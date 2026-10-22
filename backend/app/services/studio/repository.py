@@ -38,6 +38,8 @@ class PreviewRepository:
                 'CREATE TABLE IF NOT EXISTS enrichment_suggestions (id TEXT PRIMARY KEY, preview_id TEXT NOT NULL REFERENCES enrichment_previews(id) ON DELETE CASCADE, payload TEXT NOT NULL)',
                 'CREATE TABLE IF NOT EXISTS lesson_bundles (id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES lesson_projects(id) ON DELETE CASCADE, preview_id TEXT NOT NULL REFERENCES enrichment_previews(id), payload TEXT NOT NULL)',
                 'CREATE TABLE IF NOT EXISTS studio_preview_operations (project_id TEXT PRIMARY KEY REFERENCES lesson_projects(id) ON DELETE CASCADE, session_id TEXT NOT NULL, active_until REAL NOT NULL)',
+                'CREATE TABLE IF NOT EXISTS studio_scientific_snapshots (preview_id TEXT PRIMARY KEY REFERENCES enrichment_previews(id) ON DELETE CASCADE, payload TEXT NOT NULL)',
+                'CREATE TABLE IF NOT EXISTS studio_generation_operations (session_id TEXT NOT NULL, key TEXT NOT NULL, claim TEXT NOT NULL UNIQUE, preview_id TEXT NOT NULL REFERENCES enrichment_previews(id) ON DELETE CASCADE, fingerprint TEXT NOT NULL, state TEXT NOT NULL, deadline REAL NOT NULL, frozen TEXT NOT NULL, request TEXT NOT NULL, bundle_id TEXT, PRIMARY KEY(session_id, key))',
                 'CREATE TABLE IF NOT EXISTS studio_usage (session_id TEXT NOT NULL REFERENCES studio_sessions(id) ON DELETE CASCADE, started_at REAL NOT NULL, stage TEXT NOT NULL)',
             ):
                 db.execute(statement)
@@ -91,7 +93,7 @@ class PreviewRepository:
             db.execute('INSERT INTO studio_preview_operations VALUES (?, ?, ?)', (project.id, session_id, timestamp + POLICY.preview_backend_seconds + POLICY.recovery_grace_seconds))
             db.execute('INSERT INTO studio_usage VALUES (?, ?, ?)', (session_id, timestamp, 'preview'))
 
-    async def publish_preview(self, *, session_id, preview, now):
+    async def publish_preview(self, *, session_id, preview, now, scientific_snapshot=None):
         with self.transaction() as db:
             row = db.execute('SELECT p.payload FROM lesson_projects p JOIN studio_preview_operations o ON o.project_id=p.id WHERE p.id=? AND p.session_id=? AND o.active_until>?', (preview.project_id, session_id, datetime.fromisoformat(now).timestamp())).fetchone()
             if not row:
@@ -100,6 +102,8 @@ class PreviewRepository:
             if current.expires_at != preview.expires_at:
                 raise conflict('review_conflict', 'O projeto mudou durante a operação.')
             db.execute('INSERT INTO enrichment_previews VALUES (?, ?, ?)', (preview.preview_id, preview.project_id, preview.model_dump_json()))
+            if scientific_snapshot is not None:
+                db.execute('INSERT INTO studio_scientific_snapshots VALUES (?, ?)', (preview.preview_id, json.dumps(scientific_snapshot)))
             for suggestion in preview.suggestions:
                 db.execute('INSERT INTO enrichment_suggestions VALUES (?, ?, ?)', (suggestion.id, preview.preview_id, suggestion.model_dump_json()))
             db.execute('UPDATE lesson_projects SET payload=?, last_error=NULL WHERE id=?', (preview.project.model_dump_json(), preview.project_id))
