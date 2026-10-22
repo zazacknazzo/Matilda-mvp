@@ -94,7 +94,13 @@ No frontend: `npm run dev`.
 
 Confirme a ficha bibliográfica e clique em **Investigar contribuições femininas**.
 Selecione uma contribuição, leia a classificação bibliográfica e abra a evidência.
-Use as camadas do grafo, a alternativa em lista ou exporte Markdown/JSON.
+O **Mapa simples** organiza artigo, assuntos em comum e contribuições em uma
+leitura de cima para baixo. Use **Ver história e fontes** para abrir o dossiê.
+O filtro **Presença nas referências** também atualiza o mapa. A **Rede completa**
+mantém as camadas do grafo e a **Lista** apresenta todas as relações; exportações
+Markdown/JSON continuam disponíveis. No celular, alterne entre **Descobertas**,
+**Mapa e lista** e **Evidências**. A busca ampliada fica em **Quer ir além do
+catálogo?**, depois dos resultados.
 
 ## Studio: texto, revisão e aula persistida (T05/T10)
 

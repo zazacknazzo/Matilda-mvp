@@ -1,4 +1,60 @@
 import { test, expect } from "@playwright/test";
+import type { Analysis } from "../src/types";
+
+test("mapa guiado respeita filtros e abre fontes em celular, tablet e desktop", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Edição genômica/ }).click();
+  const response = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/analyses") &&
+      response.request().method() === "POST",
+  );
+  await page
+    .getByRole("button", { name: "Investigar contribuições femininas" })
+    .click();
+  const analysis: Analysis = await (await response).json();
+  await expect(
+    page.getByRole("button", { name: "Mapa simples", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  for (const status of ["CITED", "UNKNOWN"]) {
+    await page.getByLabel("Presença nas referências").selectOption(status);
+    const count = analysis.contributions.filter(
+      (match) => match.citation_status === status,
+    ).length;
+    await expect(page.locator(".map-story")).toHaveCount(count);
+    if (!count) await expect(page.locator(".map-empty")).toBeVisible();
+  }
+  await page.getByLabel("Presença nas referências").selectOption("all");
+  for (const width of [1440, 1024, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    const mapTab = page.getByRole("button", {
+      name: "Mapa e lista",
+      exact: true,
+    });
+    if (await mapTab.isVisible()) await mapTab.click();
+    await expect(page.locator(".guided-map")).toBeVisible();
+    await expect(page.locator(".map-story")).toHaveCount(
+      analysis.contributions.length,
+    );
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    if (width === 1440 || width === 390)
+      await page.screenshot({
+        path: `../docs/screenshots/mapa-${width}.png`,
+        fullPage: true,
+      });
+    await page.locator(".map-evidence-button").last().focus();
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".evidence-region")).toBeFocused();
+    await expect(page.locator(".dossier")).toBeVisible();
+    await expect(page.locator(".dossier .source-card a").first()).toBeVisible();
+  }
+});
 
 test("DOI, investigação, evidência, camadas, lista e exportação", async ({
   page,
@@ -40,6 +96,13 @@ test("DOI, investigação, evidência, camadas, lista e exportação", async ({
     "href",
     "https://doi.org/10.1126/science.1225829",
   );
+  await expect(
+    page.getByRole("region", { name: "Mapa simplificado da investigação" }),
+  ).toBeVisible();
+  await expect(page.locator(".map-story")).toHaveCount(4);
+  await page
+    .getByRole("button", { name: "Rede completa", exact: true })
+    .click();
   await expect(page.locator(".react-flow__node").first()).toHaveCSS(
     "visibility",
     "visible",
@@ -91,7 +154,13 @@ test("cenário RNA e navegação mobile sem depender do grafo", async ({
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-  await page.getByRole("button", { name: "Grafo e lista" }).click();
+  await page.getByRole("button", { name: "Mapa e lista" }).click();
+  await expect(page.locator(".guided-map")).toBeVisible();
+  await expect(page.locator(".map-story")).toHaveCount(2);
+  await page.locator(".map-evidence-button").first().click();
+  await expect(page.locator(".evidence-region")).toBeFocused();
+  await expect(page.locator(".dossier")).toContainText("Katalin Karikó");
+  await page.getByRole("button", { name: "Mapa e lista" }).click();
   await page.getByRole("button", { name: "Lista", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Relações da investigação" }),
@@ -213,6 +282,7 @@ test("ampliação automática distingue candidatos, identidades e fontes", async
       },
     }),
   );
+  await page.locator(".advanced-discovery > summary").click();
   await page
     .getByRole("button", { name: "Ampliar descoberta automaticamente" })
     .click();
@@ -261,6 +331,7 @@ test("falha de ampliação preserva investigação e permite nova tentativa", as
       json: { detail: "Fonte indisponível na fixture." },
     }),
   );
+  await page.locator(".advanced-discovery > summary").click();
   await page
     .getByRole("button", { name: "Ampliar descoberta automaticamente" })
     .click();

@@ -55,6 +55,14 @@ limitação de requisições, retenção de cache e origens de produção.
 
 ## Visualização
 
+O Forensics abre um mapa guiado em cartões, derivado de `Analysis.contributions`
+e filtrado pela classificação bibliográfica. A sequência artigo → assuntos →
+contribuição orienta a leitura; não é uma sequência histórica nem acrescenta
+arestas ao grafo. Cada cartão preserva participantes, explicação, classificação e
+acesso ao dossiê. Ao selecionar uma contribuição, o painel de evidências recebe
+foco e rolagem em qualquer largura. O CSS do redesign é limitado ao Forensics.
+
+Na opção **Rede completa**, permanece a visualização
 React Flow: zoom, pan, seleção e movimentação dos nós. As camadas filtram
 bibliografia, contribuições ou ambas. As setas são direcionais e rotuladas;
 arestas temáticas são tracejadas. O caminho conceitual da contribuição selecionada
