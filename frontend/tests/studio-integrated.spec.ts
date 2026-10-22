@@ -1,6 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
 
-async function prepareGeneration(page: Page, alreadyReview = false) {
+async function prepareGeneration(
+  page: Page,
+  alreadyReview = false,
+  acceptAll = false,
+) {
   const openReview = page.getByRole("button", {
     name: "Revisar fontes e objetivos",
   });
@@ -12,7 +16,9 @@ async function prepareGeneration(page: Page, alreadyReview = false) {
   for (let i = 0; i < (await cards.count()); i++)
     await cards
       .nth(i)
-      .getByLabel(i === 0 ? "Aceitar" : "Rejeitar", { exact: true })
+      .getByLabel(i === 0 || acceptAll ? "Aceitar" : "Rejeitar", {
+        exact: true,
+      })
       .check();
   await page
     .getByLabel("Objetivos de aprendizagem · um por linha")
@@ -67,7 +73,7 @@ test("Forensics → configuração confirmável → ciência → aula → Markdo
   await expect(explore).toBeVisible();
   await explore.click();
   await expect(
-    page.getByRole("region", { name: "Dossiê científico" }),
+    page.getByRole("complementary", { name: "Inspetor de evidências" }),
   ).toContainText("Martin Jínek");
   await page.getByRole("button", { name: "Voltar ao Studio" }).click();
   await expect(slide).toHaveAttribute("aria-current", "step");
@@ -322,4 +328,105 @@ test("Nova origem não é substituída pela prévia anterior ainda em execução
   await expect(
     page.getByRole("button", { name: "Criar prévia" }),
   ).toBeEnabled();
+});
+
+test("Explorar investigação seleciona a contribuição correta e volta ao rascunho docente", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Edição genômica/ }).click();
+  const investigated = page.waitForResponse(
+    (r) => r.url().endsWith("/api/analyses") && r.status() === 201,
+  );
+  await page
+    .getByRole("button", { name: "Investigar contribuições femininas" })
+    .click();
+  const analysis = await (await investigated).json();
+  await page.locator(".discovery-card").first().click();
+  await page
+    .getByRole("button", { name: "Transformar em aula", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Criar prévia" }).click();
+  await page
+    .getByRole("button", { name: "Revisar fontes e objetivos" })
+    .click();
+  const second = page.locator("article.review-suggestion").nth(1);
+  await second
+    .getByLabel("Proposta pedagógica")
+    .fill("Rascunho de autoria preservado.");
+  const explore = second.getByRole("button", { name: "Explorar descoberta" });
+  await explore.click();
+  await expect(
+    page.getByRole("button", { name: "Forensics — Investigar ciência" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("complementary", { name: "Inspetor de evidências" }),
+  ).toContainText(analysis.contributions[1].contribution.title);
+  await expect(page.locator(".discovery-card").nth(1)).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await page
+    .getByRole("button", { name: "Voltar ao Studio", exact: true })
+    .click();
+  await expect(second.getByLabel("Proposta pedagógica")).toHaveValue(
+    "Rascunho de autoria preservado.",
+  );
+  await expect(explore).toBeFocused();
+  // The retained canonical dossier remains usable when the original API cannot be reached.
+  await page.context().setOffline(true);
+  await explore.click();
+  await expect(
+    page.getByRole("region", { name: "Dossiê científico" }),
+  ).toContainText(analysis.contributions[1].contribution.id);
+  await page.getByRole("button", { name: "Voltar ao Studio" }).click();
+  await expect(second.getByLabel("Proposta pedagógica")).toHaveValue(
+    "Rascunho de autoria preservado.",
+  );
+  await page.context().setOffline(false);
+});
+
+test("Aula com duas contribuições explora cada fonte e preserva slide e foco", async ({
+  page,
+}) => {
+  await page.goto("/#studio");
+  await page.getByLabel("Título da aula").fill("Duas contribuições");
+  await page
+    .getByLabel("Texto original")
+    .fill("CRISPR T13-multiple: edição genética.");
+  await page.getByRole("button", { name: "Criar prévia" }).click();
+  await prepareGeneration(page, false, true);
+  const response = page.waitForResponse(
+    (r) => r.url().endsWith("/api/studio/generate") && r.status() === 201,
+  );
+  await page.getByRole("button", { name: "Gerar minha aula" }).click();
+  const bundle = await (await response).json();
+  expect(
+    new Set(
+      bundle.references.map(
+        (ref: { contribution_id: string }) => ref.contribution_id,
+      ),
+    ).size,
+  ).toBe(2);
+  await page.getByRole("button", { name: "Abrir aula existente" }).click();
+  const slide = page
+    .getByRole("navigation", { name: "Sequência de slides" })
+    .getByRole("button")
+    .nth(3);
+  await slide.click();
+  const sources = page.getByRole("button", { name: /Explorar fontes da aula/ });
+  await expect(sources).toHaveCount(2);
+  for (let index = 0; index < 2; index++) {
+    await sources.nth(index).click();
+    const dossier = page.getByRole("region", { name: "Dossiê científico" });
+    await expect(dossier).toContainText(
+      bundle.references[index].claim_supported,
+    );
+    await expect(dossier).toContainText(
+      bundle.references[index].contribution_id,
+    );
+    await page.getByRole("button", { name: "Voltar ao Studio" }).click();
+    await expect(sources.nth(index)).toBeFocused();
+    await expect(slide).toHaveAttribute("aria-current", "step");
+  }
 });

@@ -14,6 +14,7 @@ import { ReviewWorkspace } from "./ReviewWorkspace";
 import { createReviewApi } from "./review-api";
 import { GenerationPanel } from "./GenerationPanel";
 import { createGenerationApi } from "./generation-api";
+import type { ExploreAnalysis } from "./ForensicsStudioBridge";
 import { ScientificDossier } from "./ScientificDossier";
 import "./studio.css";
 
@@ -45,7 +46,9 @@ function setupFrom(value: EnrichmentPreview): PreviewRequest {
 
 export function StudioWorkspace({
   origin,
+  onExploreAnalysis,
 }: {
+  onExploreAnalysis?: ExploreAnalysis;
   origin?: { analysis_id: string; title: string } | null;
 }) {
   const [setup, setSetup] = useState<PreviewRequest>(initialSetup);
@@ -253,6 +256,7 @@ export function StudioWorkspace({
         )}
         {view === "review" && preview && !busy && (
           <ReviewWorkspace
+            onExploreAnalysis={onExploreAnalysis}
             previewId={preview.preview_id}
             api={reviewApi}
             onRequestNewPreview={edit}
@@ -292,14 +296,40 @@ export function StudioWorkspace({
           <>
             {preview?.preview_id === bundle.preview_id &&
               bundle.references.length > 0 && (
-                <button
-                  ref={exploreTrigger}
-                  onClick={() =>
-                    setExploring(bundle.references[0].contribution_id)
-                  }
-                >
-                  Explorar fontes da aula
-                </button>
+                <ul aria-label="Contribuições científicas da aula">
+                  {bundle.references
+                    .filter(
+                      (ref, index, all) =>
+                        all.findIndex(
+                          (item) =>
+                            item.contribution_id === ref.contribution_id,
+                        ) === index,
+                    )
+                    .map((reference) => (
+                      <li key={reference.contribution_id}>
+                        <button
+                          onClick={async (event) => {
+                            const trigger = event.currentTarget;
+                            exploreTrigger.current = trigger;
+                            const id = preview.scientific_context.analysis_id;
+                            if (
+                              id &&
+                              onExploreAnalysis &&
+                              (await onExploreAnalysis(
+                                id,
+                                reference.contribution_id,
+                                () => trigger.focus(),
+                              ))
+                            )
+                              return;
+                            setExploring(reference.contribution_id);
+                          }}
+                        >
+                          Explorar fontes da aula · {reference.source_title}
+                        </button>
+                      </li>
+                    ))}
+                </ul>
               )}
             <button
               onClick={() =>

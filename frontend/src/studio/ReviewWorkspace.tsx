@@ -8,9 +8,11 @@ import type {
 import { type ReviewApi, reviewErrorMessage } from "./review-api";
 import { SuggestionCard, type SuggestionEdit } from "./SuggestionCard";
 import "./review.css";
+import type { ExploreAnalysis } from "./ForensicsStudioBridge";
 import { ScientificDossier } from "./ScientificDossier";
 
 interface Props {
+  onExploreAnalysis?: ExploreAnalysis;
   previewId: string;
   api: ReviewApi;
   onContinue: (request: GenerateRequest) => void;
@@ -76,6 +78,7 @@ function ReviewSession({
   api,
   onContinue,
   onRequestNewPreview,
+  onExploreAnalysis,
 }: Props) {
   const [preview, setPreview] = useState<EnrichmentPreview | null>(null);
   const [loadError, setLoadError] = useState("");
@@ -114,6 +117,7 @@ function ReviewSession({
     );
   return (
     <ReviewEditor
+      onExploreAnalysis={onExploreAnalysis}
       initialPreview={preview}
       api={api}
       onContinue={onContinue}
@@ -124,6 +128,7 @@ function ReviewSession({
 
 function ReviewEditor({
   initialPreview,
+  onExploreAnalysis,
   api,
   onContinue,
   onRequestNewPreview,
@@ -354,8 +359,20 @@ function ReviewEditor({
                 preview={preview}
                 edit={edits[suggestion.id]}
                 disabled={blocked}
-                onExplore={(event) => {
-                  exploreTrigger.current = event.currentTarget;
+                onExplore={async (event) => {
+                  const trigger = event.currentTarget;
+                  exploreTrigger.current = trigger;
+                  const id = preview.scientific_context.analysis_id;
+                  if (
+                    id &&
+                    onExploreAnalysis &&
+                    (await onExploreAnalysis(
+                      id,
+                      suggestion.contribution_id,
+                      () => trigger.focus(),
+                    ))
+                  )
+                    return;
                   setExploring(suggestion.contribution_id);
                 }}
                 onChange={(edit) => {

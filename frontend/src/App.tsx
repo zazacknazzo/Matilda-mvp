@@ -24,7 +24,7 @@ import {
   X,
 } from "lucide-react";
 import { AutomaticDiscovery } from "./components/AutomaticDiscovery";
-import { retrievePaper, investigate } from "./services/api";
+import { retrievePaper, investigate, getAnalysis } from "./services/api";
 import type { Analysis, Paper, Match, GraphNode } from "./types";
 import {
   ScientificGraph,
@@ -47,7 +47,18 @@ const examples = [
     detail: "BNT162b2 · Polack et al., 2020",
   },
 ];
-function ForensicsApp({ onPrepare }: { onPrepare(analysis: Analysis): void }) {
+type Inspection = {
+  analysis: Analysis;
+  contributionId: string;
+  onReturn(): void;
+};
+function ForensicsApp({
+  onPrepare,
+  inspection,
+}: {
+  onPrepare(analysis: Analysis): void;
+  inspection: Inspection | null;
+}) {
   const [doi, setDoi] = useState("");
   const [paper, setPaper] = useState<Paper | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
@@ -61,6 +72,23 @@ function ForensicsApp({ onPrepare }: { onPrepare(analysis: Analysis): void }) {
   const [mobileTab, setMobileTab] = useState("explore");
   const heading = useRef<HTMLHeadingElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!inspection) return;
+    const recorded = inspection.analysis;
+    setAnalysis(recorded);
+    setPaper(recorded.paper);
+    setDoi(recorded.paper.doi);
+    setSelected(
+      recorded.contributions.find(
+        (item) => item.contribution.id === inspection.contributionId,
+      ) || null,
+    );
+    setNode(null);
+    setFilter("all");
+    setMobileTab("evidence");
+    setError("");
+    requestAnimationFrame(() => heading.current?.focus());
+  }, [inspection]);
   async function load(value: string) {
     setDoi(value);
     setError("");
@@ -824,6 +852,8 @@ function ForensicsApp({ onPrepare }: { onPrepare(analysis: Analysis): void }) {
 
 /** Keep both workspaces mounted so mode changes preserve the investigation. */
 export default function App() {
+  const [inspection, setInspection] = useState<Inspection | null>(null);
+  const inspectionRevision = useRef(0);
   const [origin, setOrigin] = useState<{
     analysis_id: string;
     title: string;
@@ -861,8 +891,23 @@ export default function App() {
         </button>
       </nav>
       <div hidden={studio}>
+        {inspection && (
+          <button
+            onClick={() => {
+              setStudio(true);
+              history.replaceState(null, "", studioLocation.current);
+              const back = inspection.onReturn;
+              setInspection(null);
+              requestAnimationFrame(back);
+            }}
+          >
+            Voltar ao Studio
+          </button>
+        )}
         <ForensicsApp
+          inspection={inspection}
           onPrepare={(analysis) => {
+            setInspection(null);
             setOrigin({
               analysis_id: analysis.id,
               title: analysis.paper.title.slice(0, 160),
@@ -874,7 +919,36 @@ export default function App() {
         />
       </div>
       <div hidden={!studio}>
-        <StudioWorkspace origin={origin} />
+        <StudioWorkspace
+          origin={origin}
+          onExploreAnalysis={async (id, contributionId, onReturn) => {
+            const current = ++inspectionRevision.current;
+            const returnLocation = location.hash;
+            try {
+              const recorded = await getAnalysis(id);
+              if (
+                current !== inspectionRevision.current ||
+                location.hash !== returnLocation
+              )
+                return true;
+              if (
+                recorded.id !== id ||
+                !recorded.contributions.some(
+                  (item) => item.contribution.id === contributionId,
+                )
+              )
+                return false;
+              studioLocation.current = returnLocation;
+              setInspection({ analysis: recorded, contributionId, onReturn });
+              setStudio(false);
+              history.replaceState(null, "", "#forensics");
+              return true;
+            } catch {
+              // Retained Studio science remains usable when the original link expires.
+              return false;
+            }
+          }}
+        />
       </div>
     </>
   );

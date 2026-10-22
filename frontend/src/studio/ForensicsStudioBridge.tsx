@@ -5,6 +5,13 @@ import { ScientificDossier } from "./ScientificDossier";
 import "./scientific-dossier.css";
 import type { Analysis } from "../types";
 
+/** Host navigation only; scientific payloads still come from the real API. */
+export type ExploreAnalysis = (
+  analysisId: string,
+  contributionId: string,
+  onReturn: () => void,
+) => Promise<boolean>;
+
 /** The existing Forensics host already owns its state and recorded investigation.
  * Only its ID crosses the write boundary; T06 resolves the context on the server.
  */

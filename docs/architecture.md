@@ -148,7 +148,10 @@ e preservando o snapshot da investigação. A configuração recebe o ID do
 Forensics; o servidor resolve e persiste a autoridade, sem confiar em ciência
 enviada pelo cliente. O dossiê integrado renderiza a prévia canônica M0, sem
 criar Paper/grafo/classificação para material textual. Editor e visualizador
-continuam montados ao explorar evidências. Respostas de uma operação anterior
+continuam montados ao explorar evidências. Com analysis_id, o host consulta a
+investigação existente e seleciona a contribuição; em indisponibilidade/expiração,
+usa o dossiê canônico retido. Cada contribuição usada pela aula tem ação própria.
+Respostas de uma operação anterior
 não substituem uma nova origem selecionada.
 
 `api/studio_lifecycle.py` compõe `studio_maintenance_lifespan` T12: varredura

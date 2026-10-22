@@ -11,9 +11,9 @@ Branch: `feat/issue-14-integrated-demo`. Data: 22/10/2026.
 | Investigação | Forensics continua responsável por DOI, artigo, grafo, classificação, descoberta e exportações. `ForensicsLessonAction` transfere o ID da investigação para a configuração confirmável do Studio. |
 | Ciência | A prévia chama `resolve_scientific_source` T06, que reutiliza T04. Investigação sem novo material conserva seu snapshot; texto não ganha Paper fictício. Metadados, fontes, participantes e limitações são persistidos com a autoridade científica. |
 | Preparação | `StudioSetup` aceita DOI ou investigação além de texto/conceitos. Nova origem invalida respostas assíncronas anteriores na interface. |
-| Revisão | T07 conserva decisões e edições; `ScientificDossier` consome os dados canônicos da prévia M0. Abrir/fechar o dossiê preserva edição não salva e foco. Nenhuma classificação de citação é inventada quando o contrato não a fornece. |
+| Revisão | T07 conserva decisões e edições; `ScientificDossier` consome os dados canônicos da prévia M0. Com `analysis_id`, explorar abre a investigação real e seleciona a contribuição; voltar preserva edição não salva e foco. Se o link estiver indisponível, o dossiê retido continua acessível. Nenhuma classificação de citação é inventada quando o contrato não a fornece. |
 | Geração | T09/T10 usam revisão aprovada e snapshot autorizado. `LessonBundle` continua único para slides, plano, referências e notas. |
-| Entrega | T08/T11 já ligados por T10: sessão real, banco real, Markdown, impressão pelo navegador e apresentação. A aula salva permite explorar suas fontes sem desmontar o visualizador. |
+| Entrega | T08/T11 já ligados por T10: sessão real, banco real, Markdown, impressão pelo navegador e apresentação. A aula salva permite explorar cada contribuição usada sem desmontar o visualizador. |
 | Recuperação | T12 passa a compor o lifespan real: varredura inicial/periódica de 15 s, reconciliação de operações órfãs e métricas agregadas de geração. GET/reconexão não inicia nova geração. |
 
 Não há novo endpoint, schema, catálogo, mock de produção ou infraestrutura.

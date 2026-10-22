@@ -24,7 +24,17 @@ class BrowserProvider(FlowProvider):
                     raise ProviderFailure('unauthorized')
         if any('falha controlada' in doc['content'] for doc in request.material['source_documents']):
             raise ProviderFailure('unauthorized')
-        return await super().complete(request)
+        result = await super().complete(request)
+        if request.stage == 'lesson' and any('T13-multiple' in doc['content'] for doc in request.material['source_documents']):
+            import json
+            from app.studio.ports import ProviderResult
+            value = json.loads(result.content)
+            for identifier in list(request.material['authorized_evidence'])[1:]:
+                claim = {'type': 'evidence_claim', 'evidence_id': identifier}
+                value['sections'][0]['explanation_blocks'].append(claim)
+                value['slides'][0]['content_blocks'].append(claim)
+            return ProviderResult(json.dumps(value).encode(), result.metadata)
+        return result
 
 
 app.dependency_overrides[get_provider] = BrowserProvider
