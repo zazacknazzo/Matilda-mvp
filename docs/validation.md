@@ -80,3 +80,79 @@ científica pendente. As consultas, datas, fontes e indicações de cache consta
 
 [Captura da ampliação automática](screenshots/automatic-discovery.png).
 As integrações públicas podem mudar; a validação registra uma observação datada.
+
+## T13 — candidato P0 integrado, 22/10/2026
+
+Código validado: `06a98f1`, base main `f7f2972` (PR #29 incluído), branch
+`feat/issue-14-integrated-demo`. Documentação/capturas são acrescentadas depois
+desse commit; não modificam o código validado.
+
+Ambiente local: macOS, Python 3.14.7, Node 26.10.0, TypeScript 5.9.3,
+Vite 6.4.5 e Playwright 1.64.1/Chromium headless. SQLite temporário por suíte.
+Não foi publicado deploy nem verificado host HTTPS nesta execução.
+
+| Verificação executada | Resultado |
+|---|---|
+| `.venv/bin/python -m pytest backend/tests -q` | **558 passaram**, 6,66 s na execução final |
+| `scripts/check_scientific_contract.py` | 7 fixtures científicas conformes |
+| `scripts/check_studio_contract.py` | 40 payloads HTTP conformes Pydantic/TypeScript |
+| `node scripts/check_lesson_types.mjs` | 4 fixtures LessonBundle conformes |
+| `tsc -b` e projetos generation/bridge/review/lesson-harness | aprovados |
+| `tsc --noEmit` no novo `studio-integrated.spec.ts` | aprovado |
+| `npm run build` | aprovado, 1771 módulos, 3,45 s |
+| `playwright.studio.config.ts` | **20 passaram**, inclui os 6 testes Forensics do config padrão e 9 novos T13 |
+| `playwright.generation.config.ts` | **18 passaram** |
+| `playwright.review.config.ts` | **19 passaram** |
+| `playwright.lesson.config.ts` | **14 passaram** |
+| `playwright.bridge.config.ts` | **5 passaram** |
+| `playwright.export.config.ts` | **11 passaram** |
+| Total Playwright, sem duplicar Forensics do config padrão | **87 passaram** |
+| Revisões independentes Standards e Spec | achados corrigidos e revalidados; [relatório](reviews/t13-code-review.md) |
+| Guard do script live sem `--allow-paid-gemini` | recusou executar, exit 2, nenhuma chamada |
+
+Backend emite duas depreciações preexistentes (Starlette/HTTPX e google.genai no
+Python 3.14). Build mantém aviso de chunk JS acima de 500 kB (517,52 kB minificado,
+160,51 kB gzip). Nenhum desses avisos foi tratado como falha nem ocultado.
+
+Para repetir Playwright, executar em `frontend`:
+
+```sh
+node node_modules/@playwright/test/cli.js test --config playwright.studio.config.ts
+node node_modules/@playwright/test/cli.js test --config playwright.generation.config.ts
+node node_modules/@playwright/test/cli.js test --config playwright.review.config.ts
+node node_modules/@playwright/test/cli.js test --config playwright.lesson.config.ts
+node node_modules/@playwright/test/cli.js test --config playwright.bridge.config.ts
+node node_modules/@playwright/test/cli.js test --config playwright.export.config.ts
+```
+
+Os seis casos `investigation.spec.ts` do config padrão são executados pelo config
+Studio com servidores automáticos, preservando sua cobertura completa. Harnesses
+isolados mantêm as substituições declaradas em seus guias; os novos E2E T13 e o
+fluxo T10 usam frontend/backend/SQLite reais sem mocks nas APIs internas. Somente
+provedores externos são controlados nessa integração.
+
+TDD: o snapshot gravado da investigação, os eventos das seis etapas e a manutenção
+no host falharam antes da conexão dos módulos; passaram após reutilizar T06/T12.
+No navegador, a troca de origem durante uma prévia falhou antes da proteção contra
+resposta antiga. Revisores identificaram retorno à contribuição incorreta/ausente
+e exploração limitada à primeira contribuição; cada problema foi reproduzido
+antes da correção e os nove cenários T13 passaram depois.
+
+Segurança real: sessão alheia/expirada não exporta, origem externa é rejeitada,
+formato/parâmetros inválidos falham, headers/escaping são seguros; material privado
+original não entra no Markdown e exportar não chama IA. A suíte completa também
+cobre limites, referências inválidas, prompt injection, idempotência, persistência,
+reinício e expiração. O Forensics permanece funcional com IA indisponível.
+
+CRISPR/RNA 50 minutos, slides/plano, evidências, revisão, Markdown, PDF, teclado,
+notas ocultas, mobile, reconexão e retry foram verificados **com provedor externo
+controlado**. Fontes bibliográficas provêm de snapshots reais com cache identificado.
+As [capturas T13 e matriz CT/P0](integrated-demo-t13.md) permitem conferir o escopo.
+
+**Gemini live não foi executado.** A chamada simples de 11,72 s informada pelo
+usuário não comprova a prévia estruturada. Há instrumentação para recuperação,
+contexto, contagem, geração, validação e persistência, com limites 45/75 s mantidos;
+o gargalo real continua sem diagnóstico confirmado até autorização específica.
+Projetor físico, diálogo de impressão/PDF no navegador do pitch, revisão humana
+das fontes/pedagogia e aceite A/B/C/D também permanecem pendentes. M4 não é declarado
+concluído. Nenhuma chamada paga ou alteração da Issue #1 foi realizada.

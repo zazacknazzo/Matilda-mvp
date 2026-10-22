@@ -43,7 +43,8 @@ após admissão, reload, download, projeção virtual sem notas e impressão em 
 | P0-4 / CT-08,13,14 | geração HTTP, transporte SDK controlado, falhas/recuperação integradas; live pendente |
 | P0-5 / CT-09 | harness T08, aula real persistida no E2E controlado; projetor físico pendente |
 | P0-6 / CT-11,12 | exportação HTTP real, download, harness T11, CSS print/PDF Chromium; diálogo físico pendente |
-| P0-7 | segurança HTTP, contratos, idempotência, expiração/manutenção T12, reconexão integrada |
+| P0-7 / CT-02,10 | Transformar em aula, retorno à investigação/contribuição, dossiê textual e preservação de editor/slide/foco |
+| Transversais | segurança HTTP, contratos, idempotência, expiração/manutenção T12 e reconexão integrada |
 | P0-8 | resultados em `validation.md`, roteiro em `demo-scenarios.md`; ensaio live/humano pendente |
 
 As contagens finais e comandos estão em [validation.md](validation.md).
@@ -62,6 +63,8 @@ duração em ms e status, inclusive em erro/cancelamento. As etapas são:
 subetapas ou tentativas; somar por etapa na mesma execução. Não são registrados
 prompt, resposta completa, material docente, chave ou identificadores científicos.
 A inicialização lazy do SDK é contabilizada na primeira contagem de tokens.
+Os eventos não têm correlação por operação; executar o ensaio CLI isoladamente
+para não misturar etapas de requisições concorrentes.
 
 Uma execução local do teste de transporte SDK **controlado**, anterior ao ensaio
 live, mediu: recuperação 0,001 ms; contexto T04 13,121 ms; contagem de tokens
@@ -110,3 +113,16 @@ autorizado. Não tratar `preview_passed` como ensaio completo de geração.
 
 O candidato não representa aceite M4 concluído enquanto esses gates estiverem
 pendentes. Não modificar/fechar automaticamente a Issue #1.
+
+## Capturas conferidas
+
+Provedor externo controlado; ciência de snapshots reais identificados como cache.
+As imagens não constituem ensaio Gemini nem validação no projetor físico.
+
+- [Dossiê RNA em viewport mobile](screenshots/t13-dossier-rna-mobile.png).
+- [Plano CRISPR na mídia de impressão](screenshots/t13-plan-crispr-print.png).
+
+Inspeção visual: texto, DOI e autoria coletiva legíveis no dossiê; plano contém
+sequência de 50 minutos, atividade, notas, evidências e limitações, sem controles
+de navegação na impressão. Quebras do PDF e legibilidade no equipamento do pitch
+permanecem no checklist humano.
