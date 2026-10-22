@@ -156,7 +156,7 @@ comprovado após a correção; revisão pedagógica humana continua necessária.
 
 ## Verificação desta correção
 
-- Backend: **635 passed**, 7,78 s, incluindo 16 testes de diagnóstico/contrato/budget.
+- Backend: **635 passed**, 8,57 s, incluindo 16 testes de diagnóstico/contrato/budget.
 - Contratos: 7 fixtures científicas, 40 payloads Studio e 4 LessonBundle TS.
 - TypeScript/build: aprovado; permanece o aviso Vite de chunk acima de 500 kB.
 - Playwright: **87 casos aprovados** — integrado T13/Forensics 20, revisão 19,
@@ -168,3 +168,5 @@ comprovado após a correção; revisão pedagógica humana continua necessária.
 - MockTransport reproduz a rejeição preservada e confirma uma chamada externa
   controlada por operação; simulação não comprova melhoria de inferência live.
 - Não foi alterado GeminiProvider, smoke Gemini, evidências/catálogo ou deadlines.
+
+Revisões independentes: [Standards e Spec](reviews/nvidia-preview-diagnosis-code-review.md). Standards teve uma sugestão P3 de manutenção corrigida; nenhum achado técnico permanece aberto nos dois eixos. A falta do JSON original continua sendo limite da investigação real.
