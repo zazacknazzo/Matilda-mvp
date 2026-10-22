@@ -255,3 +255,53 @@ def test_generation_quota_and_wrong_ids_use_real_admission(client, flow):
     assert limited.status_code == 429
     assert limited.headers['retry-after'] == '3600'
     assert len(flow.lesson_requests) == POLICY.generations_per_hour
+
+
+def test_t12_restart_preserves_t10_bundle_review_retention_and_same_key(client, flow):
+    """The production M0 adapter and isolated T12 recovery agree after merging."""
+    from app.services.studio.generation import GenerationService
+
+    saved, _ = review(client, create(client))
+    first = generate(client, saved, key='original').json()
+    session = owner(client.cookies.get(SESSION_COOKIE))
+    request = GenerateRequest.model_validate(generation(saved))
+    clock = datetime.fromisoformat(saved['expires_at']) - timedelta(seconds=1)
+    repository = StudioRepository()
+    interrupted = asyncio.run(repository.claim_generation(
+        session_id=session, request=request, idempotency_key='interrupted', now=clock.isoformat(),
+    ))
+    admitted = asyncio.run(repository.get_preview(session_id=session, preview_id=saved['preview_id'], now=clock.isoformat()))
+    assert admitted.expires_at > saved['expires_at']
+    # Reconstruct the adapter over the same real SQLite, without reseeding state.
+    restarted = StudioRepository()
+    clock += timedelta(seconds=POLICY.generation_backend_seconds + POLICY.recovery_grace_seconds - 1)
+    assert asyncio.run(restarted.cleanup_expired(now=clock.isoformat())) == 0
+    pending = asyncio.run(restarted.get_preview(session_id=session, preview_id=saved['preview_id'], now=clock.isoformat()))
+    assert pending.generation_status == 'generating'
+    clock += timedelta(seconds=1)
+    recovered = asyncio.run(restarted.get_preview(session_id=session, preview_id=saved['preview_id'], now=clock.isoformat()))
+    assert recovered.generation_status == 'failed'
+    assert recovered.last_error.code == 'generation_timeout'
+    assert recovered.suggestions == admitted.suggestions
+    assert recovered.approved_objectives == admitted.approved_objectives
+    assert recovered.source_documents == admitted.source_documents
+    assert recovered.expires_at == admitted.expires_at
+    assert recovered.last_lesson_bundle_id == first['lesson_bundle_id']
+    previous = asyncio.run(restarted.get_lesson(session_id=session, lesson_bundle_id=first['lesson_bundle_id'], now=clock.isoformat()))
+    assert previous.model_dump(mode='json') == first
+    with pytest.raises(RepositoryConflict):
+        asyncio.run(restarted.complete_generation(claim_id=interrupted.claim_id, bundle=previous, now=clock.isoformat()))
+    assert len(flow.lesson_requests) == 1
+    service = GenerationService(restarted, flow, restarted.scientific_authority, now=lambda: clock.isoformat())
+    retried = asyncio.run(service.generate(session_id=session, request=request, idempotency_key='interrupted'))
+    assert not retried.replayed
+    assert retried.bundle.lesson_bundle_id != first['lesson_bundle_id']
+    clock += timedelta(days=1)
+    reopened = StudioRepository()
+    replay_service = GenerationService(reopened, flow, reopened.scientific_authority, now=lambda: clock.isoformat())
+    replay = asyncio.run(replay_service.generate(session_id=session, request=request, idempotency_key='interrupted'))
+    assert replay.replayed and replay.bundle == retried.bundle
+    assert replay.expires_at == retried.expires_at
+    assert len(flow.lesson_requests) == 2
+    assert asyncio.run(reopened.get_lesson(session_id='other-owner', lesson_bundle_id=replay.bundle.lesson_bundle_id, now=clock.isoformat())) is None
+    assert asyncio.run(reopened.get_lesson(session_id=session, lesson_bundle_id=first['lesson_bundle_id'], now=clock.isoformat())) == previous
