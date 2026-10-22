@@ -112,7 +112,46 @@ os limites declarados por seus harnesses. Nenhum mock é fallback do produto.
 
 ## Resultados desta revisão
 
-Backend: **541 testes aprovados** em 10,56 s. Typecheck do harness de geração
-e build de produção TypeScript/Vite aprovados. Playwright e revisão independente
-por agentes em execução; resultados serão atualizados antes da entrega. Nenhuma chamada live ou ensaio no projetor foi realizado.
-A Issue #14/T13 e funcionalidades fora do escopo não integram esta alteração.
+Ambiente: Linux x64, Python 3.12.14, FastAPI 0.141.1, Pydantic 2.13.4,
+google-genai 2.32.0, Node 24.19.0, TypeScript 5.9.3, Vite 6.4.5,
+Playwright 1.64.1 e Chromium 156.0.8078.4.
+
+| Execução | Resultado obtido |
+|---|---|
+| pytest backend/tests -q | **541 aprovados**, 10,56 s; inclui os 16 novos casos T12 |
+| Typecheck generation-harness e build TypeScript/Vite | aprovados; build Vite em 3,07 s |
+| check_studio_contract.py | 40 payloads HTTP conferidos em Pydantic/TypeScript |
+| check_scientific_contract.py | 7 fixtures científicas conferidas |
+| check_lesson_types.mjs | 4 fixtures de aula conferidas |
+| Playwright generation | **18 aprovados**, 12,9 s; 11 T09 + 7 T12 |
+| Playwright studio | **9 aprovados**, 11,1 s; inclui 6 Forensics |
+| Playwright bridge | **5 aprovados**, 4,3 s; Forensics sem chave Gemini |
+| Playwright review | **19 aprovados**, 10,2 s |
+| Playwright lesson | **14 aprovados**, 7,0 s |
+| Playwright export | **11 aprovados**, 6,0 s |
+| Total Playwright | **76 aprovados** |
+| Verificação do bundle de produção | sem sentinelas de material/chave, identidade de fixture ou endpoints de controle do harness |
+
+TDD em fatias verticais: o teste de status após reinício primeiro falhou
+(`generating` aos 90 s), passou após recuperação no GET; os casos de reconexão,
+offline, retomada da aba, espera após a meta, consulta presa e acesso à aula
+anterior falharam no comportamento ausente antes das respectivas implementações.
+O teste de manutenção antecedeu o lifespan; o de métricas antecedeu os contadores.
+As regressões de retenção/transporte usam as fronteiras públicas já aprovadas,
+sem redesenhar contratos compartilhados.
+
+[Revisão independente em dois eixos](reviews/t12-code-review.md): Standards
+**0 achados**, Spec **0 achados**. Nenhuma correção funcional foi necessária
+após essa revisão. Aceite humano antes da integração permanece pendente.
+
+Há um aviso preexistente de depreciação Starlette TestClient/HTTPX; não houve
+falha de teste. As screenshots Forensics regeneradas pelos testes foram
+descartadas, sem incluir alterações visuais incidentais neste PR.
+
+**Adaptadores controlados:** Google HTTP simulado no SDK oficial; geração por
+portas M0 com orquestrador, validador e SQLite reais, sessão/revisão de referência
+no harness. Prévia T05 exercitada com aplicação real e provedor controlado.
+**APIs externas reais:** nenhuma chamada live, chave/quota/modelo/latência reais
+não atestados. Não houve ensaio no projetor. A conexão final com as rotas da T10
+e a reexecução integrada/live ficam na T13 conforme a Issue #13; esta entrega
+não declara esse gate concluído nem implementa a Issue #14.
