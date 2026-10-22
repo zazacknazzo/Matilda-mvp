@@ -33,9 +33,24 @@ for (const width of [1440, 768, 375]) {
       await page.keyboard.press("Enter");
     }
     await expect(steps.locator('[aria-current="step"]')).toHaveText(/Revisar/);
-    await page
-      .getByRole("link", { name: "Ir para objetivos e salvar" })
-      .focus();
+    const shortcut = page.getByRole("link", {
+      name: "Ir para objetivos e salvar",
+    });
+    await shortcut.focus();
+    await page.keyboard.press("Tab");
+    const review = page.getByRole("main", { name: "Revisão docente" });
+    await expect(
+      review.getByText("Ler material original completo", { exact: true }),
+    ).toBeFocused();
+    const materialScroll = await page.evaluate(() => scrollY);
+    await page.keyboard.press("Tab");
+    await expect(
+      review.locator("article.review-suggestion summary").first(),
+    ).toBeFocused();
+    expect(await page.evaluate(() => scrollY)).toBeGreaterThanOrEqual(
+      materialScroll,
+    );
+    await shortcut.focus();
     await page.keyboard.press("Enter");
     await expect(page.locator("#review-actions")).toBeFocused();
     await expect(

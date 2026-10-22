@@ -37,6 +37,16 @@
     },
     {
       "width": 1440,
+      "stage": "generation",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "stage": "generation-ready",
+      "overflow": false
+    },
+    {
+      "width": 1440,
       "stage": "lesson",
       "overflow": false
     },
@@ -82,6 +92,16 @@
     },
     {
       "width": 768,
+      "stage": "generation",
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "stage": "generation-ready",
+      "overflow": false
+    },
+    {
+      "width": 768,
       "stage": "lesson",
       "overflow": false
     },
@@ -123,6 +143,16 @@
     {
       "width": 375,
       "stage": "review",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "generation",
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "stage": "generation-ready",
       "overflow": false
     },
     {
@@ -174,6 +204,16 @@
     },
     {
       "width": 1440,
+      "stage": "generation",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "stage": "generation-ready",
+      "violations": []
+    },
+    {
+      "width": 1440,
       "stage": "lesson",
       "violations": []
     },
@@ -219,6 +259,16 @@
     },
     {
       "width": 768,
+      "stage": "generation",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "stage": "generation-ready",
+      "violations": []
+    },
+    {
+      "width": 768,
       "stage": "lesson",
       "violations": []
     },
@@ -260,6 +310,16 @@
     {
       "width": 375,
       "stage": "review",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "generation",
+      "violations": []
+    },
+    {
+      "width": 375,
+      "stage": "generation-ready",
       "violations": []
     },
     {

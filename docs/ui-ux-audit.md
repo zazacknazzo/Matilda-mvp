@@ -98,13 +98,16 @@ identificados como cache; `model=controlled` identifica a geração de teste.
 | Impressão A4 | [PDF](screenshots/ui-ux/before/plan.pdf) | [PDF](screenshots/ui-ux/after/plan.pdf) |
 
 Todos os nove estados também possuem capturas em **768 e 375 px**, nos mesmos
-diretórios, com o prefixo correspondente. Comparações rápidas:
+diretórios, com o prefixo correspondente. Os dois estados de geração também
+foram registrados e auditados nas três larguras. Comparações rápidas:
 
 | Tela / largura | Antes | Depois |
 |---|---|---|
 | Prévia / 768 | [captura](screenshots/ui-ux/before/768-preview.png) | [captura](screenshots/ui-ux/after/768-preview.png) |
 | Prévia / 375 | [captura](screenshots/ui-ux/before/375-preview.png) | [captura](screenshots/ui-ux/after/375-preview.png) |
 | Revisão / 375 | [captura](screenshots/ui-ux/before/375-review.png) | [captura](screenshots/ui-ux/after/375-review.png) |
+| Gerar / 1440 | — | [captura](screenshots/ui-ux/after/1440-generation.png) |
+| Aula pronta / 1440 | — | [captura](screenshots/ui-ux/after/1440-generation-ready.png) |
 | Loading / 375 | — | [captura](screenshots/ui-ux/after/375-loading.png) |
 | Erro / 375 | — | [captura](screenshots/ui-ux/after/375-error.png) |
 
@@ -114,9 +117,9 @@ Chromium real headless: toda a jornada Forensics → configuração → prévia 
 aceitar/rejeitar → objetivos → salvar → gerar → slides → apresentação → plano →
 Markdown/PDF. Foram verificadas navegação por teclado, foco de retorno,
 notas ocultas, textos extensos, movimento reduzido e ausência de overflow
-horizontal em 27 combinações de nove telas com 1440/768/375 px.
+horizontal em 33 combinações de onze telas com 1440/768/375 px.
 
-`axe-core`, WCAG 2 A/AA e 2.1 AA: **zero violações automatizadas nas 27
+`axe-core`, WCAG 2 A/AA e 2.1 AA: **zero violações automatizadas nas 33
 combinações**, depois das correções de contraste. Isso não equivale a certificação
 WCAG nem a teste com leitor de tela ou professores reais. Os dados resumidos
 estão em [`ui-ux-validation.json`](ui-ux-validation.json).
@@ -152,8 +155,8 @@ npx playwright test --config playwright.bridge.config.ts
 ```
 
 Sem nova dependência de produção. Bundle base: JS 517,52 kB / gzip 160,94 kB;
-final: JS 520,26 kB / gzip 161,64 kB (**+0,70 kB gzip**). CSS gzip passou de
-12,11 para 13,08 kB. O aviso preexistente de chunk acima de 500 kB permanece;
+final: JS 520,39 kB / gzip 161,67 kB (**+0,73 kB gzip**). CSS gzip passou de
+12,11 para 13,14 kB. O aviso preexistente de chunk acima de 500 kB permanece;
 não foi introduzida divisão arquitetural para esta tarefa de UI. O timer da
 revisão deixa de redesenhar editores a cada segundo. Não se alega melhoria de
 latência do provedor.

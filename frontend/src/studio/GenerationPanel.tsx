@@ -314,7 +314,7 @@ function GenerationSession({ request, api, onOpenLesson }: Props) {
           Gerar minha aula
         </button>
         <button
-          className={uncertain ? "generation-primary" : undefined}
+          className={uncertain && !readyId ? "generation-primary" : undefined}
           disabled={checking || !online}
           onClick={() => void refresh()}
         >
