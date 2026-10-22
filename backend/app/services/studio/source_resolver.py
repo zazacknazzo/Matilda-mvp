@@ -72,7 +72,10 @@ async def resolve_scientific_source(
         ))
     context = build_scientific_context(source_documents, papers=papers, analysis_id=analysis_id)
     if analysis is not None:
-        context.limitations = list(dict.fromkeys([*context.limitations, *analysis.coverage_warnings]))
+        # The unchanged investigation's warnings must describe its recorded
+        # matches, not an empty result from a later editorial catalog revision.
+        limitations = context.limitations if documents else analysis.paper.limitations
+        context.limitations = list(dict.fromkeys([*limitations, *analysis.coverage_warnings]))
     # An unchanged investigation is a recorded scientific snapshot, not a request
     # to silently replace its participants/claims with a later catalog revision.
     matches = analysis.contributions if analysis is not None and not documents else search_context_contributions(

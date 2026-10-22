@@ -49,8 +49,9 @@ export function ScientificDossier({
         </p>
         {source.scientific_context.analysis_id && (
           <p>
-            Investigação de origem: {source.scientific_context.analysis_id}. O
-            snapshot preserva a ciência mesmo após expirar o link.
+            Investigação de origem: {source.scientific_context.analysis_id}. A
+            ciência registrada permanece disponível mesmo se a investigação
+            expirar.
           </p>
         )}
         {source.papers.length ? (
@@ -78,13 +79,18 @@ export function ScientificDossier({
                 ·{" "}
                 <time dateTime={paper.retrieved_at}>{paper.retrieved_at}</time>
               </p>
-              <p>Referências recuperadas: {paper.references_status}</p>
+              <p>
+                Referências:{" "}
+                {paper.references_status === "unavailable"
+                  ? "indisponíveis"
+                  : "conjunto recuperado; completude não auditada"}
+              </p>
             </article>
           ))
         ) : (
           <p>
-            Sem artigo comparável: o material abre este dossiê canônico. Não há
-            artigo ou grafo raiz associado.
+            Sem artigo comparável: consulte as contribuições documentadas e suas
+            fontes a partir do material.
           </p>
         )}
         <h4>Conceitos e procedência</h4>
@@ -185,8 +191,8 @@ export function ScientificDossier({
         </article>
       ) : (
         <p role="alert">
-          Contribuição indisponível neste snapshot. Volte à preparação para
-          selecionar outra descoberta.
+          Contribuição indisponível nos dados preservados. Volte à preparação
+          para selecionar outra descoberta.
         </p>
       )}
       <section aria-label="Limitações do contexto">

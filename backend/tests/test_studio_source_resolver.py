@@ -142,7 +142,8 @@ def test_missing_or_expired_analysis_is_404(client, monkeypatch):
         assert error.value.detail == client.get('/api/analyses/' + analysis_id).json()['detail']
 
 
-def test_existing_investigation_keeps_its_recorded_contributions_and_warnings(client, monkeypatch, tmp_path):
+@pytest.mark.parametrize('field,value', [('title', 'Título editorial atualizado'), ('verification_status', 'pending')])
+def test_existing_investigation_keeps_its_recorded_contributions_and_warnings(client, monkeypatch, tmp_path, field, value):
     from app.services import storage
     from app.services.studio.source_resolver import resolve_scientific_source
 
@@ -152,12 +153,13 @@ def test_existing_investigation_keeps_its_recorded_contributions_and_warnings(cl
         records = storage.load_json(name)
         if name == 'contributions.json':
             for record in records:
-                record['title'] = 'Título editorial atualizado'
+                record[field] = value
         (tmp_path / name).write_text(json.dumps(records))
     monkeypatch.setattr(storage, 'DATA', tmp_path)
     result = asyncio.run(resolve_scientific_source(project_id='project', analysis_id=analysis['id']))
     assert result.snapshot()['matches'] == analysis['contributions']
     assert set(analysis['coverage_warnings']) <= set(result.scientific_context.limitations)
+    assert not any('Sem cobertura elegível' in limit for limit in result.scientific_context.limitations)
 
 
 @pytest.mark.parametrize('cached', [False, True])

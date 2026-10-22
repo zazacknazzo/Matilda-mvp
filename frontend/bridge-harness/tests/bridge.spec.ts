@@ -88,6 +88,10 @@ test("Texto sem DOI explora dossiê canônico e devolve o estado por teclado", a
   await expect(page.getByLabel("Material em preparação")).toHaveValue(
     "Revisão docente ainda em preparação",
   );
+  await explore.click();
+  await dossier.screenshot({
+    path: "../.runtime/t06-dossier-desktop.png",
+  });
 });
 
 test("DOI sem investigação transfere somente DOI e preserva ciência RNA no celular", async ({
@@ -129,6 +133,9 @@ test("DOI sem investigação transfere somente DOI e preserva ciência RNA no ce
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  await dossier.screenshot({
+    path: "../.runtime/t06-dossier-mobile.png",
+  });
 });
 
 test("Sem cobertura não inventa descobertas e permite preparação com snapshot vazio", async ({
@@ -179,7 +186,7 @@ test("Dossiê usa somente o snapshot, mesmo com APIs indisponíveis ou link expi
   ).toContainText("Citação identificada");
   await expect(
     page.getByRole("region", { name: "Dossiê científico" }),
-  ).toContainText("snapshot preserva a ciência");
+  ).toContainText("ciência registrada permanece disponível");
   await page.getByRole("button", { name: "Voltar ao Studio" }).click();
   expect(requests).toEqual([]);
 });

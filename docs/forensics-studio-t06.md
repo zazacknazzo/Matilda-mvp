@@ -116,4 +116,53 @@ node node_modules/vite/bin/vite.js --config bridge-harness/vite.config.ts
 ```
 
 Abrir `http://127.0.0.1:5177`. A suíte Playwright inicia ambos automaticamente.
-Os testes de regressão e a revisão final são registrados abaixo após execução.
+
+## Validação final — 21/10/2026
+
+Ambiente: macOS arm64, Python 3.14.7, Node 26.10.0 e Vite 6.4.5.
+
+| Verificação | Resultado |
+|---|---|
+| `.venv/bin/python -m pytest backend/tests -q` | 476 aprovados, incluindo 26 T06 |
+| `tsc -b`, `npm run build` | aprovados |
+| `tsc -p` nos harnesses bridge, review e lesson | aprovados |
+| `scripts/check_scientific_contract.py` | 7 fixtures científicas aprovadas |
+| `scripts/check_studio_contract.py` | 40 payloads HTTP aprovados |
+| `scripts/check_lesson_types.mjs` | 4 fixtures LessonBundle aprovadas |
+| Playwright `playwright.bridge.config.ts` | 5 aprovados |
+| Playwright `playwright.studio.config.ts` | 9 aprovados: 6 Forensics + 3 prévia Studio |
+| Playwright `playwright.review.config.ts` | 19 aprovados |
+| Playwright `playwright.lesson.config.ts` | 14 aprovados |
+| Playwright `playwright.export.config.ts` | 11 aprovados |
+| Prettier nos novos arquivos frontend; `git diff --check` | aprovados |
+
+Total: **58 cenários distintos de navegador aprovados**. As suítes usam as
+configurações/harnesses já declarados de teste; prévia Studio usa transporte de
+provedor controlado. Isso não constitui ensaio de Gemini ao vivo nem integração
+do host T06. Nenhuma chave é necessária. As capturas desktop/mobile do dossiê
+em `.runtime/t06-dossier-{desktop,mobile}.png` foram conferidas visualmente;
+não há rolagem horizontal no cenário móvel de 390 px. A regressão Forensics
+preserva os asserts existentes de DOI, grafo/lista, fontes, candidatos e export.
+As imagens antigas geradas pela suíte Forensics foram restauradas aos bytes
+versionados; não fazem parte da mudança.
+
+Permanecem avisos preexistentes de depreciação Starlette/TestClient e do SDK
+Gemini com Python 3.14. Dependências foram restauradas exclusivamente pelo
+lockfile, sem mudança de manifesto/lockfile.
+
+## Code review
+
+Base fixa: `7b167a55078f786e146e911f928449cd3d9dc675` (main).
+Revisões Standards e Spec executadas por agentes separados, seguidas de
+revalidação das correções.
+
+- **Standards:** 0 achados acionáveis; 0 remanescentes na revalidação.
+- **Spec:** 1 achado P2 corrigido; 0 remanescentes na revalidação. Uma mudança
+  posterior de elegibilidade podia acrescentar aviso de cobertura vazia ao
+  reutilizar matches gravados. O teste com catálogo temporário reproduziu a
+  falha; o resolvedor agora conserva os avisos da investigação sem material
+  adicional. A revalidação confirmou os 26 testes T06 aprovados.
+
+As revisões automatizadas não representam aceite humano de B/C. Revisão dos
+responsáveis pelas portas e integração continuam necessárias antes do merge;
+nenhum merge automático ou alteração da Issue #1 é feito nesta entrega.
