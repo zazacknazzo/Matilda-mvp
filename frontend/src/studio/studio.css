@@ -176,13 +176,9 @@
   text-underline-offset: 8px;
 }
 .studio-view-label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+  margin: 1rem 0;
+  color: var(--matilda-text);
+  font-weight: 400;
 }
 .studio-setup output {
   display: block;
