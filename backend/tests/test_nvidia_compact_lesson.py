@@ -14,13 +14,13 @@ from test_studio_flow import create, generate, review
 def compact_lesson():
     return {'prior_knowledge': ['Noções de DNA.'], 'materials': ['Quadro.'], 'limitations': [], 'sections': [
         {'title': 'Introdução', 'time_weight': 10, 'objective_indexes': [0], 'slides': [
-            {'layout': 'TITLE', 'title': 'Questão inicial', 'content_blocks': [{'type': 'text', 'text': 'Como investigar o mecanismo?'}], 'speaker_notes': 'Levante hipóteses com a turma.'}], 'activities': []},
+            {'title': 'Questão inicial', 'content': {'layout': 'TITLE', 'introduction': 'Como investigar o mecanismo?'}, 'speaker_notes': 'Levante hipóteses com a turma. Peça que cada grupo descreva como testaria sua explicação e compare as justificativas apresentadas.'}], 'activities': []},
         {'title': 'Mecanismo', 'time_weight': 25, 'objective_indexes': [0], 'slides': [
-            {'layout': 'CONCEPT', 'title': 'Mecanismo molecular', 'content_blocks': [{'type': 'text', 'text': 'Compare os conceitos do material.'}], 'speaker_notes': 'Explique cada etapa a partir do material.'},
-            {'layout': 'SUMMARY', 'title': 'Análise da documentação', 'content_blocks': [{'type': 'text', 'text': 'Distinga mecanismo e documentação.'}], 'speaker_notes': 'Peça justificativas para a comparação.'}], 'activities': []},
+            {'title': 'Mecanismo molecular', 'content': {'layout': 'CONCEPT', 'text': 'O RNA guia reconhece uma sequência complementar no DNA e orienta a proteína para o local de clivagem. Distinga reconhecimento, ligação e corte molecular.'}, 'speaker_notes': 'Explique cada etapa a partir do material. Peça aos alunos que relacionem o reconhecimento da sequência de DNA ao papel do RNA e justifiquem a resposta.'},
+            {'title': 'Análise da documentação', 'content': {'layout': 'SUMMARY', 'synthesis': 'Distinga mecanismo e documentação.'}, 'speaker_notes': 'Peça justificativas para a comparação. Solicite que os grupos diferenciem os mecanismos moleculares das afirmações históricas documentadas nas fontes.'}], 'activities': []},
         {'title': 'Avaliação', 'time_weight': 15, 'objective_indexes': [0], 'slides': [
-            {'layout': 'QUESTION', 'title': 'Conferir a compreensão', 'content_blocks': [{'type': 'question', 'text': 'Como sustentar a explicação?'}], 'speaker_notes': 'Discuta as respostas e as limitações.'}],
-         'activities': [{'type': 'discussion', 'prompt': 'Explique o mecanismo com apoio no material.', 'teacher_guidance': 'Solicite uma justificativa.', 'objective_indexes': [0], 'assessment_criteria': ['Conceitos e justificativa coerentes.']}]},
+            {'title': 'Conferir a compreensão', 'content': {'layout': 'QUESTION', 'question': 'Como sustentar a explicação?'}, 'speaker_notes': 'Discuta as respostas e as limitações. Registre os argumentos apresentados, examine as evidências citadas e retome as dúvidas sobre o mecanismo molecular.'}],
+         'activities': [{'type': 'discussion', 'prompt': 'Explique o mecanismo com apoio no material.', 'teacher_guidance': 'Solicite uma justificativa e compare os argumentos de cada grupo com o mecanismo descrito no material.', 'objective_indexes': [0], 'assessment_criteria': ['Conceitos e justificativa coerentes.']}]},
     ]}
 
 
@@ -40,7 +40,7 @@ def test_compact_authoring_builds_canonical_links_times_plan_read_and_markdown(c
         assert set(material['source_documents'][0]) == {'type', 'content'}
         value = compact_lesson()
         evidence = next(iter(material['authorized_evidence']))
-        value['sections'][1]['slides'][1]['content_blocks'].append({'type': 'evidence_claim', 'evidence_id': evidence})
+        value['sections'][1]['slides'][1].setdefault('evidence_ids', []).append(evidence)
         return httpx.Response(200, json={'model': 'controlled', 'usage': {'prompt_tokens': 1400, 'completion_tokens': 1600},
             'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(value)}}]})
     app.dependency_overrides[get_provider] = lambda: NVIDIAProvider(transport=httpx.MockTransport(upstream))
@@ -53,7 +53,7 @@ def test_compact_authoring_builds_canonical_links_times_plan_read_and_markdown(c
         assert sum(s['duration_minutes'] for s in bundle['sections']) == 50
         assert bundle['sections'][1]['slide_ids'] == [s['id'] for s in bundle['slides'][1:3]]
         assert bundle['sections'][2]['activity_ids'] == [bundle['activities'][0]['id']]
-        assert any(b.get('text') == 'Explique cada etapa a partir do material.' for b in bundle['sections'][1]['explanation_blocks'])
+        assert any(b.get('text') == 'Explique cada etapa a partir do material. Peça aos alunos que relacionem o reconhecimento da sequência de DNA ao papel do RNA e justifiquem a resposta.' for b in bundle['sections'][1]['explanation_blocks'])
         assert bundle['references'] and bundle['references'][0]['participants']
         path = '/api/studio/lessons/' + bundle['lesson_bundle_id']
         assert client.get(path).json() == bundle
@@ -77,7 +77,7 @@ def test_invalid_compact_lesson_never_publishes_or_changes_teacher_review(client
         elif failure == 'too_many_slides':
             value['sections'][0]['slides'] *= 10
         elif failure == 'unauthorized_evidence':
-            value['sections'][0]['slides'][0]['content_blocks'].append({'type': 'evidence_claim', 'evidence_id': 'private-invalid'})
+            value['sections'][0]['slides'][0].setdefault('evidence_ids', []).append('private-invalid')
         else:
             value['sections'][0]['objective_indexes'] = [999]
         return httpx.Response(200, json={'model': 'controlled', 'usage': {'prompt_tokens': 1400, 'completion_tokens': 1600},
@@ -119,7 +119,7 @@ def test_weighted_sections_allocate_approved_time_through_provider(monkeypatch):
 def weighted_lesson(slide_counts, weights):
     from copy import deepcopy
     value = compact_lesson()
-    template = value['sections'][0]
+    template = {**value['sections'][0], 'slides': [value['sections'][1]['slides'][0]]}
     activity = value['sections'][-1]['activities'][0]
     value['sections'] = []
     for count, weight in zip(slide_counts, weights):

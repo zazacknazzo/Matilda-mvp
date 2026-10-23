@@ -153,6 +153,9 @@ frontend e `/api` na mesma origem HTTPS, proxy com timeout de pelo menos 100 s
 e SQLite persistente. No desenvolvimento, `MATILDA_API_PROXY` altera o destino
 do proxy Vite; o navegador continua usando `/api` e não recebe a chave.
 
+O [contrato privado de layouts tipados](docs/studio-nvidia-layouts.md) documenta
+compact-v4-layouts, conversão para os slides públicos, pisos de elaboração e
+pontos de revisão docente. Nenhuma compatibilidade live do novo schema é presumida.
 O [guia da migração NVIDIA](docs/studio-nvidia.md) descreve limites, estimativa de
 tokens, classificação de falhas e smoke. O smoke existente Gemini não foi alterado.
 Nenhum ensaio cobrado deve ser executado sem autorização explícita. Após essa

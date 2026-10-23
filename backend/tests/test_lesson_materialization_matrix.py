@@ -36,8 +36,7 @@ def completed_provider(mutate):
         calls.append(1)
         material = json.loads(json.loads(http.content)['messages'][1]['content'])
         value = compact_lesson()
-        value['sections'][0]['slides'][0]['content_blocks'].append({
-            'type': 'evidence_claim', 'evidence_id': next(iter(material['authorized_evidence']))})
+        value['sections'][0]['slides'][0].setdefault('evidence_ids', []).append(next(iter(material['authorized_evidence'])))
         return httpx.Response(200, json=completion(json.dumps(value)))
     inner = NVIDIAProvider(transport=httpx.MockTransport(upstream))
     class CompletedProvider:

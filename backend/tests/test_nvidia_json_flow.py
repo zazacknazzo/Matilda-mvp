@@ -28,14 +28,13 @@ def test_json_categories_preserve_review_and_only_valid_content_is_persisted(cli
     app.dependency_overrides[get_provider] = lambda: FlowProvider()
     saved, _ = review(client, create(client))
     calls = []
-    note = 'Discuta "DNA", RNA e limitações.\nTexto literal: {NaN}, ``` e átomos.'
+    note = 'Discuta "DNA", RNA e limitações.\nTexto literal: {NaN}, ``` e átomos. Peça que os alunos fundamentem cada resposta no mecanismo descrito.'
     def upstream(http):
         calls.append(1)
         material = json.loads(json.loads(http.content)['messages'][1]['content'])
         value = compact_lesson()
         value['sections'][0]['slides'][0]['speaker_notes'] = note
-        value['sections'][1]['slides'][1]['content_blocks'].append({
-            'type': 'evidence_claim', 'evidence_id': next(iter(material['authorized_evidence']))})
+        value['sections'][1]['slides'][1].setdefault('evidence_ids', []).append(next(iter(material['authorized_evidence'])))
         if fault == 'wrong_schema':
             value['sections'][0]['time_weight'] = 'PRIVATE_TEACHER'
         content = json.dumps(value, ensure_ascii=False)

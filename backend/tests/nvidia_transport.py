@@ -35,8 +35,34 @@ def compact_payload(full):
     """Test provider speaks NVIDIA authoring format; never used in production."""
     return {**{k: full[k] for k in ('prior_knowledge', 'materials', 'limitations')}, 'sections': [
         {**{k: section[k] for k in ('title', 'objective_indexes')}, 'time_weight': section['duration_minutes'],
-         'slides': [{k: value for k, value in slide.items() if k not in ('key', 'section_key', 'duration_minutes')}
+         'slides': [authored_slide(slide)
                     for slide in full['slides'] if slide['key'] in section['slide_keys']],
          'activities': [{k: value for k, value in activity.items() if k not in ('key', 'section_key')}
                         for activity in full['activities'] if activity['key'] in section['activity_keys']]}
         for section in full['sections']]}
+
+
+def authored_slide(slide):
+    """Explicit test-double translation of existing public gold fixtures."""
+    blocks = slide['content_blocks']
+    texts = [b['text'] for b in blocks if b['type'] == 'text']
+    content = {'layout': slide['layout']}
+    if slide['layout'] == 'TITLE':
+        if texts:
+            content['introduction'] = '\n'.join(texts)
+    elif slide['layout'] == 'CONCEPT':
+        bullets = [item for b in blocks if b['type'] == 'bullets' for item in b['items']]
+        content['text'] = '\n'.join(texts or bullets)
+        if texts:
+            content['bullets'] = bullets
+    elif slide['layout'] == 'PROCESS':
+        content['steps'] = [item for b in blocks if b['type'] == 'steps' for item in b['items']]
+    elif slide['layout'] == 'QUESTION':
+        content['question'] = next(b['text'] for b in blocks if b['type'] == 'question')
+    elif slide['layout'] == 'SUMMARY':
+        content['synthesis'] = '\n'.join(texts or [item for b in blocks if b['type'] == 'bullets' for item in b['items']])
+    evidence = [b['evidence_id'] for b in blocks if b['type'] == 'evidence_claim']
+    if slide['layout'] == 'SCIENTIST_SPOTLIGHT':
+        content['evidence_id'] = evidence.pop(0)
+    return {**{k: slide[k] for k in ('title', 'speaker_notes')}, 'subtitle': slide.get('subtitle'),
+            'content': content, 'evidence_ids': evidence}

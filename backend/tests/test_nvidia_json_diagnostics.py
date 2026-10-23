@@ -120,10 +120,10 @@ def test_bad_envelope_is_not_reported_as_model_content(monkeypatch, caplog, body
     assert 'PRIVATE_SOURCE' not in caplog.text
 
 
-def test_transmitted_schema_preserves_baseline_references_unions_and_required_fields(monkeypatch):
+def test_transmitted_schema_preserves_v4_references_variants_and_required_fields(monkeypatch):
     monkeypatch.setenv('NVIDIA_API_KEY', 'controlled-only')
     baseline = json.loads((Path(__file__).resolve().parents[2] /
-                          'tests/fixtures/studio/nvidia/compact-v3-authorized.schema.json').read_text())
+                          'tests/fixtures/studio/nvidia/compact-v4-layouts.schema.json').read_text())
     def upstream(http):
         body = json.loads(http.content)
         response_format = body['response_format']
@@ -135,8 +135,8 @@ def test_transmitted_schema_preserves_baseline_references_unions_and_required_fi
         section = schema['$defs']['CompactSection']
         assert set(section['required']) == {'title', 'time_weight', 'objective_indexes', 'slides', 'activities'}
         assert section['properties']['time_weight'] == {'minimum': 1, 'maximum': 1000, 'type': 'integer'}
-        blocks = schema['$defs']['CompactSlide']['properties']['content_blocks']['items']
-        assert len(blocks['oneOf']) == 5 and blocks['discriminator']['propertyName'] == 'type'
+        content = schema['$defs']['CompactSlide']['properties']['content']
+        assert len(content['anyOf']) == 6 and 'discriminator' not in content
         def references(value):
             if isinstance(value, dict):
                 if '$ref' in value:
@@ -148,7 +148,10 @@ def test_transmitted_schema_preserves_baseline_references_unions_and_required_fi
                 for child in value:
                     references(child)
         references(schema)
-        return httpx.Response(200, json=completion(json.dumps(compact_lesson())))
+        value = compact_lesson()
+        value['sections'][1]['objective_indexes'] = [0, 1]
+        value['sections'][-1]['activities'][0]['objective_indexes'] = [0, 1]
+        return httpx.Response(200, json=completion(json.dumps(value)))
     request = request_for('lesson', material={
         'configuration': {'duration_minutes': 50, 'learning_objectives': ['Approved A.', 'Approved B.']},
         'authorized_evidence': {'allowed-evidence-a': 'Canonical A.', 'allowed-evidence-b': 'Canonical B.'}})

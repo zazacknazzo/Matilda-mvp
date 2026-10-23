@@ -35,19 +35,26 @@ def authored_lesson(sections, slides, activities, allowed):
     for index in range(slides):
         slide = deepcopy(sample)
         slide.update(layout=layouts[index % len(layouts)], title='Mecanismo e documentação',
-                     speaker_notes='Nota do modelo: peça uma explicação e examine as justificativas.')
-        if slide['layout'] == 'PROCESS':
-            slide['content_blocks'] = [{'type': 'steps', 'items': ['Leia o mecanismo.', 'Compare as etapas.']}]
-        elif slide['layout'] == 'QUESTION':
-            slide['content_blocks'] = [{'type': 'question', 'text': 'Como justificar o mecanismo?'}]
-        elif slide['layout'] == 'SCIENTIST_SPOTLIGHT':
-            slide['content_blocks'] = [{'type': 'evidence_claim', 'evidence_id': sorted(allowed)[0]}]
-        elif index == 0 and allowed:
-            slide['content_blocks'].extend({'type': 'evidence_claim', 'evidence_id': key} for key in sorted(allowed))
+                     speaker_notes='Nota do modelo: peça uma explicação e examine as justificativas. Compare as etapas do mecanismo e peça que os alunos sustentem suas respostas com a documentação.')
+        layout = slide.pop('layout')
+        if layout == 'PROCESS':
+            slide['content'] = {'layout': layout, 'steps': ['Leia o mecanismo de reconhecimento do DNA.', 'Compare as etapas de clivagem e suas consequências.']}
+        elif layout == 'QUESTION':
+            slide['content'] = {'layout': layout, 'question': 'Como justificar o mecanismo?'}
+        elif layout == 'SCIENTIST_SPOTLIGHT':
+            slide['content'] = {'layout': layout, 'evidence_id': sorted(allowed)[0]}
+        elif layout == 'CONCEPT':
+            slide['content'] = deepcopy(template['sections'][1]['slides'][0]['content'])
+        elif layout == 'SUMMARY':
+            slide['content'] = {'layout': layout, 'synthesis': 'Diferencie reconhecimento, ligação e corte do DNA e confira a documentação.'}
+        else:
+            slide['content'] = {'layout': layout, 'introduction': 'Investigue o mecanismo e a documentação.'}
+        if index == 0 and allowed:
+            slide['evidence_ids'] = sorted(allowed)
         result['sections'][index % sections]['slides'].append(slide)
     for index in range(activities):
         value = deepcopy(activity)
-        value['objective_indexes'] = [index % 2]
+        value['objective_indexes'] = [0, 1]
         result['sections'][-1]['activities'].append(value)
     return result
 
@@ -71,9 +78,9 @@ def test_combinations_reach_bundle_sqlite_replay_and_markdown(client, monkeypatc
         assert len(material['configuration']['learning_objectives']) == 2
         schema = body['response_format']['json_schema']['schema']
         if evidence:
-            assert schema['$defs']['EvidenceClaimBlock']['properties']['evidence_id']['enum'] == sorted(allowed)
+            assert schema['$defs']['SpotlightContent']['properties']['evidence_id']['enum'] == sorted(allowed)
         else:
-            assert 'EvidenceClaimBlock' not in schema['$defs']
+            assert 'SpotlightContent' not in schema['$defs']
         value = authored_lesson(sections, slides, activities, allowed)
         return httpx.Response(200, json=completion(json.dumps(value)))
     app.dependency_overrides[get_provider] = lambda: NVIDIAProvider(transport=httpx.MockTransport(upstream))
@@ -87,7 +94,7 @@ def test_combinations_reach_bundle_sqlite_replay_and_markdown(client, monkeypatc
         assert all(slide.duration_minutes >= 1 for slide in bundle.slides)
         assert bundle.metadata.learning_objectives == saved['approved_objectives']
         assert bundle.review_revision == saved['review_revision']
-        assert all(slide.speaker_notes == 'Nota do modelo: peça uma explicação e examine as justificativas.' for slide in bundle.slides)
+        assert all(slide.speaker_notes == 'Nota do modelo: peça uma explicação e examine as justificativas. Compare as etapas do mecanismo e peça que os alunos sustentem suas respostas com a documentação.' for slide in bundle.slides)
         trusted = {reference['id']: reference for reference in saved['evidence_references']}
         for reference in bundle.references:
             assert reference.model_dump() == trusted[reference.id]

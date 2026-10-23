@@ -1,6 +1,7 @@
 # Studio com NVIDIA NIM — Issue #31
 
-Versão vigente: [materialização e referências autorizadas](studio-nvidia-materialization.md).
+Versão vigente: [layouts válidos por construção e elaboração](studio-nvidia-layouts.md).
+Base de autoridade: [materialização e referências autorizadas](studio-nvidia-materialization.md).
 
 Histórico JSON: [invalid_json e saída estruturada](studio-nvidia-json-diagnosis.md).
 

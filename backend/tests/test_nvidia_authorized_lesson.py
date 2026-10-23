@@ -15,10 +15,10 @@ def test_claim_schema_accepts_only_the_authorized_canonical_ids(monkeypatch):
     def upstream(http):
         body = json.loads(http.content)
         schema = body['response_format']['json_schema']['schema']
-        evidence = schema['$defs']['EvidenceClaimBlock']['properties']['evidence_id']
+        evidence = schema['$defs']['SpotlightContent']['properties']['evidence_id']
         assert evidence['enum'] == ['allowed-evidence-a', 'allowed-evidence-b']
         value = compact_lesson()
-        value['sections'][0]['slides'][0]['content_blocks'].append({'type': 'evidence_claim', 'evidence_id': 'allowed-evidence-b'})
+        value['sections'][0]['slides'][0].setdefault('evidence_ids', []).append('allowed-evidence-b')
         return httpx.Response(200, json=completion(json.dumps(value)))
     request = request_for('lesson', material={'configuration': {'duration_minutes': 50, 'learning_objectives': ['Approved.']},
                                             'authorized_evidence': allowed})
@@ -32,33 +32,35 @@ def test_approved_objectives_are_bounded_in_both_section_and_activity_schema(mon
         schema = json.loads(http.content)['response_format']['json_schema']['schema']
         for name in ('CompactSection', 'CompactActivity'):
             assert schema['$defs'][name]['properties']['objective_indexes']['items']['enum'] == [0, 1]
-        return httpx.Response(200, json=completion(json.dumps(compact_lesson())))
+        value = compact_lesson()
+        value['sections'][1]['objective_indexes'] = [0, 1]
+        value['sections'][-1]['activities'][0]['objective_indexes'] = [0, 1]
+        return httpx.Response(200, json=completion(json.dumps(value)))
     request = request_for('lesson', material={'configuration': {'duration_minutes': 50, 'learning_objectives': ['A.', 'B.']}})
     asyncio.run(NVIDIAProvider(transport=httpx.MockTransport(upstream)).complete(request))
 
 
-def test_layout_is_checked_before_provider_reports_completed(monkeypatch, caplog):
+def test_invalid_variant_is_rejected_before_provider_reports_completed(monkeypatch, caplog):
     import pytest
     monkeypatch.setenv('NVIDIA_API_KEY', 'controlled')
     caplog.set_level('INFO', logger='matilda.studio.nvidia')
     value = compact_lesson()
-    value['sections'][0]['slides'][0]['layout'] = 'PROCESS'
+    value['sections'][0]['slides'][0]['content'] = {'layout': 'PROCESS', 'text': 'No steps.'}
     provider = NVIDIAProvider(transport=httpx.MockTransport(lambda _: httpx.Response(200, json=completion(json.dumps(value)))))
     with pytest.raises(ValueError):
         asyncio.run(provider.complete(request_for('lesson')))
-    assert 'lesson_slide_layout_invalid' in caplog.text
+    assert 'lesson_schema_invalid' in caplog.text
 
 
 def test_no_authority_removes_claims_and_spotlight_but_valid_pedagogy_remains(monkeypatch):
     monkeypatch.setenv('NVIDIA_API_KEY', 'controlled')
     def upstream(http):
         schema = json.loads(http.content)['response_format']['json_schema']['schema']
-        assert 'EvidenceClaimBlock' not in schema['$defs']
+        assert 'SpotlightContent' not in schema['$defs']
         properties = schema['$defs']['CompactSlide']['properties']
-        assert 'SCIENTIST_SPOTLIGHT' not in properties['layout']['enum']
-        items = properties['content_blocks']['items']
-        assert 'evidence_claim' not in items['discriminator']['mapping']
-        assert len(items['oneOf']) == 4
+        assert 'SCIENTIST_SPOTLIGHT' not in json.dumps(schema)
+        assert properties['evidence_ids']['maxItems'] == 0
+        assert len(properties['content']['anyOf']) == 5
         return httpx.Response(200, json=completion(json.dumps(compact_lesson())))
     result = asyncio.run(NVIDIAProvider(transport=httpx.MockTransport(upstream)).complete(request_for('lesson')))
     assert 'evidence_claim' not in result.content.decode()
@@ -71,9 +73,9 @@ def test_unknown_or_previous_request_evidence_is_rejected_without_replacement(mo
     seen = []
     def upstream(http):
         schema = json.loads(http.content)['response_format']['json_schema']['schema']
-        seen.append(schema['$defs']['EvidenceClaimBlock']['properties']['evidence_id']['enum'])
+        seen.append(schema['$defs']['SpotlightContent']['properties']['evidence_id']['enum'])
         value = compact_lesson()
-        value['sections'][0]['slides'][0]['content_blocks'].append({'type': 'evidence_claim', 'evidence_id': 'old-evidence'})
+        value['sections'][0]['slides'][0].setdefault('evidence_ids', []).append('old-evidence')
         return httpx.Response(200, json=completion(json.dumps(value)))
     provider = NVIDIAProvider(transport=httpx.MockTransport(upstream))
     for allowed in ({'old-evidence': 'Canonical.'}, {'new-evidence': 'Another canonical claim.'}):
@@ -94,7 +96,7 @@ def test_claim_is_rejected_with_no_authority_even_if_upstream_ignores_schema(mon
     monkeypatch.setenv('NVIDIA_API_KEY', 'controlled')
     caplog.set_level('INFO', logger='matilda.studio.nvidia')
     value = compact_lesson()
-    value['sections'][0]['slides'][0]['content_blocks'].append({'type': 'evidence_claim', 'evidence_id': 'PRIVATE_ID'})
+    value['sections'][0]['slides'][0].setdefault('evidence_ids', []).append('PRIVATE_ID')
     provider = NVIDIAProvider(transport=httpx.MockTransport(lambda _: httpx.Response(200, json=completion(json.dumps(value)))))
     with pytest.raises(ValueError):
         asyncio.run(provider.complete(request_for('lesson')))

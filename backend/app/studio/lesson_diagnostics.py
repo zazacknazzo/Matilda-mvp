@@ -42,6 +42,7 @@ CODES = frozenset({
     'lesson_objectives_missing',
     'lesson_configuration_missing', 'lesson_configuration_invalid', 'lesson_time_budget_infeasible',
     'lesson_expansion_invalid',
+    'lesson_pedagogy_insufficient',
     'lesson_evidence_not_authorized', 'lesson_internal_failure', 'lesson_metadata_invalid',
     'lesson_draft_schema_invalid', 'lesson_bundle_schema_invalid', 'lesson_provider_output_invalid',
 })

@@ -32,14 +32,13 @@ def test_isolated_smoke_prepares_simulated_preview_but_only_lesson_uses_nvidia(c
         assert 'time_weight' in properties and 'duration_minutes' not in properties
         material = json.loads(body['messages'][1]['content'])
         result = compact_lesson()
-        result['sections'][1]['slides'][1]['content_blocks'].append({
-            'type': 'evidence_claim', 'evidence_id': next(iter(material['authorized_evidence']))})
+        result['sections'][1]['slides'][1].setdefault('evidence_ids', []).append(next(iter(material['authorized_evidence'])))
         return httpx.Response(200, json={'model': 'controlled', 'usage': {'prompt_tokens': 1400, 'completion_tokens': 1600},
             'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(result)}}]})
     provider = smoke.SingleCallNVIDIA(transport=httpx.MockTransport(upstream))
     report = smoke.run_lesson_smoke(provider)
     assert report['status'] == 'passed' and provider.calls == len(calls) == 1
-    assert report['lesson_contract'] == 'compact-v3-authorized'
+    assert report['lesson_contract'] == 'compact-v4-layouts'
     assert report['steps'][2]['approved_minutes'] == report['steps'][2]['section_minutes'] == report['steps'][2]['slide_minutes'] == 50
     assert report['preparation_simulated'] is True and report['full_flow_proven'] is False
     assert [s['stage'] for s in report['steps']] == ['preparation', 'review', 'lesson', 'read', 'replay', 'markdown']
@@ -115,8 +114,7 @@ def test_isolated_smoke_captures_post_provider_diagnostics_without_extra_http(cl
         calls.append(1)
         material = json.loads(json.loads(http.content)['messages'][1]['content'])
         value = compact_lesson()
-        value['sections'][0]['slides'][0]['content_blocks'].append({
-            'type': 'evidence_claim', 'evidence_id': next(iter(material['authorized_evidence']))})
+        value['sections'][0]['slides'][0].setdefault('evidence_ids', []).append(next(iter(material['authorized_evidence'])))
         return httpx.Response(200, json={'model': 'controlled', 'usage': {'prompt_tokens': 900, 'completion_tokens': 1100},
             'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(value)}}]})
     class PostProviderFault(smoke.SingleCallNVIDIA):

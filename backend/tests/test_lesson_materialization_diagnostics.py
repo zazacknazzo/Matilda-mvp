@@ -22,8 +22,7 @@ def test_unauthorized_evidence_has_specific_safe_diagnostic_and_preserves_review
     def upstream(_):
         calls.append(1)
         value = compact_lesson()
-        value['sections'][0]['slides'][0]['content_blocks'].append({
-            'type': 'evidence_claim', 'evidence_id': 'PRIVATE_EVIDENCE_ID'})
+        value['sections'][0]['slides'][0].setdefault('evidence_ids', []).append('PRIVATE_EVIDENCE_ID')
         return httpx.Response(200, json=completion(json.dumps(value)))
     provider = smoke_module().SingleCallNVIDIA(transport=httpx.MockTransport(upstream))
     app.dependency_overrides[get_provider] = lambda: provider

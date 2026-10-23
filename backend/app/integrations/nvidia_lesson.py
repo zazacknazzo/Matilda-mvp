@@ -1,13 +1,16 @@
 """NVIDIA-only authoring schema; deterministic expansion to the unchanged LessonDraft."""
 from typing import Annotated, Literal
+import json
+import logging
 
 from pydantic import Field, model_validator
 
-from app.schemas.lesson import ContentBlock, Index, LessonModel, Text, validate_slide_content
+from app.schemas.lesson import Index, LessonModel, Text
 from app.services.studio.lesson_validator import LessonDraft
 from app.studio.lesson_diagnostics import LessonRejected
+from .nvidia_slides import CompactSlide
 
-CONTRACT_VERSION = 'compact-v3-authorized'
+CONTRACT_VERSION = 'compact-v4-layouts'
 
 INSTRUCTION = '''\nRetorne um único objeto JSON completo conforme o schema de resposta, não o próprio schema.
 Sem Markdown, cercas de código ou texto antes/depois. Use aspas duplas e escapes
@@ -24,32 +27,26 @@ Produza 3–8 seções, 4–12 slides NO TOTAL e 1–4 atividades NO TOTAL.
 Escreva a explicação docente uma única vez em speaker_notes; o plano será montado
 com os blocos dos slides e essas notas. Slides devem ser concisos (até 600
 caracteres pedagógicos visíveis), com notas instrutivas e avaliação coerente.
-Use evidence_claim somente com evidence_id literal da enumeração autorizada.
-Sem evidências autorizadas, não use evidence_claim nem SCIENTIST_SPOTLIGHT.
+Escolha content.layout: TITLE/introduction opcional; CONCEPT/text e bullets opcionais;
+PROCESS/steps (2–6 etapas); QUESTION/question; SUMMARY/synthesis;
+SCIENTIST_SPOTLIGHT/evidence_id autorizado. Esses campos são conteúdo pedagógico,
+não envie content_blocks. evidence_ids opcionais vinculam fontes autorizadas adicionais.
+Sem evidências autorizadas, não use SCIENTIST_SPOTLIGHT nem evidence_ids.
 Não invente, abrevie ou substitua identificadores. Não invente história.
+Cada objetivo aprovado deve aparecer em uma seção com CONCEPT/PROCESS e numa atividade.
+Produza ao menos 80 caracteres de explicação conceitual no conjunto de CONCEPT/PROCESS.
+Notas docentes (80–1500 caracteres) devem orientar explicação, perguntas e discussão;
+atividades exigem enunciado aplicável, orientação docente e critérios de avaliação.
+Esses mínimos não certificam profundidade ou adequação para a duração: revisão docente é necessária.
 '''
-
-
-class CompactSlide(LessonModel):
-    layout: Literal['TITLE', 'CONCEPT', 'PROCESS', 'SCIENTIST_SPOTLIGHT', 'QUESTION', 'SUMMARY']
-    title: Annotated[str, Field(min_length=1, max_length=100, pattern=r'\S')]
-    subtitle: Text | None = None
-    content_blocks: list[ContentBlock] = Field(max_length=6)
-    speaker_notes: Annotated[str, Field(min_length=1, max_length=1500, pattern=r'\S')]
-
-    @model_validator(mode='after')
-    def content_matches_layout(self):
-        validate_slide_content(self.layout, self.title, self.subtitle, self.content_blocks,
-                               has_contribution=any(block.type == 'evidence_claim' for block in self.content_blocks))
-        return self
 
 
 class CompactActivity(LessonModel):
     type: Literal['comprehension', 'discussion']
-    prompt: Text
-    teacher_guidance: Text
+    prompt: Annotated[str, Field(min_length=20, max_length=20000, pattern=r'\S')]
+    teacher_guidance: Annotated[str, Field(min_length=40, max_length=20000, pattern=r'\S')]
     objective_indexes: list[Index] = Field(min_length=1)
-    assessment_criteria: list[Text] = Field(min_length=1)
+    assessment_criteria: list[Annotated[str, Field(min_length=20, max_length=20000, pattern=r'\S')]] = Field(min_length=1)
 
 
 class CompactSection(LessonModel):
@@ -78,7 +75,10 @@ class CompactLessonDraft(LessonModel):
 def _schema_annotations(value):
     if isinstance(value, dict):
         # A property NAMED title is a dict and must remain; only annotation strings go.
-        return {k: _schema_annotations(v) for k, v in value.items() if not (k == 'title' and isinstance(v, str))}
+        # Layout literals make branches disjoint: anyOf has exactly the same set
+        # of instances here. Do not depend on the OpenAPI discriminator extension.
+        return {('anyOf' if k == 'oneOf' else k): _schema_annotations(v)
+                for k, v in value.items() if k != 'discriminator' and not (k == 'title' and isinstance(v, str))}
     if isinstance(value, list):
         return [_schema_annotations(v) for v in value]
     return value
@@ -93,15 +93,15 @@ def contract(request):
         for name in ('CompactSection', 'CompactActivity'):
             schema['$defs'][name]['properties']['objective_indexes']['items']['enum'] = list(range(len(objectives)))
     allowed = material.get('authorized_evidence', {})
+    evidence_items = schema['$defs']['CompactSlide']['properties']['evidence_ids']['items']
     if allowed:
-        schema['$defs']['EvidenceClaimBlock']['properties']['evidence_id']['enum'] = sorted(allowed)
+        schema['$defs']['SpotlightContent']['properties']['evidence_id']['enum'] = sorted(allowed)
+        evidence_items['enum'] = sorted(allowed)
     else:
-        del schema['$defs']['EvidenceClaimBlock']
-        blocks = schema['$defs']['CompactSlide']['properties']['content_blocks']['items']
-        blocks['oneOf'] = [item for item in blocks['oneOf'] if item['$ref'] != '#/$defs/EvidenceClaimBlock']
-        del blocks['discriminator']['mapping']['evidence_claim']
-        layouts = schema['$defs']['CompactSlide']['properties']['layout']['enum']
-        layouts.remove('SCIENTIST_SPOTLIGHT')
+        del schema['$defs']['SpotlightContent']
+        content = schema['$defs']['CompactSlide']['properties']['content']
+        content['anyOf'] = [item for item in content['anyOf'] if item['$ref'] != '#/$defs/SpotlightContent']
+        schema['$defs']['CompactSlide']['properties']['evidence_ids']['maxItems'] = 0
     return (request.system_instruction + INSTRUCTION, {
         **material,
         'source_documents': [{k: d[k] for k in ('type', 'content')} for d in material.get('source_documents', [])],
@@ -147,11 +147,10 @@ def expand(content: bytes, *, duration_minutes: int, authorized_evidence: set[st
             raise LessonAuthoringError('lesson_duplicate_identifier')
     for section in draft.sections:
         for slide in section.slides:
-            if any(block.type == 'evidence_claim' and block.evidence_id not in authorized_evidence
-                   for block in slide.content_blocks):
+            blocks = slide.public_fields()['content_blocks']
+            if any(block['type'] == 'evidence_claim' and block['evidence_id'] not in authorized_evidence
+                   for block in blocks):
                 raise LessonAuthoringError('lesson_evidence_not_authorized')
-            if slide.layout == 'SCIENTIST_SPOTLIGHT' and not authorized_evidence:
-                raise LessonAuthoringError('lesson_slide_layout_invalid')
     # A baseline minute per slide is mandatory, not a repair of model minutes.
     minimums = [len(section.slides) for section in draft.sections]
     remaining = duration_minutes - sum(minimums)
@@ -173,9 +172,10 @@ def expand(content: bytes, *, duration_minutes: int, authorized_evidence: set[st
         for index, slide in enumerate(section.slides):
             key = f'slide-{len(slides)}'
             slide_keys.append(key)
-            slides.append({**slide.model_dump(), 'key': key, 'section_key': section_key,
+            authored = slide.public_fields()
+            slides.append({**authored, 'key': key, 'section_key': section_key,
                            'duration_minutes': minutes + (index < remainder)})
-            explanation.extend(b.model_dump() for b in slide.content_blocks)
+            explanation.extend(authored['content_blocks'])
             if slide.speaker_notes.strip():
                 explanation.append({'type': 'text', 'text': slide.speaker_notes})
         for activity in section.activities:
@@ -188,6 +188,11 @@ def expand(content: bytes, *, duration_minutes: int, authorized_evidence: set[st
     try:
         full = LessonDraft(prior_knowledge=draft.prior_knowledge, materials=draft.materials, sections=sections,
                            slides=slides, activities=activities, limitations=draft.limitations)
-        return full.model_dump_json().encode()
     except (ValueError, KeyError, TypeError):
         raise LessonAuthoringError('lesson_expansion_invalid') from None
+    from .nvidia_pedagogy import assess_quality
+    quality = assess_quality(full, objective_count=objective_count, authorized_evidence=authorized_evidence)
+    logging.getLogger('matilda.studio.nvidia').info('nvidia_lesson_quality %s', json.dumps(quality, separators=(',', ':')))
+    if not quality['structural_checks_passed']:
+        raise LessonAuthoringError('lesson_pedagogy_insufficient')
+    return full.model_dump_json().encode()

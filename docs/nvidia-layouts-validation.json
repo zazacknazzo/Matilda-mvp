@@ -1,0 +1,61 @@
+{
+  "base": "eda296952c5a397a843ff512d6488fcdf377f1c1",
+  "contract": "compact-v4-layouts",
+  "real_inferences": 0,
+  "backend": {
+    "passed": 952,
+    "seconds": 21.85,
+    "initial_run": {
+      "failed": 89,
+      "passed": 863,
+      "cause": "Legacy v3 test-double output and fixture translations; assertions preserved."
+    }
+  },
+  "contracts": {
+    "passed": 307,
+    "seconds": 0.47,
+    "public_schema_sources_byte_identical": true,
+    "lesson_schema_hashes": "nvidia-layouts-public-schemas.json"
+  },
+  "typescript": "passed via tsc -b",
+  "build": "passed",
+  "positive_api_matrix": {
+    "cases": 48,
+    "minutes": 50,
+    "lesson_draft": true,
+    "lesson_bundle": true,
+    "sqlite": true,
+    "read": true,
+    "idempotent_replay": true,
+    "markdown": true
+  },
+  "layout_and_pedagogy_tests": {
+    "passed": 58,
+    "independent_json_schema_validator": "jsonschema Draft202012Validator",
+    "six_layouts": true
+  },
+  "playwright": {
+    "studio": {
+      "passed": 23,
+      "seconds": 25.1
+    },
+    "review": {
+      "passed": 19,
+      "seconds": 9.5
+    },
+    "lesson": "running",
+    "generation": "running",
+    "bridge": "pending",
+    "export": "pending"
+  },
+  "reviews": {
+    "standards": "pending",
+    "spec": "pending"
+  },
+  "smoke_live": "not authorized in this task",
+  "warnings": [
+    "Existing Starlette/HTTPX deprecation",
+    "Existing google-genai deprecation",
+    "Existing Vite chunk larger than 500 kB"
+  ]
+}
