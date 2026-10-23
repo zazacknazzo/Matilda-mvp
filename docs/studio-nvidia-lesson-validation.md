@@ -141,7 +141,14 @@ Os envelopes públicos e políticas comuns de erro/retry não mudam.
 - Cobertura nova: 50 minutos/3/4/5/8 seções, 4–12 slides, mínimos,
   arredondamento/desempate, pesos iguais/diferentes/extremos/inválidos, contagens,
   campos pedagógicos ausentes, expansão/bytes, evidências ausentes/não autorizadas.
-- Playwright e revisões independentes: resultados finais registrados após execução.
+- **90 Playwright passaram**: integrado T13/Forensics/UI23 (23,4 s), revisão19
+  (6,7 s), slides14 (4,5 s), geração/operações18 (8,6 s), ponte5 (3,0 s),
+  exportação11 (3,8 s). O sandbox inicialmente bloqueou bind nas portas locais; as
+  execuções com a permissão necessária passaram sem falha funcional.
+- Revisões independentes: **Standards0 / Spec0**, cada revisor reexecutou **57
+  testes focados**. [Relatórios por eixo](reviews/nvidia-lesson-validation-code-review.md).
+- Diff confirmado sem mudanças em schemas públicos, frontend/src, Gemini,
+  serviço de geração, persistência, ciência ou política de deadlines/retry.
 
 ## Próximo smoke — somente após nova autorização
 
