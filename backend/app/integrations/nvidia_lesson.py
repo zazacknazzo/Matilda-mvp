@@ -8,7 +8,10 @@ from app.services.studio.lesson_validator import LessonDraft
 
 CONTRACT_VERSION = 'compact-v2-weighted'
 
-INSTRUCTION = '''\nPara o schema compacto: aninhe slides e atividades na seção correspondente.
+INSTRUCTION = '''\nRetorne um único objeto JSON completo conforme o schema de resposta, não o próprio schema.
+Sem Markdown, cercas de código ou texto antes/depois. Use aspas duplas e escapes
+JSON válidos nas strings; não repita chaves, não use vírgulas finais nem NaN/Infinity.
+Para o schema compacto: aninhe slides e atividades na seção correspondente.
 Escolha time_weight inteiro de 1 a 1000 por seção: maior peso reserva mais tempo
 adicional para a intenção pedagógica daquela seção. Não informe duration_minutes.
 O servidor reserva um minuto por slide e distribui o tempo restante aprovado

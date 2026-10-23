@@ -12,6 +12,7 @@ import httpx
 from app.schemas.lesson import LessonGenerationMetadata
 from app.services.studio.repository import conflict
 from app.studio.ports import POLICY, ProviderFailure, ProviderResult
+from .nvidia_json import InvalidJSON, decode_object
 
 DEFAULT_MODEL = 'nvidia/nemotron-3.5-super-vl-120b-a12b'
 DEFAULT_BASE_URL = 'https://integrate.api.nvidia.com/v1'
@@ -48,6 +49,7 @@ class NVIDIAProvider:
             'response_format': {'type': 'json_schema', 'json_schema': {
                 'name': 'PreviewPlan' if request.stage == 'preview' else 'LessonDraft',
                 'schema': dict(schema),
+                **({'strict': True} if request.stage == 'lesson' else {}),
             }},
         }
 
@@ -73,7 +75,7 @@ class NVIDIAProvider:
             event.update(estimated_input_tokens=estimate, reasoning_effort='none', stream=False)
             if request.stage == 'lesson':
                 from .nvidia_lesson import CONTRACT_VERSION
-                event['lesson_contract'] = CONTRACT_VERSION
+                event.update(lesson_contract=CONTRACT_VERSION, json_schema_strict=True)
             if estimate > min(request.max_input_tokens, POLICY.max_input_tokens):
                 event['outcome'] = 'input_too_large'
                 raise conflict('input_too_large', 'Entrada excede o limite seguro de tokens.')
@@ -155,10 +157,11 @@ class NVIDIAProvider:
 
     def _parse(self, body, request, started, event):
         try:
-            value = json.loads(body, object_pairs_hook=unique_keys,
-                               parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
-            if not isinstance(value, dict):
-                raise ValueError()
+            value = decode_object(body)
+        except InvalidJSON as failure:
+            event.update(failure_code=failure.code, json_target='envelope', **failure.metrics)
+            self._invalid('invalid_response', event)
+        try:
             # Preserve usage on failed/truncated completions when NVIDIA supplies it.
             reported_usage = value.get('usage')
             if isinstance(reported_usage, dict):
@@ -176,6 +179,8 @@ class NVIDIAProvider:
                 raise ValueError()
             choice = choices[0]
             finish = choice.get('finish_reason')
+            event['finish_reason'] = finish if isinstance(finish, str) and finish in {
+                'stop', 'length', 'content_filter', 'tool_calls', 'function_call'} else 'unknown'
             if finish != 'stop':
                 raise ProviderFailure('blocked' if finish == 'content_filter' else 'truncated')
             message = choice['message']
@@ -202,13 +207,16 @@ class NVIDIAProvider:
             raise conflict('input_too_large', 'O uso informado pela NVIDIA excede o limite seguro de entrada.')
         if output_tokens > min(request.max_output_tokens, POLICY.max_output_tokens):
             raise ProviderFailure('truncated')
+        event['content_chars'] = len(content)
         try:
-            payload = json.loads(content, object_pairs_hook=unique_keys,
-                                 parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
-            if not isinstance(payload, dict):
-                raise ValueError()
             encoded = content.encode('utf-8')
-        except (ValueError, TypeError, RecursionError):
+            event['content_bytes'] = len(encoded)
+            decode_object(content)
+        except InvalidJSON as failure:
+            event.update(failure_code=failure.code, json_target='message_content', **failure.metrics)
+            self._invalid('invalid_json', event)
+        except UnicodeEncodeError:
+            event.update(failure_code='json_unicode_invalid', json_target='message_content')
             self._invalid('invalid_json', event)
         if request.stage == 'lesson':
             from pydantic import ValidationError
@@ -233,12 +241,3 @@ class NVIDIAProvider:
             generated_at=datetime.now(timezone.utc).isoformat(), duration_ms=int((monotonic()-started)*1000),
             input_tokens=input_tokens, output_tokens=output_tokens,
         ))
-
-
-def unique_keys(pairs):
-    result = {}
-    for key, value in pairs:
-        if key in result:
-            raise ValueError('Duplicate JSON key.')
-        result[key] = value
-    return result

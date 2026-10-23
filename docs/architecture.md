@@ -203,3 +203,8 @@ Contagem NVIDIA é estimada conservadoramente antes da rede, sem endpoint de
 inferência adicional. Payload completo UTF-8 + reserva de 1.024 tokens; nunca
 chars/4 nem tokenizer de outro modelo. Uso efetivo é verificado no retorno e
 registrado junto da estimativa e diferença. Ver [guia NVIDIA](studio-nvidia.md).
+
+O decoder privado `integrations/nvidia_json.py` distingue erros de envelope e de
+message.content sem registrar dados. A geração NVIDIA solicita json_schema.strict
+e mantém o schema compact-v2-weighted integral; Pydantic e autoridade científica
+continuam obrigatórios. Ver [diagnóstico JSON](studio-nvidia-json-diagnosis.md).

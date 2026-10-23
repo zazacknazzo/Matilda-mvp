@@ -1,6 +1,8 @@
 # Studio com NVIDIA NIM — Issue #31
 
-Atualização vigente: [validação temporal e compact-v2-weighted](studio-nvidia-lesson-validation.md).
+Diagnóstico vigente: [invalid_json e saída estruturada](studio-nvidia-json-diagnosis.md).
+
+Contrato temporal: [validação temporal e compact-v2-weighted](studio-nvidia-lesson-validation.md).
 
 Histórico lesson: [timeout, contrato compacto e smoke isolado](studio-nvidia-lesson-timeout.md).
 
@@ -58,8 +60,9 @@ explícita; o estado docente local é preservado para consulta/tentativa explíc
 
 O endpoint específico documenta `response_format.json_schema.schema`. O envelope
 usado é `{"type":"json_schema","json_schema":{"name":"PreviewPlan ou LessonDraft","schema":{...}}}`.
-Não são enviados `strict`, `nvext`, parâmetros de SDK não documentados ou um
-schema vazio como alternativa. O `model_json_schema()` existente é enviado com refinamentos de cobertura e enums de IDs autorizados na prévia,
+A geração solicita `json_schema.strict=true`, declarado no OpenAPI do endpoint
+hospedado; a prévia mantém a flag omitida. Não são enviados `nvext`, parâmetros
+de SDK não documentados ou um schema vazio como alternativa. O `model_json_schema()` existente é enviado com refinamentos de cobertura e enums de IDs autorizados na prévia,
 incluindo `$defs`, `$ref`, limites, campos obrigatórios, uniões e
 `additionalProperties=false`. Não há adaptação que retire validações. O schema da prévia agora exige sugestões com cobertura e proíbe sugestões sem cobertura, mantendo a validação científica independente.
 

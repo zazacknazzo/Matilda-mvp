@@ -26,6 +26,7 @@ def test_isolated_smoke_prepares_simulated_preview_but_only_lesson_uses_nvidia(c
         calls.append(body)
         assert body['model'] == 'nvidia/nemotron-3.5-super-vl-120b-a12b'
         assert body['response_format']['json_schema']['name'] == 'LessonDraft'
+        assert body['response_format']['json_schema']['strict'] is True
         assert body['reasoning_effort'] == 'none'
         properties = body['response_format']['json_schema']['schema']['$defs']['CompactSection']['properties']
         assert 'time_weight' in properties and 'duration_minutes' not in properties
@@ -48,7 +49,7 @@ def test_isolated_smoke_prepares_simulated_preview_but_only_lesson_uses_nvidia(c
     assert 'Explique cada etapa' not in json.dumps(report)
 
 
-@pytest.mark.parametrize('failure', [503, 'invalid_schema', 'truncated', 'invalid_weight', 'legacy_minutes'])
+@pytest.mark.parametrize('failure', [503, 'invalid_schema', 'truncated', 'invalid_weight', 'legacy_minutes', 'invalid_json', 'duplicate_json'])
 def test_isolated_smoke_never_pays_for_retry_or_correction(client, monkeypatch, failure):
     smoke = module()
     monkeypatch.setenv('NVIDIA_API_KEY', 'controlled-private-key')
@@ -66,8 +67,10 @@ def test_isolated_smoke_never_pays_for_retry_or_correction(client, monkeypatch, 
             value['sections'][0]['duration_minutes'] = 11
         else:
             value = {}
+        content = ('{bad' if failure == 'invalid_json' else
+                   '{"PRIVATE_SOURCE":1,"PRIVATE_SOURCE":2}' if failure == 'duplicate_json' else json.dumps(value))
         return httpx.Response(200, json={'model': 'controlled', 'usage': {'prompt_tokens': 1000, 'completion_tokens': 100},
-            'choices': [{'finish_reason': 'length' if failure == 'truncated' else 'stop', 'message': {'content': json.dumps(value)}}]})
+            'choices': [{'finish_reason': 'length' if failure == 'truncated' else 'stop', 'message': {'content': content}}]})
     provider = smoke.SingleCallNVIDIA(transport=httpx.MockTransport(upstream))
     report = smoke.run_lesson_smoke(provider)
     assert report['status'] == 'failed' and report['failed_stage'] == 'lesson'
@@ -75,6 +78,12 @@ def test_isolated_smoke_never_pays_for_retry_or_correction(client, monkeypatch, 
     if failure in ('invalid_weight', 'legacy_minutes', 'invalid_schema'):
         events = [event for event in report['events'] if event['type'] == 'nvidia_attempt']
         assert len(events) == 1 and events[0]['failure_code'] == 'lesson_schema_invalid'
+    if failure in ('invalid_json', 'duplicate_json'):
+        events = [event for event in report['events'] if event['type'] == 'nvidia_attempt']
+        assert len(events) == 1 and events[0]['json_target'] == 'message_content'
+        assert events[0]['failure_code'] == ('json_syntax_invalid' if failure == 'invalid_json' else 'json_duplicate_key')
+        assert events[0]['content_bytes'] > 0 and events[0]['finish_reason'] == 'stop'
+    assert 'PRIVATE_SOURCE' not in json.dumps(report)
     assert 'private-teacher-material' not in json.dumps(report)
 
 

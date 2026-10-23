@@ -162,6 +162,9 @@ autorização, o comando NVIDIA tem teto de **3 chamadas / 180 segundos**:
 .venv/bin/python scripts/smoke_studio_nvidia.py --allow-paid-nvidia
 ```
 
+O [diagnóstico de invalid_json e saída estruturada](docs/studio-nvidia-json-diagnosis.md)
+registra as categorias sanitizadas e a solicitação strict do endpoint hospedado.
+
 O [diagnóstico de validação temporal e contrato privado de pesos](docs/studio-nvidia-lesson-validation.md)
 registra a reprodução de invalid_lesson_draft e o gate real pendente.
 
