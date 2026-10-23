@@ -27,6 +27,8 @@ def test_isolated_smoke_prepares_simulated_preview_but_only_lesson_uses_nvidia(c
         assert body['model'] == 'nvidia/nemotron-3.5-super-vl-120b-a12b'
         assert body['response_format']['json_schema']['name'] == 'LessonDraft'
         assert body['reasoning_effort'] == 'none'
+        properties = body['response_format']['json_schema']['schema']['$defs']['CompactSection']['properties']
+        assert 'time_weight' in properties and 'duration_minutes' not in properties
         material = json.loads(body['messages'][1]['content'])
         result = compact_lesson()
         result['sections'][1]['slides'][1]['content_blocks'].append({
@@ -36,6 +38,8 @@ def test_isolated_smoke_prepares_simulated_preview_but_only_lesson_uses_nvidia(c
     provider = smoke.SingleCallNVIDIA(transport=httpx.MockTransport(upstream))
     report = smoke.run_lesson_smoke(provider)
     assert report['status'] == 'passed' and provider.calls == len(calls) == 1
+    assert report['lesson_contract'] == 'compact-v2-weighted'
+    assert report['steps'][2]['approved_minutes'] == report['steps'][2]['section_minutes'] == report['steps'][2]['slide_minutes'] == 50
     assert report['preparation_simulated'] is True and report['full_flow_proven'] is False
     assert [s['stage'] for s in report['steps']] == ['preparation', 'review', 'lesson', 'read', 'replay', 'markdown']
     assert report['steps'][2]['json_validated'] is True
@@ -44,7 +48,7 @@ def test_isolated_smoke_prepares_simulated_preview_but_only_lesson_uses_nvidia(c
     assert 'Explique cada etapa' not in json.dumps(report)
 
 
-@pytest.mark.parametrize('failure', [503, 'invalid_schema', 'truncated'])
+@pytest.mark.parametrize('failure', [503, 'invalid_schema', 'truncated', 'invalid_weight', 'legacy_minutes'])
 def test_isolated_smoke_never_pays_for_retry_or_correction(client, monkeypatch, failure):
     smoke = module()
     monkeypatch.setenv('NVIDIA_API_KEY', 'controlled-private-key')
@@ -53,12 +57,24 @@ def test_isolated_smoke_never_pays_for_retry_or_correction(client, monkeypatch, 
         calls.append(1)
         if isinstance(failure, int):
             return httpx.Response(failure, text='private-key private-teacher-material')
+        value = compact_lesson()
+        if failure == 'invalid_weight':
+            value['sections'][0]['time_weight'] = 0
+        elif failure == 'legacy_minutes':
+            for section in value['sections']:
+                section['duration_minutes'] = section.pop('time_weight')
+            value['sections'][0]['duration_minutes'] = 11
+        else:
+            value = {}
         return httpx.Response(200, json={'model': 'controlled', 'usage': {'prompt_tokens': 1000, 'completion_tokens': 100},
-            'choices': [{'finish_reason': 'length' if failure == 'truncated' else 'stop', 'message': {'content': '{}'}}]})
+            'choices': [{'finish_reason': 'length' if failure == 'truncated' else 'stop', 'message': {'content': json.dumps(value)}}]})
     provider = smoke.SingleCallNVIDIA(transport=httpx.MockTransport(upstream))
     report = smoke.run_lesson_smoke(provider)
     assert report['status'] == 'failed' and report['failed_stage'] == 'lesson'
     assert calls == [1] and provider.calls == 1
+    if failure in ('invalid_weight', 'legacy_minutes', 'invalid_schema'):
+        events = [event for event in report['events'] if event['type'] == 'nvidia_attempt']
+        assert len(events) == 1 and events[0]['failure_code'] == 'lesson_schema_invalid'
     assert 'private-teacher-material' not in json.dumps(report)
 
 

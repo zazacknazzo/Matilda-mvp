@@ -1,6 +1,8 @@
 # Studio com NVIDIA NIM — Issue #31
 
-Atualização lesson: [timeout, contrato compacto e smoke isolado](studio-nvidia-lesson-timeout.md).
+Atualização vigente: [validação temporal e compact-v2-weighted](studio-nvidia-lesson-validation.md).
+
+Histórico lesson: [timeout, contrato compacto e smoke isolado](studio-nvidia-lesson-timeout.md).
 
 Histórico da prévia: [candidatos científicos e compactação](studio-scientific-candidates.md).
 

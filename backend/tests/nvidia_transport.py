@@ -34,7 +34,7 @@ def controlled_nvidia(external):
 def compact_payload(full):
     """Test provider speaks NVIDIA authoring format; never used in production."""
     return {**{k: full[k] for k in ('prior_knowledge', 'materials', 'limitations')}, 'sections': [
-        {**{k: section[k] for k in ('title', 'duration_minutes', 'objective_indexes')},
+        {**{k: section[k] for k in ('title', 'objective_indexes')}, 'time_weight': section['duration_minutes'],
          'slides': [{k: value for k, value in slide.items() if k not in ('key', 'section_key', 'duration_minutes')}
                     for slide in full['slides'] if slide['key'] in section['slide_keys']],
          'activities': [{k: value for k, value in activity.items() if k not in ('key', 'section_key')}

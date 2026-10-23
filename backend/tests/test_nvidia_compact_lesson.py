@@ -13,12 +13,12 @@ from test_studio_flow import create, generate, review
 
 def compact_lesson():
     return {'prior_knowledge': ['Noções de DNA.'], 'materials': ['Quadro.'], 'limitations': [], 'sections': [
-        {'title': 'Introdução', 'duration_minutes': 10, 'objective_indexes': [0], 'slides': [
+        {'title': 'Introdução', 'time_weight': 10, 'objective_indexes': [0], 'slides': [
             {'layout': 'TITLE', 'title': 'Questão inicial', 'content_blocks': [{'type': 'text', 'text': 'Como investigar o mecanismo?'}], 'speaker_notes': 'Levante hipóteses com a turma.'}], 'activities': []},
-        {'title': 'Mecanismo', 'duration_minutes': 25, 'objective_indexes': [0], 'slides': [
+        {'title': 'Mecanismo', 'time_weight': 25, 'objective_indexes': [0], 'slides': [
             {'layout': 'CONCEPT', 'title': 'Mecanismo molecular', 'content_blocks': [{'type': 'text', 'text': 'Compare os conceitos do material.'}], 'speaker_notes': 'Explique cada etapa a partir do material.'},
             {'layout': 'SUMMARY', 'title': 'Análise da documentação', 'content_blocks': [{'type': 'text', 'text': 'Distinga mecanismo e documentação.'}], 'speaker_notes': 'Peça justificativas para a comparação.'}], 'activities': []},
-        {'title': 'Avaliação', 'duration_minutes': 15, 'objective_indexes': [0], 'slides': [
+        {'title': 'Avaliação', 'time_weight': 15, 'objective_indexes': [0], 'slides': [
             {'layout': 'QUESTION', 'title': 'Conferir a compreensão', 'content_blocks': [{'type': 'question', 'text': 'Como sustentar a explicação?'}], 'speaker_notes': 'Discuta as respostas e as limitações.'}],
          'activities': [{'type': 'discussion', 'prompt': 'Explique o mecanismo com apoio no material.', 'teacher_guidance': 'Solicite uma justificativa.', 'objective_indexes': [0], 'assessment_criteria': ['Conceitos e justificativa coerentes.']}]},
     ]}
@@ -63,7 +63,7 @@ def test_compact_authoring_builds_canonical_links_times_plan_read_and_markdown(c
         app.dependency_overrides.clear()
 
 
-@pytest.mark.parametrize('failure', ['empty_notes', 'wrong_total', 'too_many_slides', 'unauthorized_evidence', 'invalid_objective'])
+@pytest.mark.parametrize('failure', ['empty_notes', 'legacy_minutes', 'too_many_slides', 'unauthorized_evidence', 'invalid_objective'])
 def test_invalid_compact_lesson_never_publishes_or_changes_teacher_review(client, monkeypatch, failure):
     monkeypatch.setenv('NVIDIA_API_KEY', 'controlled-key')
     app.dependency_overrides[get_provider] = lambda: FlowProvider()
@@ -72,7 +72,7 @@ def test_invalid_compact_lesson_never_publishes_or_changes_teacher_review(client
         value = compact_lesson()
         if failure == 'empty_notes':
             value['sections'][0]['slides'][0]['speaker_notes'] = ''
-        elif failure == 'wrong_total':
+        elif failure == 'legacy_minutes':
             value['sections'][0]['duration_minutes'] = 11
         elif failure == 'too_many_slides':
             value['sections'][0]['slides'] *= 10
@@ -91,3 +91,134 @@ def test_invalid_compact_lesson_never_publishes_or_changes_teacher_review(client
         assert resumed['last_lesson_bundle_id'] is None and resumed['generation_status'] == 'failed'
     finally:
         app.dependency_overrides.clear()
+
+
+def test_weighted_sections_allocate_approved_time_through_provider(monkeypatch):
+    import asyncio
+    from app.services.studio.lesson_validator import LessonDraft
+    from test_nvidia_provider import completion, request_for
+    monkeypatch.setenv('NVIDIA_API_KEY', 'controlled-key')
+    value = compact_lesson()
+    for section, weight in zip(value['sections'], (1, 1, 1)):
+        section['time_weight'] = weight
+    calls = []
+    def upstream(http):
+        calls.append(1)
+        schema = json.loads(http.content)['response_format']['json_schema']['schema']
+        properties = schema['$defs']['CompactSection']['properties']
+        assert 'time_weight' in properties and 'duration_minutes' not in properties
+        return httpx.Response(200, json=completion(json.dumps(value)))
+    provider = NVIDIAProvider(transport=httpx.MockTransport(upstream))
+    result = asyncio.run(provider.complete(request_for('lesson')))
+    draft = LessonDraft.model_validate_json(result.content)
+    assert [s.duration_minutes for s in draft.sections] == [17, 17, 16]
+    assert [s.duration_minutes for s in draft.slides] == [17, 9, 8, 16]
+    assert calls == [1]
+
+
+def weighted_lesson(slide_counts, weights):
+    from copy import deepcopy
+    value = compact_lesson()
+    template = value['sections'][0]
+    activity = value['sections'][-1]['activities'][0]
+    value['sections'] = []
+    for count, weight in zip(slide_counts, weights):
+        section = deepcopy(template)
+        section['time_weight'] = weight
+        section['slides'] = [deepcopy(template['slides'][0]) for _ in range(count)]
+        value['sections'].append(section)
+    value['sections'][-1]['activities'] = [activity]
+    return value
+
+
+@pytest.mark.parametrize('counts,weights,expected', [
+    ([1, 2, 1], [1, 1, 1], [17, 17, 16]),
+    ([1, 1, 1, 1], [1, 1, 1, 1], [13, 13, 12, 12]),
+    ([2, 1, 3, 1, 1], [1, 1, 1, 1, 1], [11, 10, 11, 9, 9]),
+    ([1, 1, 1, 1], [1, 2, 3, 4], [6, 10, 15, 19]),
+    ([1, 1, 10], [1000, 1, 1], [39, 1, 10]),
+    ([1, 1, 2], [1, 1000, 1], [1, 47, 2]),
+    ([1, 1, 1, 1, 1], [1000, 1, 1, 1, 1], [46, 1, 1, 1, 1]),
+    ([4, 4, 4], [1000, 1000, 1000], [17, 17, 16]),
+    ([1] * 8, [1] * 8, [7, 7, 6, 6, 6, 6, 6, 6]),
+])
+def test_weighted_time_survives_full_bundle_validation_without_evidence(
+    client, monkeypatch, counts, weights, expected,
+):
+    from app.schemas.lesson import LessonBundle
+    from test_nvidia_provider import completion
+    monkeypatch.setenv('NVIDIA_API_KEY', 'controlled-key')
+    app.dependency_overrides[get_provider] = lambda: FlowProvider()
+    saved, _ = review(client, create(client), accept=False)
+    value = weighted_lesson(counts, weights)
+    calls = []
+    def upstream(http):
+        calls.append(1)
+        material = json.loads(json.loads(http.content)['messages'][1]['content'])
+        assert material['authorized_evidence'] == {}
+        return httpx.Response(200, json=completion(json.dumps(value)))
+    app.dependency_overrides[get_provider] = lambda: NVIDIAProvider(transport=httpx.MockTransport(upstream))
+    try:
+        response = generate(client, saved)
+        assert response.status_code == 201, response.text
+        bundle = LessonBundle.model_validate(response.json())
+        assert [s.duration_minutes for s in bundle.sections] == expected
+        assert bundle.metadata.duration_minutes == sum(expected) == 50
+        assert len(bundle.slides) == sum(counts) and len(bundle.activities) == 1
+        assert bundle.references == []
+        for section, count in zip(bundle.sections, counts):
+            slides = [slide for slide in bundle.slides if slide.section_id == section.id]
+            assert len(slides) == count
+            assert sum(slide.duration_minutes for slide in slides) == section.duration_minutes
+            assert all(type(slide.duration_minutes) is int and slide.duration_minutes >= 1 for slide in slides)
+            assert max(slide.duration_minutes for slide in slides) - min(slide.duration_minutes for slide in slides) <= 1
+            assert all(slide.evidence_ids == [] and slide.contribution_ids == [] for slide in slides)
+            assert all(slide.speaker_notes == value['sections'][0]['slides'][0]['speaker_notes'] for slide in slides)
+        assert calls == [1]
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.parametrize('weight', [0, -1, 1001, True, 1.5, '1', None])
+def test_invalid_weights_are_not_repaired(monkeypatch, caplog, weight):
+    from test_nvidia_lesson_validation import event_for
+    value = compact_lesson()
+    value['sections'][0]['time_weight'] = weight
+    event = event_for(monkeypatch, caplog, value)
+    assert event['failure_code'] == 'lesson_schema_invalid'
+
+
+@pytest.mark.parametrize('fault', ['missing_weight', 'legacy_only', 'no_activities', 'five_activities',
+    'three_slides', 'thirteen_slides', 'two_sections', 'nine_sections', 'missing_notes', 'blank_notes',
+    'missing_prompt', 'missing_guidance', 'missing_criteria'])
+def test_missing_pedagogy_and_invalid_counts_are_rejected(monkeypatch, caplog, fault):
+    from test_nvidia_lesson_validation import event_for
+    value = compact_lesson()
+    section = value['sections'][0]
+    activity = value['sections'][-1]['activities'][0]
+    if fault == 'missing_weight':
+        del section['time_weight']
+    elif fault == 'legacy_only':
+        for item in value['sections']:
+            item['duration_minutes'] = item.pop('time_weight')
+    elif fault == 'no_activities':
+        value['sections'][-1]['activities'] = []
+    elif fault == 'five_activities':
+        section['activities'] = [activity] * 4
+    elif fault == 'three_slides':
+        value['sections'][1]['slides'].pop()
+    elif fault == 'thirteen_slides':
+        section['slides'] *= 10
+    elif fault == 'two_sections':
+        value['sections'].pop()
+    elif fault == 'nine_sections':
+        value['sections'] += [section] * 6
+    elif fault == 'missing_notes':
+        del section['slides'][0]['speaker_notes']
+    elif fault == 'blank_notes':
+        section['slides'][0]['speaker_notes'] = '  '
+    else:
+        del activity[{'missing_prompt': 'prompt', 'missing_guidance': 'teacher_guidance',
+                      'missing_criteria': 'assessment_criteria'}[fault]]
+    event = event_for(monkeypatch, caplog, value)
+    assert event['failure_code'] == 'lesson_schema_invalid'

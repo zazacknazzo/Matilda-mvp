@@ -170,8 +170,8 @@ Ver `integrated-demo-t13.md` para evidências e limitações.
 ## Studio — NVIDIA NIM (#31)
 
 `integrations/nvidia_client.py` implementa as mesmas portas sem mudar API, schemas,
-tabelas ou catálogo. HTTPX envia `response_format.json_schema` com o schema privado
-integral: PreviewPlan na prévia e LessonDraft na geração. O serviço materializa e
+tabelas ou catálogo. HTTPX envia `response_format.json_schema` com o schema privado:
+PreviewPlan na prévia e compact-v2-weighted na geração NVIDIA. O serviço materializa e
 valida LessonBundle contra a revisão e o snapshot científico existentes. O provedor
 não recebe autoridade para inventar referências ou identidades.
 
@@ -179,9 +179,10 @@ No adapter NVIDIA, `integrations/nvidia_lesson.py` usa uma elaboração aninhada
 slides e atividades pertencem à seção por estrutura; chaves, vínculos e distribuição
 de minutos dos slides são construídos no servidor. O plano reutiliza blocos e
 notas pedagógicas produzidos uma vez. A expansão passa pelo LessonDraft integral
-e pelos mesmos validadores T09/Bundle; Gemini mantém o contrato original. Tempo
-total e objetivos semânticos continuam escolhas validadas da elaboração. Ver
-[timeout e smoke lesson](studio-nvidia-lesson-timeout.md).
+e pelos mesmos validadores T09/Bundle; Gemini mantém o contrato original. A IA escolhe pesos de tempo adicional por seção e objetivos semânticos. O servidor
+reserva um minuto por slide e aloca o restante aprovado por maiores restos, com
+desempate pela ordem original. Não aceita durações legadas na saída NVIDIA. Ver
+[validação temporal e smoke lesson](studio-nvidia-lesson-validation.md).
 
 Na prévia, `services/studio/preview_anchors.py` constrói escolhas literais ligadas
 à proveniência, aos conceitos e às contribuições resolvidas. PreviewPlan recebe

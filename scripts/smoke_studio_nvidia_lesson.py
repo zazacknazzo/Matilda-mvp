@@ -16,6 +16,7 @@ from uuid import uuid4
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'backend'), str(ROOT)]
 from app.integrations.nvidia_client import NVIDIAProvider, DEFAULT_MODEL, DEFAULT_BASE_URL
+from app.integrations.nvidia_lesson import CONTRACT_VERSION
 from app.services.studio.repository import conflict
 from scripts.smoke_studio_nvidia import Recorder, SmokeFailure
 
@@ -74,7 +75,7 @@ def run_lesson_smoke(provider, *, scenario='crispr'):
         logger.setLevel(logging.INFO)
         logger.propagate = False
     report = {'status': 'failed', 'scope': 'lesson_only', 'preparation_simulated': True,
-              'full_flow_proven': False, 'max_external_calls': 1, 'max_seconds': MAX_SECONDS, 'steps': []}
+              'full_flow_proven': False, 'lesson_contract': CONTRACT_VERSION, 'max_external_calls': 1, 'max_seconds': MAX_SECONDS, 'steps': []}
     started, stage = monotonic(), 'startup'
 
     def step(client, method, path, name, expected, **kwargs):
@@ -127,7 +128,10 @@ def run_lesson_smoke(provider, *, scenario='crispr'):
             if bundle.metadata.duration_minutes != 50 or not bundle.references:
                 raise SmokeFailure()
             report['steps'][-1].update(json_validated=True, metadata=bundle.generation_metadata.model_dump(),
-                                      slides=len(bundle.slides), sections=len(bundle.sections), activities=len(bundle.activities))
+                                      slides=len(bundle.slides), sections=len(bundle.sections), activities=len(bundle.activities),
+                                      approved_minutes=bundle.metadata.duration_minutes,
+                                      section_minutes=sum(section.duration_minutes for section in bundle.sections),
+                                      slide_minutes=sum(slide.duration_minutes for slide in bundle.slides))
             path = '/api/studio/lessons/' + bundle.lesson_bundle_id
             read = step(client, 'get', path, 'read', 200)
             replay = step(client, 'post', '/api/studio/generate', 'replay', 200, headers=headers, json=generation)

@@ -28,12 +28,14 @@ def event_for(monkeypatch, caplog, value, **changes):
     return events[0]
 
 
-def test_wrong_total_has_specific_sanitized_diagnostic(monkeypatch, caplog):
+@pytest.mark.parametrize('first_minutes', [10, 11])
+def test_legacy_minutes_are_rejected_without_repair(monkeypatch, caplog, first_minutes):
     value = compact_lesson()
-    value['sections'][0]['duration_minutes'] = 11
+    for section in value['sections']:
+        section['duration_minutes'] = section.pop('time_weight')
+    value['sections'][0]['duration_minutes'] = first_minutes
     event = event_for(monkeypatch, caplog, value)
-    assert event['failure_code'] == 'lesson_duration_mismatch'
-    assert event['approved_minutes'] == 50 and event['section_minutes'] == 51
+    assert event['failure_code'] == 'lesson_schema_invalid'
 
 
 @pytest.mark.parametrize('material,code', [
@@ -60,3 +62,27 @@ def test_expansion_failure_is_distinct_and_sanitized(monkeypatch, caplog):
     monkeypatch.setattr(lesson, 'LessonDraft', broken)
     event = event_for(monkeypatch, caplog, compact_lesson())
     assert event['failure_code'] == 'lesson_expansion_invalid'
+
+
+@pytest.mark.parametrize('duration', [True, 9, 121, 50.0, None])
+def test_invalid_approved_duration_is_not_coerced(monkeypatch, caplog, duration):
+    event = event_for(monkeypatch, caplog, compact_lesson(), material={'configuration': {'duration_minutes': duration}})
+    assert event['failure_code'] == 'lesson_configuration_invalid'
+
+
+def test_insufficient_time_for_slide_minimum_is_distinct(monkeypatch, caplog):
+    from test_nvidia_compact_lesson import weighted_lesson
+    event = event_for(monkeypatch, caplog, weighted_lesson([4, 4, 4], [1, 1, 1]),
+                      material={'configuration': {'duration_minutes': 10}})
+    assert event['failure_code'] == 'lesson_time_budget_infeasible'
+    assert event['approved_minutes'] == 10 and event['minimum_minutes'] == 12
+
+
+def test_expanded_size_limit_is_enforced_before_return(monkeypatch, caplog):
+    value = compact_lesson()
+    for section in value['sections']:
+        for slide in section['slides']:
+            slide['content_blocks'] = [{'type': 'text', 'text': 'x' * 2700}] * 6
+    event = event_for(monkeypatch, caplog, value)
+    assert event['outcome'] == 'response_too_large'
+    assert event['failure_code'] == 'lesson_expanded_response_too_large'

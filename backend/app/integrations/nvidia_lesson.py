@@ -3,13 +3,18 @@ from typing import Annotated, Literal
 
 from pydantic import Field, model_validator
 
-from app.schemas.lesson import ContentBlock, Index, LessonModel, Minutes, Text
+from app.schemas.lesson import ContentBlock, Index, LessonModel, Text
 from app.services.studio.lesson_validator import LessonDraft
 
+CONTRACT_VERSION = 'compact-v2-weighted'
+
 INSTRUCTION = '''\nPara o schema compacto: aninhe slides e atividades na seção correspondente.
-Informe minutos inteiros por seção, somando a duração solicitada; reserve ao menos
-um minuto por slide. O servidor distribui esses minutos entre os slides e cria
-chaves e vínculos. Não escreva esses campos. Objetivos continuam sendo índices
+Escolha time_weight inteiro de 1 a 1000 por seção: maior peso reserva mais tempo
+adicional para a intenção pedagógica daquela seção. Não informe duration_minutes.
+O servidor reserva um minuto por slide e distribui o tempo restante aprovado
+proporcionalmente aos pesos, por maiores restos (empates na ordem das seções).
+Depois divide cada seção entre seus slides, com resto na ordem. Atividades estão
+incluídas no tempo da seção. O servidor cria chaves e vínculos. Objetivos continuam sendo índices
 semânticos da lista aprovada, escolhidos por você para cada seção e atividade.
 Produza 3–8 seções, 4–12 slides NO TOTAL e 1–4 atividades NO TOTAL.
 Escreva a explicação docente uma única vez em speaker_notes; o plano será montado
@@ -37,7 +42,7 @@ class CompactActivity(LessonModel):
 
 class CompactSection(LessonModel):
     title: Text
-    duration_minutes: Minutes
+    time_weight: Annotated[int, Field(ge=1, le=1000)]
     objective_indexes: list[Index] = Field(min_length=1)
     slides: list[CompactSlide] = Field(min_length=1, max_length=12)
     activities: list[CompactActivity] = Field(max_length=4)
@@ -55,8 +60,6 @@ class CompactLessonDraft(LessonModel):
             raise ValueError('Aula exige 4–12 slides totais.')
         if not 1 <= sum(len(s.activities) for s in self.sections) <= 4:
             raise ValueError('Aula exige 1–4 atividades totais.')
-        if any(s.duration_minutes < len(s.slides) for s in self.sections):
-            raise ValueError('Minutos da seção não comportam os slides.')
         return self
 
 
@@ -100,14 +103,24 @@ def approved_duration(material):
 
 def expand(content: bytes, *, duration_minutes: int) -> bytes:
     draft = CompactLessonDraft.model_validate_json(content)
-    if sum(s.duration_minutes for s in draft.sections) != duration_minutes:
-        raise LessonAuthoringError('lesson_duration_mismatch', approved_minutes=duration_minutes,
-                                   section_minutes=sum(s.duration_minutes for s in draft.sections))
+    # A baseline minute per slide is mandatory, not a repair of model minutes.
+    minimums = [len(section.slides) for section in draft.sections]
+    remaining = duration_minutes - sum(minimums)
+    if remaining < 0:
+        raise LessonAuthoringError('lesson_time_budget_infeasible', approved_minutes=duration_minutes,
+                                   minimum_minutes=sum(minimums))
+    weight_total = sum(section.time_weight for section in draft.sections)
+    shares = [divmod(remaining * section.time_weight, weight_total) for section in draft.sections]
+    durations = [minimum + share[0] for minimum, share in zip(minimums, shares)]
+    leftover = duration_minutes - sum(durations)
+    order = sorted(range(len(shares)), key=lambda index: (-shares[index][1], index))
+    for index in order[:leftover]:
+        durations[index] += 1
     sections, slides, activities = [], [], []
     for section_index, section in enumerate(draft.sections):
         section_key = f'section-{section_index}'
         slide_keys, activity_keys, explanation = [], [], []
-        minutes, remainder = divmod(section.duration_minutes, len(section.slides))
+        minutes, remainder = divmod(durations[section_index], len(section.slides))
         for index, slide in enumerate(section.slides):
             key = f'slide-{len(slides)}'
             slide_keys.append(key)
@@ -120,7 +133,7 @@ def expand(content: bytes, *, duration_minutes: int) -> bytes:
             key = f'activity-{len(activities)}'
             activity_keys.append(key)
             activities.append({**activity.model_dump(), 'key': key, 'section_key': section_key})
-        sections.append({'key': section_key, 'title': section.title, 'duration_minutes': section.duration_minutes,
+        sections.append({'key': section_key, 'title': section.title, 'duration_minutes': durations[section_index],
                          'objective_indexes': section.objective_indexes, 'explanation_blocks': explanation,
                          'slide_keys': slide_keys, 'activity_keys': activity_keys})
     try:

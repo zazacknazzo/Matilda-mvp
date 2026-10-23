@@ -162,6 +162,9 @@ autorização, o comando NVIDIA tem teto de **3 chamadas / 180 segundos**:
 .venv/bin/python scripts/smoke_studio_nvidia.py --allow-paid-nvidia
 ```
 
+O [diagnóstico de validação temporal e contrato privado de pesos](docs/studio-nvidia-lesson-validation.md)
+registra a reprodução de invalid_lesson_draft e o gate real pendente.
+
 Para diagnosticar somente a geração sem pagar pelas prévias novamente, há um
 [smoke lesson isolado](docs/studio-nvidia-lesson-timeout.md): preparação pedagógica
 explicitamente simulada por API, ciência canônica real em cache, uma inferência

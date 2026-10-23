@@ -72,7 +72,8 @@ class NVIDIAProvider:
             estimate = await self.count_input_tokens(request)
             event.update(estimated_input_tokens=estimate, reasoning_effort='none', stream=False)
             if request.stage == 'lesson':
-                event['lesson_contract'] = 'compact-v1'
+                from .nvidia_lesson import CONTRACT_VERSION
+                event['lesson_contract'] = CONTRACT_VERSION
             if estimate > min(request.max_input_tokens, POLICY.max_input_tokens):
                 event['outcome'] = 'input_too_large'
                 raise conflict('input_too_large', 'Entrada excede o limite seguro de tokens.')
@@ -215,6 +216,7 @@ class NVIDIAProvider:
             try:
                 encoded = expand(encoded, duration_minutes=approved_duration(request.material))
                 if len(encoded) > POLICY.max_body_bytes:
+                    event['failure_code'] = 'lesson_expanded_response_too_large'
                     self._invalid('response_too_large', event)
             except ValidationError:
                 event.update(outcome='pydantic_validation', failure_code='lesson_schema_invalid')
@@ -222,9 +224,9 @@ class NVIDIAProvider:
             except LessonAuthoringError as failure:
                 event.update(outcome='invalid_lesson_draft', failure_code=failure.code, **failure.metrics)
                 raise
-            except (ValueError, KeyError):
+            except (ValueError, KeyError, TypeError):
                 if event['outcome'] == 'unavailable':
-                    event['outcome'] = 'invalid_lesson_draft'
+                    event.update(outcome='invalid_lesson_draft', failure_code='lesson_expansion_invalid')
                 raise
         return ProviderResult(encoded, LessonGenerationMetadata(
             provider='nvidia', model=model, prompt_version=request.prompt_version, schema_version=1,

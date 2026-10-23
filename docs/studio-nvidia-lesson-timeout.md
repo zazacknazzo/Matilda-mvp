@@ -1,5 +1,8 @@
 # Geração NVIDIA — timeout, contrato compacto e smoke isolado (#31 / PR #32)
 
+Registro histórico do compact-v1. O contrato vigente e os diagnósticos de validação
+estão em [compact-v2-weighted](studio-nvidia-lesson-validation.md).
+
 Base: `394d109`. Não houve inferência real NVIDIA/Gemini nesta correção.
 A prévia e os contratos públicos permanecem. PR #34/UI não foi alterado.
 
