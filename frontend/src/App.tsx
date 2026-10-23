@@ -869,6 +869,18 @@ export default function App() {
   }, []);
   return (
     <>
+      {studio && (
+        <a
+          className="skip-link"
+          href="#studio-main"
+          onClick={(event) => {
+            event.preventDefault();
+            document.getElementById("studio-main")?.focus();
+          }}
+        >
+          Ir para o conteúdo do Studio
+        </a>
+      )}
       <nav className="mode-navigation" aria-label="Modos Matilda">
         <button
           aria-pressed={!studio}

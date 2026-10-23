@@ -3,9 +3,13 @@ import type { EnrichmentPreview } from "../types/studio";
 export function PreviewPanel({
   preview,
   onEdit,
+  onReview,
+  busy,
 }: {
   preview: EnrichmentPreview;
   onEdit(): void;
+  onReview(): void;
+  busy: boolean;
 }) {
   const labels = new Map(
     preview.concepts.map((concept) => [concept.id, concept.name]),
@@ -24,8 +28,18 @@ export function PreviewPanel({
             {preview.project.duration_minutes} min
           </p>
         </div>
-        <button onClick={onEdit}>Editar entrada</button>
+        <div className="studio-preview-actions">
+          <button className="primary-button" disabled={busy} onClick={onReview}>
+            Revisar fontes e objetivos
+          </button>
+          <button onClick={onEdit}>Editar entrada</button>
+        </div>
       </div>
+      <p className="studio-next-step">
+        {preview.suggestions.length} sugestões para sua revisão. Confira o
+        material, as propostas e suas fontes. A aula só será gerada após sua
+        aprovação.
+      </p>
       <p>
         Retida até {new Date(preview.expires_at).toLocaleString("pt-BR")}.
         Consulta não renova o prazo.
@@ -36,7 +50,10 @@ export function PreviewPanel({
           {preview.source_documents.map((document) => (
             <article key={document.id}>
               <h3>{document.title}</h3>
-              <pre data-testid="original-document">{document.content}</pre>
+              <details className="matilda-disclosure">
+                <summary>Ler material original completo</summary>
+                <pre data-testid="original-document">{document.content}</pre>
+              </details>
             </article>
           ))}
           <h3>Conceitos identificados</h3>
@@ -84,12 +101,14 @@ export function PreviewPanel({
                   .map((id) => labels.get(id) || id)
                   .join(" · ")}
               </h3>
-              <h4>Onde inserir</h4>
-              <blockquote>{suggestion.source_anchor.quote}</blockquote>
-              <small>
-                Ocorrência {suggestion.source_anchor.occurrence + 1} no
-                documento original.
-              </small>
+              <details className="matilda-disclosure">
+                <summary>Onde inserir · trecho original</summary>
+                <blockquote>{suggestion.source_anchor.quote}</blockquote>
+                <small>
+                  Ocorrência {suggestion.source_anchor.occurrence + 1} no
+                  documento original.
+                </small>
+              </details>
               <h4>Proposta pedagógica</h4>
               <p>{suggestion.suggested_content}</p>
               <h4>Por que inserir</h4>
@@ -111,7 +130,10 @@ export function PreviewPanel({
                     document.getElementById(`studio-evidence-${id}`)?.focus();
                   }}
                 >
-                  Conferir evidência {id}
+                  Conferir evidência ·{" "}
+                  {preview.evidence_references.find(
+                    (reference) => reference.id === id,
+                  )?.source_title || id}
                 </a>
               ))}
             </article>

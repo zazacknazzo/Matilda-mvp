@@ -255,6 +255,7 @@ Gemini permanece selecionável pelo SDK `google-genai`.
 - [Método científico e fontes](docs/research-methodology.md)
 - [Catálogo automático](docs/automatic-catalog.md)
 - [Cenários de demonstração](docs/demo-scenarios.md)
+- [Auditoria UI/UX, comparação visual e validação](docs/ui-ux-audit.md)
 - [Escopo e pendências do PRD](docs/prd-status.md)
 - [PRD da próxima expansão do motor de busca](docs/prd-expansao-motor-busca.md)
 

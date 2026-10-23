@@ -160,9 +160,14 @@ function ReviewEditor({
   const confirmationTrigger = useRef<HTMLButtonElement | null>(null);
   useEffect(() => () => operation.current?.abort(), []);
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
+    // The clock only affects expiry. Avoid rerendering every document and
+    // controlled editor each second while the teacher reads or types.
+    setNow(Date.now());
+    const remaining = Date.parse(preview.expires_at) - Date.now();
+    if (remaining <= 0) return;
+    const timer = window.setTimeout(() => setNow(Date.now()), remaining + 1);
+    return () => window.clearTimeout(timer);
+  }, [preview.expires_at]);
   useEffect(() => {
     if (error || notice) feedback.current?.focus();
   }, [error, notice]);
@@ -308,6 +313,25 @@ function ReviewEditor({
           Revise as fontes, decida sobre cada sugestão e aprove os objetivos.
           Apenas a proposta pedagógica e sua justificativa podem ser editadas.
         </p>
+        <div className="review-checkpoint">
+          <p>
+            <strong>
+              {preview.suggestions.length - pending} de{" "}
+              {preview.suggestions.length}
+            </strong>{" "}
+            sugestões revisadas ·{" "}
+            {approved ? "Objetivos aprovados" : "Objetivos aguardam aprovação"}
+          </p>
+          <a
+            href="#review-actions"
+            onClick={(event) => {
+              event.preventDefault();
+              document.getElementById("review-actions")?.focus();
+            }}
+          >
+            Ir para objetivos e salvar
+          </a>
+        </div>
         {expired && (
           <p role="alert">
             Esta prévia expirou. Prepare uma nova prévia para continuar.
@@ -331,7 +355,10 @@ function ReviewEditor({
             {preview.source_documents.map((doc) => (
               <div key={doc.id}>
                 <h3>{doc.title}</h3>
-                <p className="review-literal">{doc.content}</p>
+                <details className="matilda-disclosure">
+                  <summary>Ler material original completo</summary>
+                  <p className="review-literal">{doc.content}</p>
+                </details>
               </div>
             ))}
             <h3>Conceitos e procedência</h3>
@@ -383,7 +410,11 @@ function ReviewEditor({
             ))}
           </section>
         </div>
-        <section aria-label="Objetivos da aula">
+        <section
+          aria-label="Objetivos da aula"
+          id="review-actions"
+          tabIndex={-1}
+        >
           <h2>Objetivos da aula</h2>
           <fieldset disabled={blocked}>
             <legend>Revisão e aprovação dos objetivos</legend>
@@ -449,6 +480,7 @@ function ReviewEditor({
           )}
           <div className="review-buttons">
             <button
+              className="review-primary"
               disabled={
                 blocked ||
                 uncertain ||
@@ -472,6 +504,7 @@ function ReviewEditor({
               Consultar versão salva
             </button>
             <button
+              className="review-primary"
               disabled={!canContinue}
               onClick={() =>
                 onContinue({
