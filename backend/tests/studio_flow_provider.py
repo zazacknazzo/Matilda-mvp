@@ -26,10 +26,10 @@ class FlowProvider(PreviewProvider):
         if request.stage == 'preview':
             result = await super().complete(request)
             value = json.loads(result.content)
-            matches = request.material['authorized_contributions']
-            if len(matches) > 1:
+            candidates = request.material['scientific_candidates']
+            if len(candidates) > 1:
                 item = dict(value['suggestions'][0])
-                item.update(contribution_id=matches[1]['contribution_id'], concept_ids=matches[1]['concept_ids'][:1], evidence_ids=matches[1]['evidence_ids'][:1])
+                item.update(candidate_id=candidates[1]['id'])
                 value['suggestions'].append(item)
             return ProviderResult(json.dumps(value).encode(), result.metadata)
         self.lesson_requests.append(request)

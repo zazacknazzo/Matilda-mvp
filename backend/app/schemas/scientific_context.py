@@ -6,6 +6,7 @@ from urllib.parse import urlsplit
 
 from fastapi import HTTPException
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic_core import PydanticCustomError
 
 from .models import Concept, Paper
 
@@ -85,12 +86,13 @@ class SourceAnchor(ScientificModel):
     def locate(self, document: SourceDocument) -> tuple[int, int]:
         """Return Python character offsets for a zero-based literal occurrence."""
         if document.id != self.source_document_id:
-            raise ValueError('Âncora aponta para outro documento.')
+            raise PydanticCustomError('invalid_source_anchor', 'Âncora aponta para outro documento.', {'anchor_error': 'invalid_source_document'})
         start = -1
         for _ in range(self.occurrence + 1):
             start = document.content.find(self.quote, start + 1)
             if start == -1:
-                raise ValueError('Ocorrência literal da âncora não existe no documento.')
+                raise PydanticCustomError('invalid_source_anchor', 'Ocorrência literal da âncora não existe no documento.',
+                                          {'anchor_error': 'non_literal_quote' if _ == 0 else 'invalid_occurrence'})
         return start, start + len(self.quote)
 
 

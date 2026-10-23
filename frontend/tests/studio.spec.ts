@@ -11,7 +11,7 @@ test("texto CRISPR chega à prévia persistida com fontes e sessão isolada", as
     "  CRISPR-Cas9 é uma ferramenta para discutir edição genética.\nTexto original preservado.  ";
   await page.getByLabel("Texto original").fill(original);
   await page.getByLabel("Conceitos (um por linha)").fill("CRISPR-Cas9");
-  await expect(page.getByText(/enviado ao Gemini/)).toBeVisible();
+  await expect(page.getByText(/enviado ao provedor de IA/)).toBeVisible();
   await page.getByRole("button", { name: "Criar prévia" }).click();
   await expect(page.getByRole("status")).toContainText("Preparando");
   await expect(

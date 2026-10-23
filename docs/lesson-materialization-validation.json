@@ -1,0 +1,64 @@
+{
+  "base_commit": "e2acbc717199dcbb6ff44eaa85a0a8311ad73b3c",
+  "reviewed_functional_commit": "9cafe79823dcc6ca255dd435595f291df814f93f",
+  "private_contract": "compact-v3-authorized",
+  "real_inferences": 0,
+  "backend_initial": {
+    "passed": 892,
+    "failed": 1,
+    "failure": "Raw transport mapped to502 instead of503; implementation corrected, original test preserved."
+  },
+  "backend_final": {
+    "passed": 894,
+    "failed": 0,
+    "seconds": 27.28
+  },
+  "contracts": {
+    "scientific": 7,
+    "studio_http": 40,
+    "lesson_typescript": 4
+  },
+  "typescript_build": "passed",
+  "playwright_final": {
+    "unique_passed": 90,
+    "failed": 0,
+    "suites": {
+      "integrated_forensics_ui": 23,
+      "review": 19,
+      "slides": 14,
+      "generation_operations": 18,
+      "bridge": 5,
+      "export": 11
+    }
+  },
+  "playwright_generation_initial": {
+    "passed": 17,
+    "failed": 1,
+    "failure": "Response has been disposed in harness route.fetch/response.json at teardown"
+  },
+  "playwright_generation_isolated": {
+    "passed": 1,
+    "failed": 0
+  },
+  "playwright_generation_rerun": {
+    "passed": 18,
+    "failed": 0
+  },
+  "reviews": {
+    "standards_findings": 0,
+    "spec_findings": 0,
+    "focused_tests_passed_per_reviewer": 143
+  },
+  "public_lesson_json_schemas_unchanged": 6,
+  "positive_combinations": 48,
+  "smoke_without_authorization": {
+    "exit_code": 2,
+    "code": "explicit_authorization_required"
+  },
+  "known_warnings": [
+    "Starlette/httpx deprecation",
+    "google-genai deprecation",
+    "Vite JavaScript chunk520.42kB"
+  ],
+  "live_gate": "Not run; new explicit authorization required for one-call isolated smoke."
+}

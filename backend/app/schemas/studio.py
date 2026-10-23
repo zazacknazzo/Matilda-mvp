@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from typing import Annotated, Literal, TypeVar
 
 from pydantic import Field, field_validator, model_validator
+from pydantic_core import PydanticCustomError
 
 from .lesson import (
     Id, Text, LessonModel, LessonBundle, LessonReference, LessonGenerationMetadata,
@@ -158,10 +159,10 @@ class EnrichmentPreview(LessonModel):
         used = set()
         for suggestion in self.suggestions:
             if suggestion.project_id != self.project_id or not set(suggestion.concept_ids) <= set(context.concept_ids):
-                raise ValueError('Sugestão fora do projeto/contexto.')
+                raise PydanticCustomError('invalid_concept', 'Sugestão fora do projeto/contexto.')
             document = documents.get(suggestion.source_anchor.source_document_id)
             if document is None:
-                raise ValueError('Âncora fora dos documentos da prévia.')
+                raise PydanticCustomError('invalid_source_anchor', 'Âncora fora dos documentos da prévia.', {'anchor_error': 'invalid_source_document'})
             suggestion.source_anchor.locate(document)
             for identifier in suggestion.evidence_ids:
                 reference = references.get(identifier)
@@ -206,12 +207,16 @@ class EnrichmentPreview(LessonModel):
         by_evidence = {ref.id: ref for ref in self.evidence_references}
         for suggestion in self.suggestions:
             match = by_contribution.get(suggestion.contribution_id)
-            if match is None or match.contribution.verification_status != 'verified' or any(r.identity_status != 'verified' for r in match.researchers):
-                raise ValueError('Contribuição/identidade não elegível na ciência autorizada.')
+            if match is None:
+                raise PydanticCustomError('unknown_contribution', 'Contribuição/identidade não elegível na ciência autorizada.')
+            if match.contribution.verification_status != 'verified':
+                raise PydanticCustomError('ineligible_contribution', 'Contribuição/identidade não elegível na ciência autorizada.')
+            if any(r.identity_status != 'verified' for r in match.researchers):
+                raise PydanticCustomError('invalid_identity', 'Contribuição/identidade não elegível na ciência autorizada.')
             if suggestion.researcher_ids != match.contribution.researcher_ids or [r.id for r in match.researchers] != suggestion.researcher_ids:
-                raise ValueError('Pesquisadores não correspondem à contribuição autorizada.')
+                raise PydanticCustomError('invalid_identity', 'Pesquisadores não correspondem à contribuição autorizada.')
             if not set(suggestion.concept_ids) <= ({c.id for c in match.matched_concepts} & set(match.contribution.concept_ids)):
-                raise ValueError('Conceitos não correspondem à contribuição autorizada.')
+                raise PydanticCustomError('invalid_concept', 'Conceitos não correspondem à contribuição autorizada.')
             for identifier in suggestion.evidence_ids:
                 evidence = next((e for e in match.evidence if e.id == identifier), None)
                 reference = by_evidence[identifier]
@@ -280,14 +285,19 @@ class ExportQuery(LessonModel):
 
 def validate_lesson_response(bundle: LessonBundle, *, preview: EnrichmentPreview, request: GenerateRequest) -> None:
     """Bind the imported T02 bundle to the server-owned, frozen teacher review."""
-    request.validate_preview(preview)
+    try:
+        request.validate_preview(preview)
+    except ValueError:
+        raise PydanticCustomError('lesson_review_mismatch', 'Aula não pertence à revisão autorizada.') from None
     if (bundle.project_id, bundle.preview_id, bundle.review_revision) != (preview.project_id, preview.preview_id, preview.review_revision):
-        raise ValueError('Aula não pertence à revisão autorizada.')
+        raise PydanticCustomError('lesson_review_mismatch', 'Aula não pertence à revisão autorizada.')
     project, metadata = preview.project, bundle.metadata
+    if metadata.learning_objectives != preview.approved_objectives:
+        raise PydanticCustomError('lesson_objectives_mismatch', 'Aula deve preservar configuração e objetivos aprovados pelo professor.')
     if (metadata.title, metadata.subject, metadata.education_level, metadata.duration_minutes, metadata.learning_objectives) != (
         project.title, project.subject, project.education_level, project.duration_minutes, preview.approved_objectives,
     ):
-        raise ValueError('Aula deve preservar configuração e objetivos aprovados pelo professor.')
+        raise PydanticCustomError('lesson_configuration_mismatch', 'Aula deve preservar configuração e objetivos aprovados pelo professor.')
     accepted_evidence = {eid for s in preview.suggestions if s.status == 'accepted' for eid in s.evidence_ids}
     bundle.validate_authorized_references({ref.id: ref for ref in preview.evidence_references if ref.id in accepted_evidence})
 

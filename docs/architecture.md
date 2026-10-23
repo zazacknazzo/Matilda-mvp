@@ -120,8 +120,9 @@ produção ou botões que aparentem executar revisão/geração ainda não integ
 
 `api/studio_runtime.py` compõe POST de revisão, o router de geração T09, GET
 lesson e o router Markdown T11. `get_repository` fornece `StudioRepository`,
-que estende a persistência T05 no mesmo banco; `get_provider` continua criando
-apenas o adaptador Gemini real e permite substituição explícita nos testes.
+que estende a persistência T05 no mesmo banco; `get_provider` seleciona
+o adaptador real NVIDIA por padrão ou Gemini explicitamente; permite substituição
+explícita somente nos testes. Não há fallback automático.
 
 `services/studio/runtime_repository.py` grava revisão e operações de geração em
 transações curtas, com comparação da revisão, ownership, expiração e idempotência.
@@ -164,3 +165,53 @@ e eventos sem material/chave. Não altera deadlines, schemas, validação ou ret
 Os routers de exportação T11 e persistência/autorização T10 são reutilizados
 integralmente; os testes T13 verificam sua composição no host real.
 Ver `integrated-demo-t13.md` para evidências e limitações.
+
+
+## Studio — NVIDIA NIM (#31)
+
+`integrations/nvidia_client.py` implementa as mesmas portas sem mudar API, schemas,
+tabelas ou catálogo. HTTPX envia `response_format.json_schema` com o schema privado:
+PreviewPlan na prévia e compact-v3-authorized na geração NVIDIA. O serviço materializa e
+valida LessonBundle contra a revisão e o snapshot científico existentes. O provedor
+não recebe autoridade para inventar referências ou identidades.
+
+No adapter NVIDIA, `integrations/nvidia_lesson.py` usa uma elaboração aninhada:
+slides e atividades pertencem à seção por estrutura; chaves, vínculos e distribuição
+de minutos dos slides são construídos no servidor. O plano reutiliza blocos e
+notas pedagógicas produzidos uma vez. A expansão passa pelo LessonDraft integral
+e pelos mesmos validadores T09/Bundle; Gemini mantém o contrato original. A IA escolhe pesos de tempo adicional por seção e objetivos semânticos. O servidor
+reserva um minuto por slide e aloca o restante aprovado por maiores restos, com
+desempate pela ordem original. Não aceita durações legadas na saída NVIDIA. Ver
+[validação temporal e smoke lesson](studio-nvidia-lesson-validation.md).
+
+Na prévia, `services/studio/preview_anchors.py` constrói escolhas literais ligadas
+à proveniência, aos conceitos e às contribuições resolvidas. PreviewPlan recebe
+somente `candidate_id`; cada candidato liga contribuição, conceito, evidências
+e âncora literal. O serviço resolve o ID para todos os campos científicos,
+revalida a autoridade e publica EnrichmentPreview. Documentos e afirmações são
+enviados sem mapas e campos administrativos repetidos. A ausência de trecho
+conceitual literal falha antes da inferência, preservando o material. Ver
+[candidatos científicos](studio-scientific-candidates.md).
+
+NVIDIA_API_KEY vem exclusivamente do ambiente do backend. AI_PROVIDER seleciona
+nvidia (padrão) ou gemini (explícito); valor desconhecido falha dentro da operação,
+preservando material/revisão. Nenhum SDK realiza retries ocultos no adaptador NVIDIA.
+A admissão SQLite continua impondo uma operação por sessão e duas globais, comuns
+à prévia e geração; limites HTTPX não substituem essa admissão persistida.
+
+Contagem NVIDIA é estimada conservadoramente antes da rede, sem endpoint de
+inferência adicional. Payload completo UTF-8 + reserva de 1.024 tokens; nunca
+chars/4 nem tokenizer de outro modelo. Uso efetivo é verificado no retorno e
+registrado junto da estimativa e diferença. Ver [guia NVIDIA](studio-nvidia.md).
+
+O decoder privado `integrations/nvidia_json.py` distingue erros de envelope e de
+message.content sem registrar dados. A geração NVIDIA solicita json_schema.strict
+e mantém o contrato compacto de pesos com referências autorizadas; Pydantic e autoridade científica
+continuam obrigatórios. Ver [diagnóstico JSON](studio-nvidia-json-diagnosis.md).
+
+A geração NVIDIA restringe evidence_id e índices de objetivos às escolhas da
+revisão. Sem autoridade, o schema não oferece blocos documentais ou spotlight.
+Layout e conteúdo visível usam a mesma validação do LessonSlide público.
+`studio/lesson_diagnostics.py` expõe somente códigos e tipos Pydantic permitidos;
+materialização e publicação SQLite revalidam os contratos e a revisão congelada.
+Ver [matriz de materialização](studio-nvidia-materialization.md).

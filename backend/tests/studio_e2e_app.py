@@ -18,7 +18,8 @@ class BrowserProvider(FlowProvider):
             if any('T13-reconnect' in doc['content'] for doc in documents):
                 await asyncio.sleep(1)
             if any('falha única' in doc['content'] for doc in documents):
-                key = documents[0]['id']
+                # Administrative IDs are deliberately absent from the hosted payload.
+                key = tuple(document['content'] for document in documents)
                 if key not in self.failed_once:
                     self.failed_once.add(key)
                     raise ProviderFailure('unauthorized')
@@ -37,4 +38,8 @@ class BrowserProvider(FlowProvider):
         return result
 
 
-app.dependency_overrides[get_provider] = BrowserProvider
+# Only external HTTP is substituted: the production NVIDIA adapter runs in E2E.
+import os
+from nvidia_transport import controlled_nvidia
+os.environ['NVIDIA_API_KEY'] = 'e2e-controlled-key'
+app.dependency_overrides[get_provider] = lambda: controlled_nvidia(BrowserProvider())

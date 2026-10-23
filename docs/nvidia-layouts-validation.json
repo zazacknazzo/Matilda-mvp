@@ -1,0 +1,110 @@
+{
+  "base": "eda296952c5a397a843ff512d6488fcdf377f1c1",
+  "contract": "compact-v4-layouts",
+  "real_inferences": 0,
+  "backend": {
+    "passed": 952,
+    "seconds": 21.85,
+    "initial_run": {
+      "failed": 89,
+      "passed": 863,
+      "cause": "Legacy v3 test-double output and fixture translations; assertions preserved."
+    }
+  },
+  "contracts": {
+    "passed": 307,
+    "seconds": 0.47,
+    "public_schema_sources_byte_identical": true,
+    "lesson_schema_hashes": "nvidia-layouts-public-schemas.json"
+  },
+  "typescript": "passed via tsc -b",
+  "build": "passed",
+  "positive_api_matrix": {
+    "cases": 48,
+    "minutes": 50,
+    "lesson_draft": true,
+    "lesson_bundle": true,
+    "sqlite": true,
+    "read": true,
+    "idempotent_replay": true,
+    "markdown": true
+  },
+  "layout_and_pedagogy_tests": {
+    "passed": 58,
+    "independent_json_schema_validator": "jsonschema Draft202012Validator",
+    "six_layouts": true
+  },
+  "playwright": {
+    "studio": {
+      "passed": 23,
+      "seconds": 25.1
+    },
+    "review": {
+      "passed": 19,
+      "seconds": 9.5
+    },
+    "lesson": {
+      "passed": 14,
+      "seconds": 5.5
+    },
+    "generation": {
+      "passed": 18,
+      "seconds": 8.5,
+      "initial_passed": 17,
+      "initial_failed": 1,
+      "initial_failure": "Response has been disposed in operations.spec.ts:89 route.fetch/response.json",
+      "isolated": {
+        "passed": 1,
+        "seconds": 2.0
+      },
+      "product_or_harness_changes": false
+    },
+    "bridge": {
+      "passed": 5,
+      "seconds": 3.1
+    },
+    "export": {
+      "passed": 11,
+      "seconds": 4.2
+    },
+    "total_final_passed": 90
+  },
+  "reviews": {
+    "base": "eda2969",
+    "reviewed_commit": "68c0c4c",
+    "standards": {
+      "material_findings": 0,
+      "tests_passed": 125,
+      "seconds": 3.9,
+      "separate_checkout": true,
+      "read_only": true
+    },
+    "spec": {
+      "material_findings": 0,
+      "tests_passed": 125,
+      "seconds": 2.67,
+      "separate_checkout": true,
+      "read_only": true
+    },
+    "post_review_cleanup": [
+      "Explicit mandatory CONCEPT text in instruction",
+      "Remove unused test import"
+    ],
+    "post_review_tests": {
+      "passed": 125,
+      "seconds": 2.43
+    }
+  },
+  "smoke_live": "not authorized in this task",
+  "warnings": [
+    "Existing Starlette/HTTPX deprecation",
+    "Existing google-genai deprecation",
+    "Existing Vite chunk larger than 500 kB"
+  ],
+  "smoke_without_authorization": {
+    "exit_code": 2,
+    "code": "explicit_authorization_required",
+    "paid_calls": 0
+  },
+  "payload_measurement": "nvidia-layouts-payload.json"
+}

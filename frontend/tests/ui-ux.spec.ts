@@ -23,9 +23,21 @@ for (const width of [1440, 768, 375]) {
       .getByRole("button", { name: "Criar prévia", exact: true })
       .click();
     await expect(steps.locator('[aria-current="step"]')).toHaveText(/Conferir/);
+    const heading = page.getByRole("heading", {
+      name: "Prévia da aula",
+      exact: true,
+    });
+    await expect(heading).toBeFocused();
+    // A route change must announce the stage at a visible focus target.
+    // Playwright's toBeVisible alone also accepts a clipped 1px heading.
+    await expect(heading).toHaveCSS("clip-path", "none");
+    expect((await heading.boundingBox())?.height).toBeGreaterThan(16);
     const next = page.getByRole("button", {
       name: "Revisar fontes e objetivos",
     });
+    const beforeBlur = await next.boundingBox();
+    await next.focus();
+    expect(await next.boundingBox()).toEqual(beforeBlur);
     await expect(next).toBeInViewport();
     if (width === 1440) await next.click();
     else {

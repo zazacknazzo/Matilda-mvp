@@ -1,0 +1,335 @@
+{
+  "$defs": {
+    "BulletsBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "bullets",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "items"
+      ],
+      "type": "object"
+    },
+    "CompactActivity": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "comprehension",
+            "discussion"
+          ],
+          "type": "string"
+        },
+        "prompt": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "teacher_guidance": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "objective_indexes": {
+          "items": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "assessment_criteria": {
+          "items": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "prompt",
+        "teacher_guidance",
+        "objective_indexes",
+        "assessment_criteria"
+      ],
+      "type": "object"
+    },
+    "CompactSection": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "time_weight": {
+          "maximum": 1000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "objective_indexes": {
+          "items": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "slides": {
+          "items": {
+            "$ref": "#/$defs/CompactSlide"
+          },
+          "maxItems": 12,
+          "minItems": 1,
+          "type": "array"
+        },
+        "activities": {
+          "items": {
+            "$ref": "#/$defs/CompactActivity"
+          },
+          "maxItems": 4,
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "time_weight",
+        "objective_indexes",
+        "slides",
+        "activities"
+      ],
+      "type": "object"
+    },
+    "CompactSlide": {
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "enum": [
+            "TITLE",
+            "CONCEPT",
+            "PROCESS",
+            "SCIENTIST_SPOTLIGHT",
+            "QUESTION",
+            "SUMMARY"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        },
+        "subtitle": {
+          "anyOf": [
+            {
+              "maxLength": 20000,
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "content_blocks": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "bullets": "#/$defs/BulletsBlock",
+                "evidence_claim": "#/$defs/EvidenceClaimBlock",
+                "question": "#/$defs/QuestionBlock",
+                "steps": "#/$defs/StepsBlock",
+                "text": "#/$defs/TextBlock"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/TextBlock"
+              },
+              {
+                "$ref": "#/$defs/BulletsBlock"
+              },
+              {
+                "$ref": "#/$defs/StepsBlock"
+              },
+              {
+                "$ref": "#/$defs/QuestionBlock"
+              },
+              {
+                "$ref": "#/$defs/EvidenceClaimBlock"
+              }
+            ]
+          },
+          "maxItems": 6,
+          "type": "array"
+        },
+        "speaker_notes": {
+          "maxLength": 1500,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        }
+      },
+      "required": [
+        "layout",
+        "title",
+        "content_blocks",
+        "speaker_notes"
+      ],
+      "type": "object"
+    },
+    "EvidenceClaimBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "evidence_claim",
+          "type": "string"
+        },
+        "evidence_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "evidence_id"
+      ],
+      "type": "object"
+    },
+    "QuestionBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "question",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "type": "object"
+    },
+    "StepsBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "steps",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 2,
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "items"
+      ],
+      "type": "object"
+    },
+    "TextBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "text",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "prior_knowledge": {
+      "items": {
+        "maxLength": 20000,
+        "minLength": 1,
+        "pattern": "\\S",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "materials": {
+      "items": {
+        "maxLength": 20000,
+        "minLength": 1,
+        "pattern": "\\S",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/CompactSection"
+      },
+      "maxItems": 8,
+      "minItems": 3,
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "maxLength": 20000,
+        "minLength": 1,
+        "pattern": "\\S",
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "prior_knowledge",
+    "materials",
+    "sections",
+    "limitations"
+  ],
+  "type": "object"
+}

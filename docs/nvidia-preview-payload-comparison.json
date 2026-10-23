@@ -1,0 +1,47 @@
+{
+  "base_commit": "32562f5",
+  "method": "scripts/measure_studio_preview_payload.py; public smoke fixtures; MockTransport returns 401 before planning; no external HTTP",
+  "counter": "full compact UTF-8 JSON payload bytes + 1024; unchanged",
+  "samples": [
+    {
+      "scenario": "crispr",
+      "before": {
+        "payload_utf8_bytes": 10934,
+        "system_utf8_bytes": 1985,
+        "material_utf8_bytes": 6361,
+        "schema_utf8_bytes": 1856,
+        "estimated_input_tokens": 11958,
+        "scenario": "crispr"
+      },
+      "after": {
+        "payload_utf8_bytes": 6467,
+        "system_utf8_bytes": 1061,
+        "material_utf8_bytes": 3556,
+        "schema_utf8_bytes": 1247,
+        "estimated_input_tokens": 7491,
+        "scenario": "crispr"
+      },
+      "payload_reduction_percent": 40.85
+    },
+    {
+      "scenario": "rna",
+      "before": {
+        "payload_utf8_bytes": 9130,
+        "system_utf8_bytes": 1985,
+        "material_utf8_bytes": 4987,
+        "schema_utf8_bytes": 1602,
+        "estimated_input_tokens": 10154,
+        "scenario": "rna"
+      },
+      "after": {
+        "payload_utf8_bytes": 6773,
+        "system_utf8_bytes": 1061,
+        "material_utf8_bytes": 4000,
+        "schema_utf8_bytes": 1173,
+        "estimated_input_tokens": 7797,
+        "scenario": "rna"
+      },
+      "payload_reduction_percent": 25.82
+    }
+  ]
+}

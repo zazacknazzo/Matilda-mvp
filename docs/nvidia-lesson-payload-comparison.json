@@ -1,0 +1,32 @@
+{
+  "base_commit": "394d109",
+  "mode": "offline_api_sqlite_mock_transport",
+  "external_calls": 0,
+  "measurement": "scripts/measure_studio_lesson_payload.py; same text-only preparation and review; sample output is explicitly a test fixture, not inference",
+  "before": {
+    "payload_bytes": 8735,
+    "estimated_input_tokens": 9759,
+    "schema_bytes": 6011,
+    "required_entries": 37,
+    "system_bytes": 1111,
+    "material_bytes": 1188,
+    "max_tokens": 8000,
+    "reasoning_effort": "low",
+    "stream": false,
+    "sample_output_bytes": 3799
+  },
+  "after": {
+    "payload_bytes": 7020,
+    "estimated_input_tokens": 8044,
+    "schema_bytes": 3885,
+    "required_entries": 28,
+    "system_bytes": 1923,
+    "material_bytes": 815,
+    "max_tokens": 8000,
+    "reasoning_effort": "none",
+    "stream": false,
+    "sample_output_bytes": 2898
+  },
+  "payload_reduction_percent": 19.63,
+  "sample_output_reduction_percent": 23.72
+}

@@ -175,7 +175,7 @@ export function StudioSetup({
         </small>
       </fieldset>
       <p className="studio-notice">
-        Ao criar a prévia, seu material será enviado ao Gemini com a
+        Ao criar a prévia, seu material será enviado ao provedor de IA configurado com a
         configuração da aula e o conjunto científico autorizado. Não inclua
         dados pessoais de alunos ou material sem autorização. A retenção é de 7
         dias após uma ação docente válida; consultar não renova esse prazo. A

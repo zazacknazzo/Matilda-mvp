@@ -15,11 +15,11 @@ const messages: Record<StudioErrorCode, string> = {
   session_limit:
     "Limite de cinco prévias por hora atingido. Aguarde antes de tentar novamente.",
   invalid_generation:
-    "O Gemini retornou conteúdo inválido ou incompleto. O material foi preservado.",
+    "O provedor de IA retornou conteúdo inválido ou incompleto. O material foi preservado.",
   provider_unavailable:
-    "O Gemini está indisponível ou recusou a chamada. O material foi preservado.",
+    "O provedor de IA está indisponível ou recusou a chamada. O material foi preservado.",
   studio_not_configured:
-    "Studio sem configuração Gemini no backend. O material foi preservado; o Forensics continua disponível.",
+    "Studio sem configuração de IA no backend. O material foi preservado; o Forensics continua disponível.",
   generation_timeout:
     "A prévia excedeu o prazo. O material foi preservado. Tente novamente explicitamente.",
 };

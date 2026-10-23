@@ -1,0 +1,13 @@
+{
+  "source_url": "https://docs.api.nvidia.com/nim/reference/nvidia-nemotron-3_5-super-vl-120b-a12b-infer",
+  "retrieved_on": "2026-10-23",
+  "source_location": "Public reference HTML, embedded OpenAPI: components.schemas.ChatRequest.properties.response_format",
+  "request_endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
+  "response_format_types": ["text", "json_object", "json_schema"],
+  "response_format_required": ["type"],
+  "json_schema_fields": {"name": "string", "schema": "object", "strict": "boolean"},
+  "json_schema_required": ["name", "schema"],
+  "response_format_fragment_sha256_sorted_json": "79c0772d71b0e35c18048ec9616b38a4a3a5d3ef8abd3f0b1f2558443a9f34f2",
+  "limits_of_evidence": "The field declares strict but does not specify a supported JSON Schema keyword matrix or prove this lesson schema works live.",
+  "inference_performed": false
+}

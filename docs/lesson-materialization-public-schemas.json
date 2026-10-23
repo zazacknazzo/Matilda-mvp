@@ -1,0 +1,26 @@
+{
+  "LessonBundle": {
+    "unchanged_from_e2acbc7": true,
+    "sha256_sorted_json": "b7711068a0e50dfcba9197b4a84a6f7e938418740baad5d527b571d41c45e910"
+  },
+  "LessonSection": {
+    "unchanged_from_e2acbc7": true,
+    "sha256_sorted_json": "00dd11def1d8b87613cb098ce8a4ac70644f81305fac44f41d694fd1e4c28741"
+  },
+  "LessonSlide": {
+    "unchanged_from_e2acbc7": true,
+    "sha256_sorted_json": "ebfa6aae830769c7642af4c82c865c7b0e7808c5cf4306495895e9c243dac11a"
+  },
+  "LessonActivity": {
+    "unchanged_from_e2acbc7": true,
+    "sha256_sorted_json": "006acb4f6ec3803bdb86b86dc018c41e2befceca8b94d033b49773c5d7d97bd8"
+  },
+  "LessonReference": {
+    "unchanged_from_e2acbc7": true,
+    "sha256_sorted_json": "51a25e0822351b98f5faada74a4b0c86f9818edf94fd2920c4ac04ff6d901e2f"
+  },
+  "LessonGenerationMetadata": {
+    "unchanged_from_e2acbc7": true,
+    "sha256_sorted_json": "2fc6bd21eada0fd05aed50d3e9b9ede172c91dd7805756a48c351335463aac01"
+  }
+}

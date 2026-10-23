@@ -1,0 +1,371 @@
+{
+  "$defs": {
+    "CompactActivity": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "comprehension",
+            "discussion"
+          ],
+          "type": "string"
+        },
+        "prompt": {
+          "maxLength": 20000,
+          "minLength": 20,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "teacher_guidance": {
+          "maxLength": 20000,
+          "minLength": 40,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "objective_indexes": {
+          "items": {
+            "minimum": 0,
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "assessment_criteria": {
+          "items": {
+            "maxLength": 20000,
+            "minLength": 20,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "prompt",
+        "teacher_guidance",
+        "objective_indexes",
+        "assessment_criteria"
+      ],
+      "type": "object"
+    },
+    "CompactSection": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "time_weight": {
+          "maximum": 1000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "objective_indexes": {
+          "items": {
+            "minimum": 0,
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "slides": {
+          "items": {
+            "$ref": "#/$defs/CompactSlide"
+          },
+          "maxItems": 12,
+          "minItems": 1,
+          "type": "array"
+        },
+        "activities": {
+          "items": {
+            "$ref": "#/$defs/CompactActivity"
+          },
+          "maxItems": 4,
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "time_weight",
+        "objective_indexes",
+        "slides",
+        "activities"
+      ],
+      "type": "object"
+    },
+    "CompactSlide": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "subtitle": {
+          "anyOf": [
+            {
+              "maxLength": 20000,
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "content": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TitleContent"
+            },
+            {
+              "$ref": "#/$defs/ConceptContent"
+            },
+            {
+              "$ref": "#/$defs/ProcessContent"
+            },
+            {
+              "$ref": "#/$defs/QuestionContent"
+            },
+            {
+              "$ref": "#/$defs/SummaryContent"
+            },
+            {
+              "$ref": "#/$defs/SpotlightContent"
+            }
+          ]
+        },
+        "speaker_notes": {
+          "maxLength": 1500,
+          "minLength": 80,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string",
+            "enum": [
+              "allowed-evidence-a",
+              "allowed-evidence-b"
+            ]
+          },
+          "maxItems": 4,
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "content",
+        "speaker_notes"
+      ],
+      "type": "object"
+    },
+    "ConceptContent": {
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "const": "CONCEPT",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "bullets": {
+          "items": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "maxItems": 4,
+          "type": "array"
+        }
+      },
+      "required": [
+        "layout",
+        "text"
+      ],
+      "type": "object"
+    },
+    "ProcessContent": {
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "const": "PROCESS",
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 2,
+          "type": "array"
+        }
+      },
+      "required": [
+        "layout",
+        "steps"
+      ],
+      "type": "object"
+    },
+    "QuestionContent": {
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "const": "QUESTION",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        }
+      },
+      "required": [
+        "layout",
+        "question"
+      ],
+      "type": "object"
+    },
+    "SpotlightContent": {
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "const": "SCIENTIST_SPOTLIGHT",
+          "type": "string"
+        },
+        "evidence_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string",
+          "enum": [
+            "allowed-evidence-a",
+            "allowed-evidence-b"
+          ]
+        }
+      },
+      "required": [
+        "layout",
+        "evidence_id"
+      ],
+      "type": "object"
+    },
+    "SummaryContent": {
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "const": "SUMMARY",
+          "type": "string"
+        },
+        "synthesis": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        }
+      },
+      "required": [
+        "layout",
+        "synthesis"
+      ],
+      "type": "object"
+    },
+    "TitleContent": {
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "const": "TITLE",
+          "type": "string"
+        },
+        "introduction": {
+          "anyOf": [
+            {
+              "maxLength": 20000,
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "layout"
+      ],
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "prior_knowledge": {
+      "items": {
+        "maxLength": 20000,
+        "minLength": 1,
+        "pattern": "\\S",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "materials": {
+      "items": {
+        "maxLength": 20000,
+        "minLength": 1,
+        "pattern": "\\S",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/CompactSection"
+      },
+      "maxItems": 8,
+      "minItems": 3,
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "maxLength": 20000,
+        "minLength": 1,
+        "pattern": "\\S",
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "prior_knowledge",
+    "materials",
+    "sections",
+    "limitations"
+  ],
+  "type": "object"
+}
