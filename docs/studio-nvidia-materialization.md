@@ -209,9 +209,24 @@ seus erros de transporte e política limitada existente foram verificados.
 Não mudaram API, TS, UI/UX, catálogo, motor científico, tabelas ou idempotência.
 
 Backend final: **894 passed**,27,28s. Contratos **7/40/4** e TypeScript/build
-aprovados. Playwright integrado: **23 passed**,31,0s, incluindo Forensics/UI.
-Avisos existentes de dependências e chunk520,42kB permanecem. Suítes adicionais
-e revisões Standards/Spec serão registradas ao concluir.
+aprovados. **90 Playwright finais passaram**: integrado/Forensics/UI23 (31,0s),
+revisão19 (10,0s), slides14 (8,5s), geração/operações18 (11,0s), ponte5 (6,3s),
+exportação11 (5,0s).
+
+O primeiro run de geração passou17/18: o mock route.fetch/response.json recebeu
+Response has been disposed em operations.spec.ts:89 durante fechamento do teste.
+O caso isolado passou1/1 e o rerun completo passou18/18, sem mudar frontend/harness.
+Esse comportamento já estava registrado no histórico; permanece uma limitação
+do transporte de teste, não uma falha NVIDIA comprovada.
+
+Revisões independentes: **Standards0 / Spec0**, cada revisor reexecutou **143 testes
+focados** em checkout separado. [Relatórios por eixo](reviews/nvidia-materialization-code-review.md).
+A única limpeza posterior foi retirar um import duplicado, sem mudança funcional.
+Avisos existentes de dependências e chunk520,42kB permanecem.
+[Registro estruturado das verificações](lesson-materialization-validation.json).
+
+O comando sem autorização recusou explicit_authorization_required/exit2 antes
+de ler credenciais ou iniciar rede. Nenhuma inferência real foi executada.
 
 Riscos remanescentes: compilação do schema dinâmico e geração real NVIDIA ainda
 precisam de novo smoke autorizado; enum não dispensa a conferência local. Semântica
