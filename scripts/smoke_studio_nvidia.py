@@ -50,7 +50,7 @@ class Recorder(logging.Handler):
 
     def emit(self, record):
         message = record.getMessage()
-        for prefix in ('nvidia_attempt ', 'studio_stage ', 'studio_preview_validation '):
+        for prefix in ('nvidia_attempt ', 'studio_stage ', 'studio_preview_validation ', 'studio_lesson_validation '):
             if message.startswith(prefix):
                 self.events.append({'type': prefix.strip(), **json.loads(message[len(prefix):])})
                 break

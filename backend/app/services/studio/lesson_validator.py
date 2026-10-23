@@ -9,7 +9,7 @@ import json
 from typing import Annotated, Literal, Sequence
 from uuid import uuid4
 
-from pydantic import Field
+from pydantic import Field, ValidationError
 
 from app.schemas.lesson import (
     ContentBlock, EvidenceClaimBlock, Index, LessonBundle, LessonGenerationMetadata,
@@ -18,6 +18,7 @@ from app.schemas.lesson import (
 from app.schemas.models import Concept, DiscoveryMatch, Paper
 from app.schemas.studio import EnrichmentPreview, GenerateRequest, validate_lesson_response
 from app.studio.ports import POLICY
+from app.studio.lesson_diagnostics import LessonRejected, validation_rejection
 
 LocalKey = Annotated[str, Field(pattern=r'^[a-zA-Z][a-zA-Z0-9_-]{0,39}$')]
 
@@ -86,15 +87,21 @@ def _unique_pairs(pairs):
 def materialize_lesson(content: bytes, *, preview: EnrichmentPreview, request: GenerateRequest,
                        metadata: LessonGenerationMetadata) -> LessonBundle:
     if not isinstance(content, bytes) or len(content) > POLICY.max_body_bytes:
-        raise ValueError('Provider response too large.')
-    payload = json.loads(content.decode('utf-8'), object_pairs_hook=_unique_pairs,
-                         parse_constant=lambda _: (_ for _ in ()).throw(ValueError('Non-finite JSON.')))
-    draft = LessonDraft.model_validate(payload)
+        raise LessonRejected('lesson_draft_size_invalid', 'draft')
+    try:
+        payload = json.loads(content.decode('utf-8'), object_pairs_hook=_unique_pairs,
+                             parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
+    except (ValueError, RecursionError):
+        raise LessonRejected('lesson_draft_json_invalid', 'draft') from None
+    try:
+        draft = LessonDraft.model_validate(payload)
+    except ValidationError as failure:
+        raise validation_rejection(failure, 'draft') from None
     identifiers = {}
     for kind, collection in (('section', draft.sections), ('slide', draft.slides), ('activity', draft.activities)):
         keys = [item.key for item in collection]
         if len(keys) != len(set(keys)):
-            raise ValueError('Duplicate component keys.')
+            raise LessonRejected('lesson_duplicate_local_key')
         identifiers[kind] = {key: str(uuid4()) for key in keys}
     accepted = {eid for suggestion in preview.suggestions if suggestion.status == 'accepted' for eid in suggestion.evidence_ids}
     allowed = {ref.id: ref for ref in preview.evidence_references if ref.id in accepted}
@@ -103,10 +110,19 @@ def materialize_lesson(content: bytes, *, preview: EnrichmentPreview, request: G
     def evidence_ids(blocks):
         values = list(dict.fromkeys(block.evidence_id for block in blocks if isinstance(block, EvidenceClaimBlock)))
         if any(value not in allowed for value in values):
-            raise ValueError('Evidence outside the approved review.')
+            raise LessonRejected('lesson_evidence_not_authorized')
         used.extend(values)
         return values
 
+    for section in draft.sections:
+        if any(key not in identifiers['slide'] for key in section.slide_keys):
+            raise LessonRejected('lesson_section_slide_link_invalid')
+        if any(key not in identifiers['activity'] for key in section.activity_keys):
+            raise LessonRejected('lesson_section_activity_link_invalid')
+    if any(slide.section_key not in identifiers['section'] for slide in draft.slides):
+        raise LessonRejected('lesson_slide_section_link_invalid')
+    if any(activity.section_key not in identifiers['section'] for activity in draft.activities):
+        raise LessonRejected('lesson_activity_section_link_invalid')
     sections = []
     for section in draft.sections:
         evidence_ids(section.explanation_blocks)
@@ -129,21 +145,24 @@ def materialize_lesson(content: bytes, *, preview: EnrichmentPreview, request: G
                    'id': identifiers['activity'][item.key], 'section_id': identifiers['section'][item.section_key]}
                   for item in draft.activities]
     references = [allowed[eid] for eid in dict.fromkeys(used)]
-    bundle = LessonBundle(
-        lesson_bundle_id=str(uuid4()), project_id=preview.project_id, preview_id=preview.preview_id,
-        schema_version=1, review_revision=preview.review_revision,
-        metadata={
-            'title': preview.project.title, 'subject': preview.project.subject,
-            'education_level': preview.project.education_level, 'duration_minutes': preview.project.duration_minutes,
-            'learning_objectives': preview.approved_objectives,
-            'prior_knowledge': draft.prior_knowledge, 'materials': draft.materials,
-        },
-        sections=sections, slides=slides, activities=activities, references=references,
-        limitations=list(dict.fromkeys([
-            *preview.limitations, *(text for ref in references for text in ref.limitations),
-            *draft.limitations, 'Conteúdo pedagógico gerado por IA; revisão docente integral necessária.',
-        ])),
-        generation_metadata=metadata,
-    )
+    try:
+        bundle = LessonBundle(
+            lesson_bundle_id=str(uuid4()), project_id=preview.project_id, preview_id=preview.preview_id,
+            schema_version=1, review_revision=preview.review_revision,
+            metadata={
+                'title': preview.project.title, 'subject': preview.project.subject,
+                'education_level': preview.project.education_level, 'duration_minutes': preview.project.duration_minutes,
+                'learning_objectives': preview.approved_objectives,
+                'prior_knowledge': draft.prior_knowledge, 'materials': draft.materials,
+            },
+            sections=sections, slides=slides, activities=activities, references=references,
+            limitations=list(dict.fromkeys([
+                *preview.limitations, *(text for ref in references for text in ref.limitations),
+                *draft.limitations, 'Conteúdo pedagógico gerado por IA; revisão docente integral necessária.',
+            ])),
+            generation_metadata=metadata,
+        )
+    except ValidationError as failure:
+        raise validation_rejection(failure, 'bundle') from None
     validate_lesson_response(bundle, preview=preview, request=request)
     return bundle

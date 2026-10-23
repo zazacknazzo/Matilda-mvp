@@ -1,6 +1,6 @@
 """T09 bounded generation against frozen M0 ports; no SDK or fixture selection."""
 import asyncio
-import logging
+import sqlite3
 
 from pydantic import ValidationError
 from collections.abc import Callable
@@ -13,6 +13,7 @@ from app.schemas.studio import EnrichmentPreview, GenerateRequest, StudioError
 from app.studio.ports import POLICY, ProviderFailure, ProviderRequest, RepositoryConflict, StudioProvider, StudioRepository
 from .lesson_validator import LessonDraft, ScientificAuthority, materialize_lesson
 from .metrics import StudioMetrics
+from app.studio.lesson_diagnostics import LessonRejected, record_failure, validation_rejection
 
 PROMPT_VERSION = 'studio-lesson-v2'
 SYSTEM = '''Você organiza uma aula pedagógica no schema JSON fornecido, em português.
@@ -82,6 +83,7 @@ class GenerationService:
         deadline = started + POLICY.generation_backend_seconds
         claim_id = None
         preview = None
+        phase = 'review'
         try:
             async with asyncio.timeout(POLICY.generation_backend_seconds):
                 request = GenerateRequest.model_validate(request.model_dump())
@@ -107,26 +109,40 @@ class GenerationService:
                 claim_id = claim.claim_id
                 if on_admitted:
                     on_admitted((datetime.fromisoformat(admitted_at) + timedelta(days=POLICY.retention_days)).isoformat())
+                phase = 'provider'
                 result = await self._run_provider(preview, request, deadline)
                 if self.monotonic() > deadline:
+                    record_failure(LessonRejected('lesson_deadline_exceeded', 'persistence'), 'persistence')
                     raise generation_error('generation_timeout', retryable=True, project_id=preview.project_id)
+                phase = 'persistence'
                 bundle = await self.repository.complete_generation(claim_id=claim_id, bundle=result, now=self.now())
+                phase = 'completion'
                 current = await self.repository.get_preview(session_id=session_id, preview_id=request.preview_id, now=self.now())
                 return GenerationResult(bundle, False, current.expires_at if current else preview.expires_at)
         except asyncio.CancelledError:
             if claim_id:
-                await self.repository.fail_generation(claim_id=claim_id, error=generation_error('generation_timeout', retryable=True, project_id=preview.project_id).error, now=self.now())
+                await self._fail_claim(claim_id, generation_error('generation_timeout', retryable=True, project_id=preview.project_id).error)
             raise
         except TimeoutError:
+            record_failure(LessonRejected('lesson_deadline_exceeded', phase), phase)
             error = generation_error('generation_timeout', retryable=True, project_id=preview.project_id if preview else None)
         except RepositoryConflict as failure:
             error = failure
-        except Exception:
+        except Exception as failure:
+            code = 'lesson_storage_failure' if isinstance(failure, sqlite3.Error) else 'lesson_internal_failure'
+            record_failure(LessonRejected(code, phase), phase)
             # Never expose prompts, model responses, provider errors or keys.
             error = generation_error('provider_unavailable', retryable=True, project_id=preview.project_id if preview else None)
         if claim_id:
-            await self.repository.fail_generation(claim_id=claim_id, error=error.error, now=self.now())
+            await self._fail_claim(claim_id, error.error)
         raise error from None
+
+    async def _fail_claim(self, claim_id, error):
+        try:
+            await self.repository.fail_generation(claim_id=claim_id, error=error, now=self.now())
+        except Exception:
+            # Keep the original public error; lifecycle recovery owns an abandoned claim.
+            record_failure(LessonRejected('lesson_failure_recording_failed', 'persistence'), 'persistence')
 
     async def _run_provider(self, preview, request, deadline):
         permitted = {eid for suggestion in preview.suggestions if suggestion.status == 'accepted' for eid in suggestion.evidence_ids}
@@ -144,6 +160,7 @@ class GenerationService:
                 raise generation_error('generation_timeout', retryable=True, project_id=preview.project_id)
             provider_request = ProviderRequest(stage='lesson', system_instruction=SYSTEM + ('\nA tentativa anterior falhou; confira o schema e os IDs permitidos.' if attempt else ''),
                 material=material, response_schema=LessonDraft.model_json_schema(), deadline=provider_deadline, prompt_version=PROMPT_VERSION)
+            phase = 'provider'
             try:
                 async with asyncio.timeout(remaining):
                     tokens = await self.provider.count_input_tokens(provider_request)
@@ -155,14 +172,24 @@ class GenerationService:
                     result = await self.provider.complete(provider_request)
                 if self.monotonic() > provider_deadline:
                     raise ProviderFailure('timeout')
-                metadata = LessonGenerationMetadata.model_validate(result.metadata.model_dump())
-                if metadata.prompt_version != PROMPT_VERSION or (metadata.output_tokens is not None and metadata.output_tokens > POLICY.max_output_tokens) or (metadata.input_tokens is not None and metadata.input_tokens > POLICY.max_input_tokens):
-                    raise ValueError('Invalid generation metadata or token budget.')
+                phase = 'metadata'
+                if not isinstance(getattr(result, 'metadata', None), LessonGenerationMetadata):
+                    raise LessonRejected('lesson_metadata_invalid', phase)
+                try:
+                    metadata = LessonGenerationMetadata.model_validate(result.metadata.model_dump(warnings=False))
+                except ValidationError as failure:
+                    raise validation_rejection(failure, phase) from None
+                if metadata.prompt_version != PROMPT_VERSION:
+                    raise LessonRejected('lesson_metadata_prompt_mismatch', phase)
+                if (metadata.output_tokens is not None and metadata.output_tokens > POLICY.max_output_tokens) or (metadata.input_tokens is not None and metadata.input_tokens > POLICY.max_input_tokens):
+                    raise LessonRejected('lesson_metadata_budget_invalid', phase)
                 self.metrics.output(metadata.output_tokens)
+                phase = 'materialization'
                 return materialize_lesson(result.content, preview=preview, request=request, metadata=metadata)
             except (TimeoutError, ProviderFailure) as failure:
                 reason = failure.reason if isinstance(failure, ProviderFailure) else 'timeout'
                 if reason == 'timeout':
+                    record_failure(LessonRejected('lesson_deadline_exceeded', phase), phase)
                     raise generation_error('generation_timeout', retryable=True, project_id=preview.project_id) from None
                 if reason in ('unauthorized', 'blocked'):
                     raise generation_error('provider_unavailable', project_id=preview.project_id) from None
@@ -170,9 +197,13 @@ class GenerationService:
                     raise generation_error('invalid_generation', retryable=True, project_id=preview.project_id) from None
                 if attempt + 1 == POLICY.max_provider_attempts:
                     raise generation_error('provider_unavailable', retryable=True, project_id=preview.project_id) from None
+            except RepositoryConflict:
+                raise
             except (ValueError, KeyError, TypeError) as failure:
-                logging.getLogger('matilda.studio.validation').info('studio_validation stage=lesson outcome=%s',
-                    'pydantic_validation' if isinstance(failure, ValidationError) else 'scientific_validation')
+                record_failure(failure, phase)
                 if attempt + 1 == POLICY.max_provider_attempts:
                     raise generation_error('invalid_generation', retryable=True, project_id=preview.project_id) from None
+            except Exception as failure:
+                record_failure(LessonRejected('lesson_internal_failure', phase), phase)
+                raise generation_error('invalid_generation', project_id=preview.project_id) from None
         raise generation_error('invalid_generation', project_id=preview.project_id)

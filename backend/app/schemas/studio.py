@@ -3,6 +3,7 @@ from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
 from typing import Annotated, Literal, TypeVar
 
+from pydantic_core import PydanticCustomError
 from pydantic import Field, field_validator, model_validator
 from pydantic_core import PydanticCustomError
 
@@ -285,14 +286,19 @@ class ExportQuery(LessonModel):
 
 def validate_lesson_response(bundle: LessonBundle, *, preview: EnrichmentPreview, request: GenerateRequest) -> None:
     """Bind the imported T02 bundle to the server-owned, frozen teacher review."""
-    request.validate_preview(preview)
+    try:
+        request.validate_preview(preview)
+    except ValueError:
+        raise PydanticCustomError('lesson_review_mismatch', 'Aula não pertence à revisão autorizada.') from None
     if (bundle.project_id, bundle.preview_id, bundle.review_revision) != (preview.project_id, preview.preview_id, preview.review_revision):
-        raise ValueError('Aula não pertence à revisão autorizada.')
+        raise PydanticCustomError('lesson_review_mismatch', 'Aula não pertence à revisão autorizada.')
     project, metadata = preview.project, bundle.metadata
+    if metadata.learning_objectives != preview.approved_objectives:
+        raise PydanticCustomError('lesson_objectives_mismatch', 'Aula deve preservar configuração e objetivos aprovados pelo professor.')
     if (metadata.title, metadata.subject, metadata.education_level, metadata.duration_minutes, metadata.learning_objectives) != (
         project.title, project.subject, project.education_level, project.duration_minutes, preview.approved_objectives,
     ):
-        raise ValueError('Aula deve preservar configuração e objetivos aprovados pelo professor.')
+        raise PydanticCustomError('lesson_configuration_mismatch', 'Aula deve preservar configuração e objetivos aprovados pelo professor.')
     accepted_evidence = {eid for s in preview.suggestions if s.status == 'accepted' for eid in s.evidence_ids}
     bundle.validate_authorized_references({ref.id: ref for ref in preview.evidence_references if ref.id in accepted_evidence})
 

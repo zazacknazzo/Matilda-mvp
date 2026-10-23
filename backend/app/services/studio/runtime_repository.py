@@ -4,6 +4,9 @@ import sqlite3
 from datetime import datetime, timedelta
 from uuid import uuid4
 
+from pydantic import ValidationError
+from pydantic_core import PydanticCustomError
+
 from app.schemas.lesson import LessonBundle, LessonReference
 from app.schemas.models import Concept, DiscoveryMatch, Paper
 from app.schemas.studio import EnrichmentPreview, GenerateRequest, validate_lesson_response
@@ -12,6 +15,7 @@ from .generation import generation_error
 from .generation_identity import fingerprint, timestamp
 from .lesson_validator import ScientificAuthority
 from .repository import PreviewRepository, not_found
+from app.studio.lesson_diagnostics import LessonRejected, record_failure, validation_rejection
 
 
 class StudioRepository(PreviewRepository):
@@ -129,16 +133,29 @@ class StudioRepository(PreviewRepository):
             db.row_factory = sqlite3.Row
             op = db.execute("SELECT * FROM studio_generation_operations WHERE claim=? AND state='generating'", (claim_id,)).fetchone()
             if not op:
+                record_failure(LessonRejected('lesson_generation_claim_missing', 'persistence'), 'persistence')
                 raise generation_error('review_conflict')
             if timestamp(now) > op['deadline']:
+                record_failure(LessonRejected('lesson_deadline_exceeded', 'persistence'), 'persistence')
                 raise generation_error('generation_timeout', retryable=True)
-            frozen = EnrichmentPreview.model_validate_json(op['frozen'])
-            request = GenerateRequest.model_validate_json(op['request'])
+            try:
+                frozen = EnrichmentPreview.model_validate_json(op['frozen'])
+                request = GenerateRequest.model_validate_json(op['request'])
+            except ValidationError as failure:
+                rejected = validation_rejection(failure, 'persistence')
+                record_failure(LessonRejected('lesson_persistence_snapshot_invalid', 'persistence',
+                                              validation_types=rejected.validation_types), 'persistence')
+                raise generation_error('provider_unavailable', retryable=True) from None
             current = self._preview(db, op['session_id'], op['preview_id'], now)
             if current is None or fingerprint(current, request) != op['fingerprint']:
+                record_failure(LessonRejected('lesson_persistence_review_mismatch', 'persistence'), 'persistence')
                 raise generation_error('review_conflict')
-            bundle = LessonBundle.model_validate(bundle.model_dump())
-            validate_lesson_response(bundle, preview=frozen, request=request)
+            try:
+                bundle = LessonBundle.model_validate(bundle.model_dump(warnings=False))
+                validate_lesson_response(bundle, preview=frozen, request=request)
+            except (ValidationError, PydanticCustomError) as failure:
+                record_failure(failure, 'bundle')
+                raise generation_error('invalid_generation') from None
             db.execute('INSERT INTO lesson_bundles VALUES (?, ?, ?, ?)', (bundle.lesson_bundle_id, bundle.project_id, bundle.preview_id, bundle.model_dump_json()))
             db.execute("UPDATE studio_generation_operations SET state='completed', bundle_id=? WHERE claim=?", (bundle.lesson_bundle_id, claim_id))
             current.project.status = current.generation_status = 'ready'
