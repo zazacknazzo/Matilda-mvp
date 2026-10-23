@@ -1,0 +1,12 @@
+{
+  "payload_bytes": 8713,
+  "estimated_input_tokens": 9737,
+  "schema_bytes": 4126,
+  "required_entries": 28,
+  "system_bytes": 3345,
+  "material_bytes": 815,
+  "max_tokens": 8000,
+  "reasoning_effort": "none",
+  "stream": false,
+  "sample_output_bytes": 2864
+}

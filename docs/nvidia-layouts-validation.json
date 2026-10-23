@@ -43,19 +43,68 @@
       "passed": 19,
       "seconds": 9.5
     },
-    "lesson": "running",
-    "generation": "running",
-    "bridge": "pending",
-    "export": "pending"
+    "lesson": {
+      "passed": 14,
+      "seconds": 5.5
+    },
+    "generation": {
+      "passed": 18,
+      "seconds": 8.5,
+      "initial_passed": 17,
+      "initial_failed": 1,
+      "initial_failure": "Response has been disposed in operations.spec.ts:89 route.fetch/response.json",
+      "isolated": {
+        "passed": 1,
+        "seconds": 2.0
+      },
+      "product_or_harness_changes": false
+    },
+    "bridge": {
+      "passed": 5,
+      "seconds": 3.1
+    },
+    "export": {
+      "passed": 11,
+      "seconds": 4.2
+    },
+    "total_final_passed": 90
   },
   "reviews": {
-    "standards": "pending",
-    "spec": "pending"
+    "base": "eda2969",
+    "reviewed_commit": "68c0c4c",
+    "standards": {
+      "material_findings": 0,
+      "tests_passed": 125,
+      "seconds": 3.9,
+      "separate_checkout": true,
+      "read_only": true
+    },
+    "spec": {
+      "material_findings": 0,
+      "tests_passed": 125,
+      "seconds": 2.67,
+      "separate_checkout": true,
+      "read_only": true
+    },
+    "post_review_cleanup": [
+      "Explicit mandatory CONCEPT text in instruction",
+      "Remove unused test import"
+    ],
+    "post_review_tests": {
+      "passed": 125,
+      "seconds": 2.43
+    }
   },
   "smoke_live": "not authorized in this task",
   "warnings": [
     "Existing Starlette/HTTPX deprecation",
     "Existing google-genai deprecation",
     "Existing Vite chunk larger than 500 kB"
-  ]
+  ],
+  "smoke_without_authorization": {
+    "exit_code": 2,
+    "code": "explicit_authorization_required",
+    "paid_calls": 0
+  },
+  "payload_measurement": "nvidia-layouts-payload.json"
 }

@@ -27,7 +27,7 @@ Produza 3–8 seções, 4–12 slides NO TOTAL e 1–4 atividades NO TOTAL.
 Escreva a explicação docente uma única vez em speaker_notes; o plano será montado
 com os blocos dos slides e essas notas. Slides devem ser concisos (até 600
 caracteres pedagógicos visíveis), com notas instrutivas e avaliação coerente.
-Escolha content.layout: TITLE/introduction opcional; CONCEPT/text e bullets opcionais;
+Escolha content.layout: TITLE/introduction opcional; CONCEPT/text obrigatório e bullets opcionais;
 PROCESS/steps (2–6 etapas); QUESTION/question; SUMMARY/synthesis;
 SCIENTIST_SPOTLIGHT/evidence_id autorizado. Esses campos são conteúdo pedagógico,
 não envie content_blocks. evidence_ids opcionais vinculam fontes autorizadas adicionais.

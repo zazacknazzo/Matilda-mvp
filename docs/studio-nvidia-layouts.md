@@ -118,8 +118,8 @@ este schema completo.** Compilação, aplicação e latência reais exigem novo 
 autorizado. Não se remove uma restrição só para obter HTTP200.
 
 Medição offline com a preparação textual controlada do script existente:
-payload8.700bytes, schema4.126bytes, estimativa conservadora9.724/12.000tokens;
-saída de exemplo2.809bytes. Não são tokens NVIDIA ou uma resposta do smoke real.
+payload8.713bytes, schema4.126bytes, estimativa conservadora9.737/12.000tokens;
+saída de exemplo2.864bytes. Não são tokens NVIDIA ou uma resposta do smoke real.
 A reserva de1.024bytes e os limites12.000/8.000/128KiB permanecem. Materiais maiores
 continuam podendo falhar explicitamente antes da rede, sem truncamento.
 
@@ -181,6 +181,28 @@ não foram relaxadas.103regressões afetadas passaram após a migração. O prim
 focado teve195passaram/1falha: uma nota de teste JSON escapado tinha menos de80
 caracteres; o material controlado foi elaborado mantendo os caracteres especiais
 e a asserção de preservação literal. Tipos/contratos públicos e frontend não mudaram.
+
+Backend final: **952 passaram**,21,85s. Contratos científicos/HTTP/Lesson:
+**307 passaram**,0,47s. Todos os arquivos públicos de schemas são byte a byte
+idênticos à base; os seis hashes Lesson também coincidem:
+[compatibilidade](nvidia-layouts-public-schemas.json). TypeScript/tsc -b e build
+aprovados, sem alterações no frontend. jsonschema é dependência dos testes,
+como pytest, e não é chamado no caminho de produção.
+
+**90 Playwright finais passaram**: integrado/Forensics/UI23, revisão19,
+slides14, geração/operações18, ponte5, exportação11. O primeiro geração foi17/18
+por Response has been disposed em operations.spec.ts:89, no route.fetch/json
+do harness. Caso isolado1/1 e rerun completo18/18 passaram sem modificar produto
+ou harness. Capturas PNG geradas pela suíte foram restauradas, preservando as
+imagens existentes do Agente3. Avisos de dependências/chunk>500kB permanecem.
+
+Revisões independentes em branches/checkouts separados: **Standards0 / Spec0
+achados materiais**; cada revisor reexecutou125testes. Ajuste de clareza sugerido
+pelo Spec (text obrigatório em CONCEPT) e import de teste sem uso foram limpos;
+125testes focados passaram novamente em2,43s.
+[Relatórios por eixo](reviews/nvidia-layouts-code-review.md). O comando smoke sem
+flag retornou explicit_authorization_required/exit2 antes de credenciais/rede.
+Nenhum smoke live foi executado nesta implementação; o gate real segue pendente.
 
 ## Próximo smoke — não executar nesta tarefa
 

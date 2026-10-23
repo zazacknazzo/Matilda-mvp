@@ -1,5 +1,4 @@
 """Coarse authoring gates reject missing pedagogy, without grading teachers."""
-from copy import deepcopy
 import asyncio
 import json
 
