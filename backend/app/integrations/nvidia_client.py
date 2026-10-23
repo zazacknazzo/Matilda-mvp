@@ -75,7 +75,8 @@ class NVIDIAProvider:
             event.update(estimated_input_tokens=estimate, reasoning_effort='none', stream=False)
             if request.stage == 'lesson':
                 from .nvidia_lesson import CONTRACT_VERSION
-                event.update(lesson_contract=CONTRACT_VERSION, json_schema_strict=True)
+                event.update(lesson_contract=CONTRACT_VERSION, json_schema_strict=True,
+                             authorized_evidence_count=len(request.material.get('authorized_evidence', {})))
             if estimate > min(request.max_input_tokens, POLICY.max_input_tokens):
                 event['outcome'] = 'input_too_large'
                 raise conflict('input_too_large', 'Entrada excede o limite seguro de tokens.')
@@ -220,14 +221,19 @@ class NVIDIAProvider:
             self._invalid('invalid_json', event)
         if request.stage == 'lesson':
             from pydantic import ValidationError
-            from .nvidia_lesson import LessonAuthoringError, approved_duration, expand
+            from .nvidia_lesson import LessonAuthoringError, approved_duration, approved_objective_count, expand
             try:
-                encoded = expand(encoded, duration_minutes=approved_duration(request.material))
+                encoded = expand(encoded, duration_minutes=approved_duration(request.material),
+                                 authorized_evidence=set(request.material.get('authorized_evidence', {})),
+                                 objective_count=approved_objective_count(request.material))
                 if len(encoded) > POLICY.max_body_bytes:
                     event['failure_code'] = 'lesson_expanded_response_too_large'
                     self._invalid('response_too_large', event)
-            except ValidationError:
-                event.update(outcome='pydantic_validation', failure_code='lesson_schema_invalid')
+            except ValidationError as failure:
+                from app.studio.lesson_diagnostics import validation_rejection
+                rejected = validation_rejection(failure, 'provider')
+                code = rejected.code if rejected.code != 'lesson_provider_output_invalid' else 'lesson_schema_invalid'
+                event.update(outcome='pydantic_validation', failure_code=code, validation_types=list(rejected.validation_types))
                 raise
             except LessonAuthoringError as failure:
                 event.update(outcome='invalid_lesson_draft', failure_code=failure.code, **failure.metrics)

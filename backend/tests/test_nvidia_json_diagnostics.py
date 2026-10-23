@@ -123,7 +123,7 @@ def test_bad_envelope_is_not_reported_as_model_content(monkeypatch, caplog, body
 def test_transmitted_schema_preserves_baseline_references_unions_and_required_fields(monkeypatch):
     monkeypatch.setenv('NVIDIA_API_KEY', 'controlled-only')
     baseline = json.loads((Path(__file__).resolve().parents[2] /
-                          'tests/fixtures/studio/nvidia/compact-v2-weighted.schema.json').read_text())
+                          'tests/fixtures/studio/nvidia/compact-v3-authorized.schema.json').read_text())
     def upstream(http):
         body = json.loads(http.content)
         response_format = body['response_format']
@@ -149,7 +149,10 @@ def test_transmitted_schema_preserves_baseline_references_unions_and_required_fi
                     references(child)
         references(schema)
         return httpx.Response(200, json=completion(json.dumps(compact_lesson())))
-    asyncio.run(NVIDIAProvider(transport=httpx.MockTransport(upstream)).complete(request_for('lesson')))
+    request = request_for('lesson', material={
+        'configuration': {'duration_minutes': 50, 'learning_objectives': ['Approved A.', 'Approved B.']},
+        'authorized_evidence': {'allowed-evidence-a': 'Canonical A.', 'allowed-evidence-b': 'Canonical B.'}})
+    asyncio.run(NVIDIAProvider(transport=httpx.MockTransport(upstream)).complete(request))
 
 
 def test_preview_does_not_enable_lesson_strict_mode_or_prompt(monkeypatch):

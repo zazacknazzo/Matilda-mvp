@@ -66,23 +66,25 @@ def test_expansion_failure_is_distinct_and_sanitized(monkeypatch, caplog):
 
 @pytest.mark.parametrize('duration', [True, 9, 121, 50.0, None])
 def test_invalid_approved_duration_is_not_coerced(monkeypatch, caplog, duration):
-    event = event_for(monkeypatch, caplog, compact_lesson(), material={'configuration': {'duration_minutes': duration}})
+    event = event_for(monkeypatch, caplog, compact_lesson(), material={'configuration': {'duration_minutes': duration, 'learning_objectives': ['Approved.']}})
     assert event['failure_code'] == 'lesson_configuration_invalid'
 
 
 def test_insufficient_time_for_slide_minimum_is_distinct(monkeypatch, caplog):
     from test_nvidia_compact_lesson import weighted_lesson
     event = event_for(monkeypatch, caplog, weighted_lesson([4, 4, 4], [1, 1, 1]),
-                      material={'configuration': {'duration_minutes': 10}})
+                      material={'configuration': {'duration_minutes': 10, 'learning_objectives': ['Approved.']}})
     assert event['failure_code'] == 'lesson_time_budget_infeasible'
     assert event['approved_minutes'] == 10 and event['minimum_minutes'] == 12
 
 
 def test_expanded_size_limit_is_enforced_before_return(monkeypatch, caplog):
-    value = compact_lesson()
+    from test_nvidia_compact_lesson import weighted_lesson
+    value = weighted_lesson([4, 4, 4], [1, 1, 1])
+    value['prior_knowledge'] = ['x' * 20000] * 5
     for section in value['sections']:
         for slide in section['slides']:
-            slide['content_blocks'] = [{'type': 'text', 'text': 'x' * 2700}] * 6
+            slide['speaker_notes'] = 'y' * 1500
     event = event_for(monkeypatch, caplog, value)
     assert event['outcome'] == 'response_too_large'
     assert event['failure_code'] == 'lesson_expanded_response_too_large'

@@ -39,7 +39,7 @@ def test_isolated_smoke_prepares_simulated_preview_but_only_lesson_uses_nvidia(c
     provider = smoke.SingleCallNVIDIA(transport=httpx.MockTransport(upstream))
     report = smoke.run_lesson_smoke(provider)
     assert report['status'] == 'passed' and provider.calls == len(calls) == 1
-    assert report['lesson_contract'] == 'compact-v2-weighted'
+    assert report['lesson_contract'] == 'compact-v3-authorized'
     assert report['steps'][2]['approved_minutes'] == report['steps'][2]['section_minutes'] == report['steps'][2]['slide_minutes'] == 50
     assert report['preparation_simulated'] is True and report['full_flow_proven'] is False
     assert [s['stage'] for s in report['steps']] == ['preparation', 'review', 'lesson', 'read', 'replay', 'markdown']
@@ -104,3 +104,35 @@ def test_isolated_smoke_refuses_missing_cache_before_any_external_http(client, m
     report = smoke.run_lesson_smoke(provider)
     assert report['status'] == 'failed' and report['code'] == 'preparation_cache_unavailable'
     assert provider.calls == 0 and calls == []
+
+
+@pytest.mark.parametrize('fault,code', [('link', 'lesson_section_slide_link_invalid'), ('metadata', 'lesson_metadata_prompt_mismatch')])
+def test_isolated_smoke_captures_post_provider_diagnostics_without_extra_http(client, monkeypatch, fault, code):
+    smoke = module()
+    monkeypatch.setenv('NVIDIA_API_KEY', 'controlled-only')
+    calls = []
+    def upstream(http):
+        calls.append(1)
+        material = json.loads(json.loads(http.content)['messages'][1]['content'])
+        value = compact_lesson()
+        value['sections'][0]['slides'][0]['content_blocks'].append({
+            'type': 'evidence_claim', 'evidence_id': next(iter(material['authorized_evidence']))})
+        return httpx.Response(200, json={'model': 'controlled', 'usage': {'prompt_tokens': 900, 'completion_tokens': 1100},
+            'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(value)}}]})
+    class PostProviderFault(smoke.SingleCallNVIDIA):
+        async def complete(self, request):
+            from app.studio.ports import ProviderResult
+            result = await super().complete(request)
+            value = json.loads(result.content)
+            if fault == 'link':
+                value['sections'][0]['slide_keys'] = ['PRIVATE_LINK']
+            else:
+                result.metadata.prompt_version = 'PRIVATE_VERSION'
+            return ProviderResult(json.dumps(value).encode(), result.metadata)
+    provider = PostProviderFault(transport=httpx.MockTransport(upstream))
+    report = smoke.run_lesson_smoke(provider)
+    assert report['status'] == 'failed' and report['code'] == 'invalid_generation'
+    assert provider.calls == 1 and calls == [1]
+    events = [event for event in report['events'] if event['type'] == 'studio_lesson_validation']
+    assert events and events[0]['failure_code'] == code
+    assert not any(private in json.dumps(report) for private in ('PRIVATE_LINK', 'PRIVATE_VERSION'))

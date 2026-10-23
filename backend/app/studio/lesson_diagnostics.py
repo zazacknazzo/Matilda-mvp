@@ -12,7 +12,7 @@ CODES = frozenset({
     'lesson_configuration_mismatch',
     'lesson_contribution_binding_mismatch',
     'lesson_draft_json_invalid',
-    'lesson_draft_size_invalid',
+    'lesson_draft_size_invalid', 'lesson_draft_type_invalid',
     'lesson_duplicate_identifier',
     'lesson_duplicate_local_key',
     'lesson_duration_mismatch',
@@ -34,8 +34,12 @@ CODES = frozenset({
     'lesson_slide_section_link_invalid',
     'lesson_timestamp_invalid',
     'lesson_metadata_prompt_mismatch', 'lesson_metadata_budget_invalid', 'lesson_deadline_exceeded',
+    'lesson_cancelled',
     'lesson_storage_failure', 'lesson_failure_recording_failed', 'lesson_generation_claim_missing',
     'lesson_persistence_review_mismatch', 'lesson_persistence_snapshot_invalid',
+    'lesson_objectives_missing',
+    'lesson_configuration_missing', 'lesson_configuration_invalid', 'lesson_time_budget_infeasible',
+    'lesson_expansion_invalid',
     'lesson_evidence_not_authorized', 'lesson_internal_failure', 'lesson_metadata_invalid',
     'lesson_draft_schema_invalid', 'lesson_bundle_schema_invalid', 'lesson_provider_output_invalid',
 })
@@ -45,7 +49,7 @@ PYDANTIC_TYPES = frozenset({
     'string_pattern_mismatch', 'int_type', 'int_parsing', 'greater_than', 'greater_than_equal',
     'less_than', 'less_than_equal', 'list_type', 'too_short', 'too_long', 'literal_error',
     'union_tag_invalid', 'union_tag_not_found', 'model_type', 'dict_type', 'bool_type',
-    'json_invalid', 'value_error', 'finite_number',
+    'json_invalid', 'value_error', 'finite_number', 'string_unicode',
 })
 
 

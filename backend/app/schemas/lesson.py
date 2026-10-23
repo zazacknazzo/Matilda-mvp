@@ -117,9 +117,13 @@ class LessonReference(LessonModel):
     @field_validator('source_url')
     @classmethod
     def safe_link(cls, value):
-        parts = urlsplit(value)
-        if (parts.scheme not in ('http', 'https') or not parts.hostname
-                or parts.username or parts.password or any(c.isspace() for c in value)):
+        try:
+            parts = urlsplit(value)
+            invalid = (parts.scheme not in ('http', 'https') or not parts.hostname
+                       or parts.username or parts.password or any(c.isspace() for c in value))
+        except ValueError:
+            raise PydanticCustomError('lesson_reference_url_invalid', 'Fonte exige URL HTTP(S) sem credenciais/espaços.') from None
+        if invalid:
             raise PydanticCustomError('lesson_reference_url_invalid', 'Fonte exige URL HTTP(S) sem credenciais/espaços.')
         return value
 
@@ -140,6 +144,26 @@ class LessonSection(LessonModel):
     activity_ids: list[Id]
 
 
+def validate_slide_content(layout, title, subtitle, blocks, *, has_contribution):
+    kinds = {b.type for b in blocks}
+    if layout == 'PROCESS' and 'steps' not in kinds:
+        raise PydanticCustomError('lesson_slide_layout_invalid', 'PROCESS exige 2–6 etapas.')
+    if layout == 'QUESTION' and 'question' not in kinds:
+        raise PydanticCustomError('lesson_slide_layout_invalid', 'QUESTION exige pergunta.')
+    if layout == 'CONCEPT' and not kinds.intersection({'text', 'bullets'}):
+        raise PydanticCustomError('lesson_slide_layout_invalid', 'CONCEPT exige texto ou tópicos.')
+    if layout == 'SCIENTIST_SPOTLIGHT' and ('evidence_claim' not in kinds or not has_contribution):
+        raise PydanticCustomError('lesson_slide_layout_invalid', 'Spotlight exige contribuição e bloco documental.')
+    visible = len(title) + len(subtitle or '')
+    for block in blocks:
+        if isinstance(block, (TextBlock, QuestionBlock)):
+            visible += len(block.text)
+        elif isinstance(block, (BulletsBlock, StepsBlock)):
+            visible += sum(len(x) for x in block.items)
+    if visible > 600:
+        raise PydanticCustomError('lesson_slide_content_too_large', 'Slide excede 600 caracteres pedagógicos visíveis.')
+
+
 class LessonSlide(LessonModel):
     id: Id
     section_id: Id
@@ -156,23 +180,8 @@ class LessonSlide(LessonModel):
     def layout_and_content(self):
         unique(self.contribution_ids, 'Contribuições')
         unique(self.evidence_ids, 'Evidências')
-        kinds = {b.type for b in self.content_blocks}
-        if self.layout == 'PROCESS' and 'steps' not in kinds:
-            raise PydanticCustomError('lesson_slide_layout_invalid', 'PROCESS exige 2–6 etapas.')
-        if self.layout == 'QUESTION' and 'question' not in kinds:
-            raise PydanticCustomError('lesson_slide_layout_invalid', 'QUESTION exige pergunta.')
-        if self.layout == 'CONCEPT' and not kinds.intersection({'text', 'bullets'}):
-            raise PydanticCustomError('lesson_slide_layout_invalid', 'CONCEPT exige texto ou tópicos.')
-        if self.layout == 'SCIENTIST_SPOTLIGHT' and ('evidence_claim' not in kinds or not self.contribution_ids):
-            raise PydanticCustomError('lesson_slide_layout_invalid', 'Spotlight exige contribuição e bloco documental.')
-        visible = len(self.title) + len(self.subtitle or '')
-        for block in self.content_blocks:
-            if isinstance(block, (TextBlock, QuestionBlock)):
-                visible += len(block.text)
-            elif isinstance(block, (BulletsBlock, StepsBlock)):
-                visible += sum(len(x) for x in block.items)
-        if visible > 600:
-            raise PydanticCustomError('lesson_slide_content_too_large', 'Slide excede 600 caracteres pedagógicos visíveis.')
+        validate_slide_content(self.layout, self.title, self.subtitle, self.content_blocks,
+                               has_contribution=bool(self.contribution_ids))
         if {b.evidence_id for b in self.content_blocks if isinstance(b, EvidenceClaimBlock)} != set(self.evidence_ids):
             raise PydanticCustomError('lesson_evidence_binding_mismatch', 'Evidências do slide devem coincidir com seus blocos documentais.')
         return self

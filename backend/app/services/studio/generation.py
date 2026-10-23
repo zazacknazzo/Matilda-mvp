@@ -120,6 +120,7 @@ class GenerationService:
                 current = await self.repository.get_preview(session_id=session_id, preview_id=request.preview_id, now=self.now())
                 return GenerationResult(bundle, False, current.expires_at if current else preview.expires_at)
         except asyncio.CancelledError:
+            record_failure(LessonRejected('lesson_cancelled', phase), phase)
             if claim_id:
                 await self._fail_claim(claim_id, generation_error('generation_timeout', retryable=True, project_id=preview.project_id).error)
             raise

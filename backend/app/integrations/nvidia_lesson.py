@@ -3,10 +3,11 @@ from typing import Annotated, Literal
 
 from pydantic import Field, model_validator
 
-from app.schemas.lesson import ContentBlock, Index, LessonModel, Text
+from app.schemas.lesson import ContentBlock, Index, LessonModel, Text, validate_slide_content
 from app.services.studio.lesson_validator import LessonDraft
+from app.studio.lesson_diagnostics import LessonRejected
 
-CONTRACT_VERSION = 'compact-v2-weighted'
+CONTRACT_VERSION = 'compact-v3-authorized'
 
 INSTRUCTION = '''\nRetorne um único objeto JSON completo conforme o schema de resposta, não o próprio schema.
 Sem Markdown, cercas de código ou texto antes/depois. Use aspas duplas e escapes
@@ -23,16 +24,24 @@ Produza 3–8 seções, 4–12 slides NO TOTAL e 1–4 atividades NO TOTAL.
 Escreva a explicação docente uma única vez em speaker_notes; o plano será montado
 com os blocos dos slides e essas notas. Slides devem ser concisos (até 600
 caracteres pedagógicos visíveis), com notas instrutivas e avaliação coerente.
-Use evidence_claim somente com evidence_id autorizado. Não invente história.
+Use evidence_claim somente com evidence_id literal da enumeração autorizada.
+Sem evidências autorizadas, não use evidence_claim nem SCIENTIST_SPOTLIGHT.
+Não invente, abrevie ou substitua identificadores. Não invente história.
 '''
 
 
 class CompactSlide(LessonModel):
     layout: Literal['TITLE', 'CONCEPT', 'PROCESS', 'SCIENTIST_SPOTLIGHT', 'QUESTION', 'SUMMARY']
-    title: Annotated[str, Field(min_length=1, max_length=100)]
+    title: Annotated[str, Field(min_length=1, max_length=100, pattern=r'\S')]
     subtitle: Text | None = None
     content_blocks: list[ContentBlock] = Field(max_length=6)
     speaker_notes: Annotated[str, Field(min_length=1, max_length=1500, pattern=r'\S')]
+
+    @model_validator(mode='after')
+    def content_matches_layout(self):
+        validate_slide_content(self.layout, self.title, self.subtitle, self.content_blocks,
+                               has_contribution=any(block.type == 'evidence_claim' for block in self.content_blocks))
+        return self
 
 
 class CompactActivity(LessonModel):
@@ -77,19 +86,35 @@ def _schema_annotations(value):
 
 def contract(request):
     material = request.material
+    schema = _schema_annotations(CompactLessonDraft.model_json_schema())
+    configuration = material.get('configuration', {})
+    objectives = configuration.get('learning_objectives') if isinstance(configuration, dict) else None
+    if isinstance(objectives, list) and objectives:
+        for name in ('CompactSection', 'CompactActivity'):
+            schema['$defs'][name]['properties']['objective_indexes']['items']['enum'] = list(range(len(objectives)))
+    allowed = material.get('authorized_evidence', {})
+    if allowed:
+        schema['$defs']['EvidenceClaimBlock']['properties']['evidence_id']['enum'] = sorted(allowed)
+    else:
+        del schema['$defs']['EvidenceClaimBlock']
+        blocks = schema['$defs']['CompactSlide']['properties']['content_blocks']['items']
+        blocks['oneOf'] = [item for item in blocks['oneOf'] if item['$ref'] != '#/$defs/EvidenceClaimBlock']
+        del blocks['discriminator']['mapping']['evidence_claim']
+        layouts = schema['$defs']['CompactSlide']['properties']['layout']['enum']
+        layouts.remove('SCIENTIST_SPOTLIGHT')
     return (request.system_instruction + INSTRUCTION, {
         **material,
         'source_documents': [{k: d[k] for k in ('type', 'content')} for d in material.get('source_documents', [])],
         'accepted_suggestions': [{k: s[k] for k in ('pedagogical_rationale', 'suggested_content')}
                                  for s in material.get('accepted_suggestions', [])],
-    }, _schema_annotations(CompactLessonDraft.model_json_schema()))
+    }, schema)
 
 
-class LessonAuthoringError(ValueError):
+class LessonAuthoringError(LessonRejected):
     """Fixed diagnostic codes and integer metrics only; never provider content."""
     def __init__(self, code, **metrics):
-        super().__init__(code)
-        self.code, self.metrics = code, metrics
+        super().__init__(code, 'provider')
+        self.metrics = metrics
 
 
 def approved_duration(material):
@@ -104,8 +129,28 @@ def approved_duration(material):
     return duration
 
 
-def expand(content: bytes, *, duration_minutes: int) -> bytes:
+def approved_objective_count(material):
+    configuration = material.get('configuration', {})
+    objectives = configuration.get('learning_objectives') if isinstance(configuration, dict) else None
+    if not isinstance(objectives, list) or not objectives or any(not isinstance(text, str) or not text.strip() for text in objectives):
+        raise LessonAuthoringError('lesson_objectives_missing')
+    return len(objectives)
+
+
+def expand(content: bytes, *, duration_minutes: int, authorized_evidence: set[str], objective_count: int) -> bytes:
     draft = CompactLessonDraft.model_validate_json(content)
+    for owner in [*draft.sections, *(activity for section in draft.sections for activity in section.activities)]:
+        if any(index >= objective_count for index in owner.objective_indexes):
+            raise LessonAuthoringError('lesson_objective_not_approved')
+        if len(set(owner.objective_indexes)) != len(owner.objective_indexes):
+            raise LessonAuthoringError('lesson_duplicate_identifier')
+    for section in draft.sections:
+        for slide in section.slides:
+            if any(block.type == 'evidence_claim' and block.evidence_id not in authorized_evidence
+                   for block in slide.content_blocks):
+                raise LessonAuthoringError('lesson_evidence_not_authorized')
+            if slide.layout == 'SCIENTIST_SPOTLIGHT' and not authorized_evidence:
+                raise LessonAuthoringError('lesson_slide_layout_invalid')
     # A baseline minute per slide is mandatory, not a repair of model minutes.
     minimums = [len(section.slides) for section in draft.sections]
     remaining = duration_minutes - sum(minimums)

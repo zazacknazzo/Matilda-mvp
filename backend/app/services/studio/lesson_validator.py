@@ -86,7 +86,9 @@ def _unique_pairs(pairs):
 
 def materialize_lesson(content: bytes, *, preview: EnrichmentPreview, request: GenerateRequest,
                        metadata: LessonGenerationMetadata) -> LessonBundle:
-    if not isinstance(content, bytes) or len(content) > POLICY.max_body_bytes:
+    if not isinstance(content, bytes):
+        raise LessonRejected('lesson_draft_type_invalid', 'draft')
+    if len(content) > POLICY.max_body_bytes:
         raise LessonRejected('lesson_draft_size_invalid', 'draft')
     try:
         payload = json.loads(content.decode('utf-8'), object_pairs_hook=_unique_pairs,

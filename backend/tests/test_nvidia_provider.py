@@ -14,7 +14,7 @@ def request_for(stage='preview', **changes):
     from app.services.studio.lesson_validator import LessonDraft
     return ProviderRequest(**{
         'stage': stage, 'system_instruction': 'Retorne somente JSON em português brasileiro.',
-        'material': {'text': 'RNA mensageiro', **({'configuration': {'duration_minutes': 50}} if stage == 'lesson' else {})},
+        'material': {'text': 'RNA mensageiro', **({'configuration': {'duration_minutes': 50, 'learning_objectives': ['Approved objective.']}} if stage == 'lesson' else {})},
         'response_schema': (PreviewPlan if stage == 'preview' else LessonDraft).model_json_schema(),
         'deadline': monotonic() + 2, 'prompt_version': 'test-v1', **changes,
     })
