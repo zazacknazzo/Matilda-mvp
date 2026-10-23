@@ -107,7 +107,8 @@ top_p0,95, none, stream=false, limites12.000/8.000 e deadlines continuam.
 
 [Snapshot do schema transmitido](../tests/fixtures/studio/nvidia/compact-v2-weighted.schema.json):
 3.867 bytes de JSON compacto, oito definições em $defs. O schema integral é
-idêntico ao da base88fdde7; o teste compara cada campo e resolve todos os refs locais.
+idêntico ao gerado pelo código recuperado de88fdde7 (comparação executada). O teste
+compara cada campo do snapshot e resolve todos os refs locais.
 
 - Raiz object, additionalProperties=false; prior_knowledge, materials, sections e
   limitations obrigatórios. Seções3–8; time_weight inteiro1–1000; slides e atividades
@@ -168,7 +169,19 @@ NVIDIA, qualidade pedagógica ou funcionamento real do modo estrito.
 
 Backend completo: **760 passed**, 11,48s. Contratos **7/40/4**, TypeScript/build
 aprovados. Avisos existentes de dependências e chunk520,42kB permanecem.
-Playwright completo e Standards/Spec: registrar os resultados finais após execução.
+**90 Playwright passaram**: integrado T13/Forensics/UI23 (25,0s), revisão19
+(8,3s), slides14 (4,5s), geração/operações18 (8,4s), ponte5 (3,4s), exportação11
+(4,3s). Não houve falha funcional nas execuções finais; a coleta integrada anterior
+foi interrompida pelo reinício do ambiente.
+
+Revisões independentes: **Standards0 / Spec0**; cada revisor reexecutou **51 testes
+focados** em checkout separado somente leitura.
+[Relatórios por eixo](reviews/nvidia-json-diagnosis-code-review.md).
+
+O comando sem --allow-paid-nvidia foi executado e recusou com
+explicit_authorization_required/exit2, antes de ler credenciais ou iniciar rede.
+Nenhuma inferência real foi executada. Diff confirmado sem mudanças em schemas
+públicos, frontend/src, Gemini, serviço de geração, ciência, revisão ou políticas.
 
 O checkout temporário desapareceu durante atualização de ambiente; as alterações
 não commitadas foram reconstituídas no checkout persistente .runtime/nvidia-json-worktree.
