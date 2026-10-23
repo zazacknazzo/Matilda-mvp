@@ -211,13 +211,16 @@ class NVIDIAProvider:
             self._invalid('invalid_json', event)
         if request.stage == 'lesson':
             from pydantic import ValidationError
-            from .nvidia_lesson import expand
+            from .nvidia_lesson import LessonAuthoringError, approved_duration, expand
             try:
-                encoded = expand(encoded, duration_minutes=request.material['configuration']['duration_minutes'])
+                encoded = expand(encoded, duration_minutes=approved_duration(request.material))
                 if len(encoded) > POLICY.max_body_bytes:
                     self._invalid('response_too_large', event)
             except ValidationError:
-                event['outcome'] = 'pydantic_validation'
+                event.update(outcome='pydantic_validation', failure_code='lesson_schema_invalid')
+                raise
+            except LessonAuthoringError as failure:
+                event.update(outcome='invalid_lesson_draft', failure_code=failure.code, **failure.metrics)
                 raise
             except (ValueError, KeyError):
                 if event['outcome'] == 'unavailable':

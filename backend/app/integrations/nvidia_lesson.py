@@ -79,10 +79,30 @@ def contract(request):
     }, _schema_annotations(CompactLessonDraft.model_json_schema()))
 
 
+class LessonAuthoringError(ValueError):
+    """Fixed diagnostic codes and integer metrics only; never provider content."""
+    def __init__(self, code, **metrics):
+        super().__init__(code)
+        self.code, self.metrics = code, metrics
+
+
+def approved_duration(material):
+    configuration = material.get('configuration')
+    if configuration is None or isinstance(configuration, dict) and 'duration_minutes' not in configuration:
+        raise LessonAuthoringError('lesson_configuration_missing')
+    if not isinstance(configuration, dict):
+        raise LessonAuthoringError('lesson_configuration_invalid')
+    duration = configuration['duration_minutes']
+    if type(duration) is not int or not 10 <= duration <= 120:
+        raise LessonAuthoringError('lesson_configuration_invalid')
+    return duration
+
+
 def expand(content: bytes, *, duration_minutes: int) -> bytes:
     draft = CompactLessonDraft.model_validate_json(content)
     if sum(s.duration_minutes for s in draft.sections) != duration_minutes:
-        raise ValueError('Durações não correspondem à configuração aprovada.')
+        raise LessonAuthoringError('lesson_duration_mismatch', approved_minutes=duration_minutes,
+                                   section_minutes=sum(s.duration_minutes for s in draft.sections))
     sections, slides, activities = [], [], []
     for section_index, section in enumerate(draft.sections):
         section_key = f'section-{section_index}'
@@ -103,6 +123,9 @@ def expand(content: bytes, *, duration_minutes: int) -> bytes:
         sections.append({'key': section_key, 'title': section.title, 'duration_minutes': section.duration_minutes,
                          'objective_indexes': section.objective_indexes, 'explanation_blocks': explanation,
                          'slide_keys': slide_keys, 'activity_keys': activity_keys})
-    full = LessonDraft(prior_knowledge=draft.prior_knowledge, materials=draft.materials, sections=sections,
-                       slides=slides, activities=activities, limitations=draft.limitations)
-    return full.model_dump_json().encode()
+    try:
+        full = LessonDraft(prior_knowledge=draft.prior_knowledge, materials=draft.materials, sections=sections,
+                           slides=slides, activities=activities, limitations=draft.limitations)
+        return full.model_dump_json().encode()
+    except (ValueError, KeyError, TypeError):
+        raise LessonAuthoringError('lesson_expansion_invalid') from None
