@@ -114,7 +114,8 @@ class LessonAuthoringError(LessonRejected):
     """Fixed diagnostic codes and integer metrics only; never provider content."""
     def __init__(self, code, **metrics):
         super().__init__(code, 'provider')
-        self.metrics = metrics
+        self.metrics = {key: value for key, value in metrics.items()
+                        if key in {'approved_minutes', 'minimum_minutes', 'section_minutes'} and type(value) is int}
 
 
 def approved_duration(material):

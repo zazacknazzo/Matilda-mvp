@@ -1,6 +1,8 @@
 # Studio com NVIDIA NIM — Issue #31
 
-Diagnóstico vigente: [invalid_json e saída estruturada](studio-nvidia-json-diagnosis.md).
+Versão vigente: [materialização e referências autorizadas](studio-nvidia-materialization.md).
+
+Histórico JSON: [invalid_json e saída estruturada](studio-nvidia-json-diagnosis.md).
 
 Contrato temporal: [validação temporal e compact-v2-weighted](studio-nvidia-lesson-validation.md).
 

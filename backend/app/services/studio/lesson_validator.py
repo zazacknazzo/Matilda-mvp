@@ -10,6 +10,7 @@ from typing import Annotated, Literal, Sequence
 from uuid import uuid4
 
 from pydantic import Field, ValidationError
+from pydantic_core import PydanticCustomError
 
 from app.schemas.lesson import (
     ContentBlock, EvidenceClaimBlock, Index, LessonBundle, LessonGenerationMetadata,
@@ -166,5 +167,8 @@ def materialize_lesson(content: bytes, *, preview: EnrichmentPreview, request: G
         )
     except ValidationError as failure:
         raise validation_rejection(failure, 'bundle') from None
-    validate_lesson_response(bundle, preview=preview, request=request)
+    try:
+        validate_lesson_response(bundle, preview=preview, request=request)
+    except PydanticCustomError as failure:
+        raise LessonRejected(failure.type, 'review') from None
     return bundle

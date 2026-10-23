@@ -131,7 +131,7 @@ class GenerationService:
             error = failure
         except Exception as failure:
             code = 'lesson_storage_failure' if isinstance(failure, sqlite3.Error) else 'lesson_internal_failure'
-            record_failure(LessonRejected(code, phase), phase)
+            record_failure(failure if isinstance(failure, ValidationError) else LessonRejected(code, phase), phase)
             # Never expose prompts, model responses, provider errors or keys.
             error = generation_error('provider_unavailable', retryable=True, project_id=preview.project_id if preview else None)
         if claim_id:
@@ -205,6 +205,10 @@ class GenerationService:
                 if attempt + 1 == POLICY.max_provider_attempts:
                     raise generation_error('invalid_generation', retryable=True, project_id=preview.project_id) from None
             except Exception as failure:
+                if phase == 'provider':
+                    code = 'lesson_provider_transport_failure' if isinstance(failure, ConnectionError) else 'lesson_provider_internal_failure'
+                    record_failure(LessonRejected(code, phase), phase)
+                    raise generation_error('provider_unavailable', retryable=True, project_id=preview.project_id) from None
                 record_failure(LessonRejected('lesson_internal_failure', phase), phase)
                 raise generation_error('invalid_generation', project_id=preview.project_id) from None
         raise generation_error('invalid_generation', project_id=preview.project_id)

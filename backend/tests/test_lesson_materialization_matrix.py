@@ -300,7 +300,8 @@ def test_persistence_failures_are_safe_and_do_not_publish(client, reviewed, capl
     assert current['last_lesson_bundle_id'] is None and current['generation_status'] == 'failed'
 
 
-def test_completion_read_failure_keeps_valid_bundle_and_replay_does_not_infer_again(client, reviewed, caplog):
+@pytest.mark.parametrize('kind', ['storage', 'validation'])
+def test_completion_read_failure_keeps_valid_bundle_and_replay_does_not_infer_again(client, reviewed, caplog, kind):
     import sqlite3
     from app.api.studio_preview import get_repository
     from app.services.studio.runtime_repository import StudioRepository
@@ -314,6 +315,9 @@ def test_completion_read_failure_keeps_valid_bundle_and_replay_does_not_infer_ag
         async def get_preview(self, **kwargs):
             if self.committed and not self.failed_read:
                 self.failed_read = True
+                if kind == 'validation':
+                    from pydantic import ValidationError
+                    raise ValidationError.from_exception_data('PRIVATE_MODEL', [{'type': 'string_type', 'loc': ('PRIVATE_FIELD',), 'input': None}])
                 raise sqlite3.OperationalError('PRIVATE_ERROR')
             return await super().get_preview(**kwargs)
     repository = LostResponseRepository()
@@ -326,5 +330,6 @@ def test_completion_read_failure_keeps_valid_bundle_and_replay_does_not_infer_ag
     replay = generate(client, reviewed)
     assert replay.status_code == 200 and replay.json()['lesson_bundle_id'] == current['last_lesson_bundle_id']
     assert calls == [1]
-    assert 'lesson_storage_failure' in caplog.text and '"validation_phase":"completion"' in caplog.text
-    assert 'PRIVATE_ERROR' not in caplog.text
+    assert ('lesson_storage_failure' if kind == 'storage' else 'lesson_completion_schema_invalid') in caplog.text
+    assert '"validation_phase":"completion"' in caplog.text
+    assert not any(value in caplog.text for value in ('PRIVATE_ERROR', 'PRIVATE_MODEL', 'PRIVATE_FIELD'))

@@ -171,7 +171,7 @@ Ver `integrated-demo-t13.md` para evidências e limitações.
 
 `integrations/nvidia_client.py` implementa as mesmas portas sem mudar API, schemas,
 tabelas ou catálogo. HTTPX envia `response_format.json_schema` com o schema privado:
-PreviewPlan na prévia e compact-v2-weighted na geração NVIDIA. O serviço materializa e
+PreviewPlan na prévia e compact-v3-authorized na geração NVIDIA. O serviço materializa e
 valida LessonBundle contra a revisão e o snapshot científico existentes. O provedor
 não recebe autoridade para inventar referências ou identidades.
 
@@ -206,5 +206,12 @@ registrado junto da estimativa e diferença. Ver [guia NVIDIA](studio-nvidia.md)
 
 O decoder privado `integrations/nvidia_json.py` distingue erros de envelope e de
 message.content sem registrar dados. A geração NVIDIA solicita json_schema.strict
-e mantém o schema compact-v2-weighted integral; Pydantic e autoridade científica
+e mantém o contrato compacto de pesos com referências autorizadas; Pydantic e autoridade científica
 continuam obrigatórios. Ver [diagnóstico JSON](studio-nvidia-json-diagnosis.md).
+
+A geração NVIDIA restringe evidence_id e índices de objetivos às escolhas da
+revisão. Sem autoridade, o schema não oferece blocos documentais ou spotlight.
+Layout e conteúdo visível usam a mesma validação do LessonSlide público.
+`studio/lesson_diagnostics.py` expõe somente códigos e tipos Pydantic permitidos;
+materialização e publicação SQLite revalidam os contratos e a revisão congelada.
+Ver [matriz de materialização](studio-nvidia-materialization.md).

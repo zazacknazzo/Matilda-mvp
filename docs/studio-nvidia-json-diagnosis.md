@@ -1,5 +1,8 @@
 # NVIDIA lesson: invalid_json e saída estruturada (#31 / PR #32)
 
+Histórico do contrato v2. A versão vigente está em
+[materialização e referências autorizadas](studio-nvidia-materialization.md).
+
 Base: `88fdde76d1ebbdb64c509c427375dd458768da7d`.
 Escopo: parser/diagnósticos NVIDIA, instrução privada, strict documentado,
 testes e documentação. compact-v2-weighted preservado. Sem inferência real,

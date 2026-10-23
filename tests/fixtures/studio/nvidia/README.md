@@ -1,10 +1,12 @@
-# NVIDIA private schema snapshot
+# NVIDIA private schema snapshots
 
-`compact-v2-weighted.schema.json` captures the JSON Schema sent inside
-`response_format.json_schema.schema`, without material, prompts or credentials.
-It is unchanged from the contract at `88fdde7`; only the outer lesson request now
-sets `strict=true`. The test compares the entire schema and checks local refs,
-unions and required fields. No keyword or validation was removed.
+`compact-v2-weighted.schema.json` is the historical schema at e2acbc7.
+`compact-v3-authorized.schema.json` captures the current request with two
+synthetic authorized evidence IDs and two approved objectives. Actual schemas
+are generated per frozen request: enums contain exactly its allowed choices.
+Without evidence the claim branch and spotlight layout are absent.
 
-This fixture verifies request preservation, not NVIDIA's hosted schema compiler.
-See `docs/studio-nvidia-json-diagnosis.md` for public endpoint evidence and limits.
+Both snapshots contain only schema, no material, prompts or credentials. The
+transmitted-schema test compares the v3 fixture and resolves all local refs.
+Public lesson JSON Schemas remain unchanged; refer to the compatibility report.
+See docs/studio-nvidia-materialization.md for decisions, limits and live gates.

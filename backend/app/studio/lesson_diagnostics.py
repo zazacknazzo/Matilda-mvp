@@ -34,6 +34,8 @@ CODES = frozenset({
     'lesson_slide_section_link_invalid',
     'lesson_timestamp_invalid',
     'lesson_metadata_prompt_mismatch', 'lesson_metadata_budget_invalid', 'lesson_deadline_exceeded',
+    'lesson_persistence_schema_invalid', 'lesson_completion_schema_invalid', 'lesson_review_schema_invalid',
+    'lesson_provider_transport_failure', 'lesson_provider_internal_failure',
     'lesson_cancelled',
     'lesson_storage_failure', 'lesson_failure_recording_failed', 'lesson_generation_claim_missing',
     'lesson_persistence_review_mismatch', 'lesson_persistence_snapshot_invalid',
@@ -65,7 +67,8 @@ def validation_rejection(failure, phase):
     types = {error['type'] for error in failure.errors(include_url=False, include_input=False, include_context=False)}
     known = sorted(types & CODES)
     fallback = {'metadata': 'lesson_metadata_invalid', 'draft': 'lesson_draft_schema_invalid',
-                'bundle': 'lesson_bundle_schema_invalid'}.get(phase, 'lesson_provider_output_invalid')
+                'bundle': 'lesson_bundle_schema_invalid', 'persistence': 'lesson_persistence_schema_invalid',
+                'completion': 'lesson_completion_schema_invalid', 'review': 'lesson_review_schema_invalid'}.get(phase, 'lesson_provider_output_invalid')
     safe_types = {kind if kind in PYDANTIC_TYPES or kind in CODES else 'other' for kind in types}
     return LessonRejected(known[0] if known and phase != 'metadata' else fallback, phase, validation_types=safe_types)
 
@@ -79,7 +82,7 @@ def record_failure(failure, phase):
         fallback = 'lesson_provider_output_invalid' if phase == 'provider' else 'lesson_internal_failure'
         failure = LessonRejected(fallback, phase)
     event = {'stage': 'lesson', 'validation_phase': failure.phase, 'failure_code': failure.code,
-             'outcome': 'pydantic_validation' if failure.validation_types else 'scientific_validation'}
+             'outcome': 'pydantic_validation' if failure.validation_types else 'rejected'}
     if failure.validation_types:
         event['validation_types'] = list(failure.validation_types)
     logging.getLogger('matilda.studio.validation').info('studio_lesson_validation %s',
