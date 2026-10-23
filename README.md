@@ -174,6 +174,10 @@ lesson real, leitura/idempotência e Markdown. Exige autorização separada:
 Teto de uma chamada/100 s totais, preservando os 75 s do backend e a reserva de
 5 s. Esse ensaio isolado não comprova o fluxo completo real.
 
+A [sincronização NVIDIA com a UI/UX integrada na T13](docs/studio-nvidia-t13-sync.md)
+registra as versões combinadas, a correção de foco comprovada, a regressão completa
+e o gate real de geração ainda pendente.
+
 O relatório do smoke completo exige as prévias CRISPR/RNA e uma aula de 50 minutos com leitura e
 Markdown. O smoke usa fontes bibliográficas reais em cache datado e SQLite separado.
 O resultado controlado da suíte não comprova inferência NVIDIA em produção.
